@@ -1,0 +1,97 @@
+package tests.freemind;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import freemind.controller.LastStateStorageManagement;
+import freemind.controller.actions.generated.instance.MindmapLastStateStorage;
+
+public class LastStorageManagementTests extends FreeMindTestBase {
+
+	private static final String INITIAL_XML =
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?><mindmap_last_state_map_storage/>";
+	private LastStateStorageManagement mMgm;
+
+	@BeforeEach
+	protected void setUp() throws Exception {
+		super.setUp();
+		mMgm = new LastStateStorageManagement(INITIAL_XML);
+	}
+
+	@Test
+	public void testGetXml() {
+		assertEquals(INITIAL_XML, mMgm.getXml());
+	}
+
+	@Test
+	public void testChangeOrAdd() {
+		for (int i = 0; i < LastStateStorageManagement.LIST_AMOUNT_LIMIT + 1; ++i) {
+			MindmapLastStateStorage test = new MindmapLastStateStorage();
+			test.setRestorableName("" + i);
+			mMgm.changeOrAdd(test);
+			assertEquals(test, mMgm.getStorage("" + i));
+			waitOneMilli();
+		}
+		// the element at zero is the oldest and must have been removed.
+		assertNull(mMgm.getStorage("" + 0));
+	}
+
+	@Test
+	public void testGetList() {
+		for (int i = 0; i < LastStateStorageManagement.LIST_AMOUNT_LIMIT; ++i) {
+			MindmapLastStateStorage test = new MindmapLastStateStorage();
+			test.setRestorableName("" + i);
+			if (i <= 5) {
+				test.setTabIndex(5 - i);
+			} else {
+				test.setTabIndex(-1);
+			}
+			mMgm.changeOrAdd(test);
+			assertEquals(test, mMgm.getStorage("" + i));
+			waitOneMilli();
+		}
+		List<MindmapLastStateStorage> list = mMgm.getLastOpenList();
+		assertEquals(6, list.size());
+		assertEquals("5", list.get(0).getRestorableName());
+		assertEquals("4", list.get(1).getRestorableName());
+	}
+
+	@Test
+	public void testChangeOrAdd2() {
+		for (int i = 0; i < LastStateStorageManagement.LIST_AMOUNT_LIMIT; ++i) {
+			MindmapLastStateStorage test = new MindmapLastStateStorage();
+			test.setRestorableName("" + i);
+			mMgm.changeOrAdd(test);
+			assertEquals(test, mMgm.getStorage("" + i));
+			waitOneMilli();
+		}
+		// change the first:
+		MindmapLastStateStorage storageFirstElement = mMgm.getStorage("" + 0);
+		storageFirstElement.setY(2);
+		mMgm.changeOrAdd(storageFirstElement);
+		waitOneMilli();
+		MindmapLastStateStorage test = new MindmapLastStateStorage();
+		test.setRestorableName("" + LastStateStorageManagement.LIST_AMOUNT_LIMIT + 1);
+		mMgm.changeOrAdd(test);
+		waitOneMilli();
+		// the element at one is the oldest and must have been removed.
+		assertNotNull(mMgm.getStorage("" + 0));
+		assertNull(mMgm.getStorage("" + 1));
+	}
+
+	private void waitOneMilli() {
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+			freemind.main.Resources.getInstance().logException(e);
+
+		}
+	}
+
+}

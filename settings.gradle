@@ -1,0 +1,4 @@
+rootProject.name = 'freemind'
+
+include('JOrtho')
+include('app')

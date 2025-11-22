@@ -1,0 +1,44 @@
+plugins {
+    id "java-library"
+    id "application"
+    id "freemind-conventions"
+}
+
+group = "com.inet.jortho"
+version = "1.0"
+
+dependencies {
+    testCompileOnly("junit:junit:3.8.2")
+    testRuntimeOnly("junit:junit:4.13.2")
+}
+
+tasks.named("jar") {
+    archiveBaseName.set("jortho")
+    archiveFileName.set(archiveBaseName.get() + "-" + version + ".jar")
+    exclude("com/inet/jorthodictionaries/**")
+    exclude("SampleApp*.class")
+    doFirst {
+        manifest {
+            attributes(
+                "Implementation-Title": "i-net JOrtho",
+                "Implementation-Version": version,
+                "Implementation-Vendor": "i-net software GmbH",
+                "Application-Name": "i-net JOrtho",
+                "Codebase": "*",
+                "Permissions": "sandbox",
+                "Application-Library-Allowable-Codebase": "*",
+                "Trusted-Only": "false",
+                "Trusted-Library": "false"
+            )
+        }
+    }
+}
+
+tasks.named("test") {
+    useJUnit()
+}
+
+tasks.named("run") {
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+    mainClass = "SampleApplication"
+}

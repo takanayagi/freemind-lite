@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:deprecation,all,-fallthrough,-serial'
+    options.release = 17
+}
+
+tasks.named("test") {
+    useJUnitPlatform()
+    testLogging {
+        events "skipped", "failed"
+    }
+}

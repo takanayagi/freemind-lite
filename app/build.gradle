@@ -1,0 +1,193 @@
+plugins {
+    id "application"
+    id "eclipse"
+    id "freemind-conventions"
+}
+
+group = parent.name
+version = "1.1.0"
+
+application {
+    mainClass = "freemind.main.FreeMindStarter"
+}
+
+configurations {
+    bindingAntTask.extendsFrom compileOnly
+}
+
+configurations.all {
+    exclude group: "org.apache.xmlgraphics", module: "batik-js"
+    exclude group: "batik"
+    exclude group: "xalan", module: "xalan"
+    exclude group: "xerces", module: "xercesImpl"
+    exclude group: "xml-apis", module: "xml-apis"
+}
+
+dependencies {
+    implementation("com.jgoodies:jgoodies-forms:1.8.0")
+    implementation("com.jgoodies:jgoodies-common:1.8.1")
+    implementation("org.jibx:jibx-run:1.4.2")
+    implementation("org.jsoup:jsoup:1.10.3")
+    implementation project(":JOrtho")
+    implementation("org.freeplane.lightdev:simplyhtml:0.18.12")
+    implementation("javax.help:javahelp:2.0.05")
+    implementation("org.apache.xmlgraphics:batik-dom:1.7")
+    implementation("org.apache.xmlgraphics:batik-svggen:1.7")
+    implementation("org.apache.xmlgraphics:batik-transcoder:1.7")
+    implementation("org.apache.xmlgraphics:batik-util:1.7")
+    implementation("org.apache.xmlgraphics:fop:1.0")
+    runtimeOnly("org.apache.xmlgraphics:batik-codec:1.7")
+    runtimeOnly("org.freeplane.dpolivaev.mnemonicsetter:mnemonicsetter:0.6") // simplyhtml dependency
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.jibx:jibx-bind:1.4.2")
+    testImplementation("org.jibx:jibx-extras:1.4.2")
+    bindingAntTask("org.jibx:jibx-bind:1.4.2")
+    bindingAntTask("org.jibx:jibx-extras:1.4.2")
+    bindingAntTask("org.apache.bcel:bcel:6.4.1")
+}
+
+sourceSets {
+    xsdCompiler {
+        java {
+            destinationDirectory = file("build/tmp/bindings")
+        }
+        compileClasspath = files(java.srcDirs)
+        runtimeClasspath = files(java.destinationDirectory)
+    }
+    binding {
+        java {
+            srcDirs = ["build/generated/sources/bindings/java/main"]
+            destinationDirectory = file("build/classes/java/main")
+        }
+        compileClasspath = files(java.srcDirs)
+    }
+}
+
+ext.ver = { ->
+    def versionMatcher = file("src/main/java/freemind/main/FreeMind.java").text =~ /(?s).*new VersionInformation\("(.*?)".*/
+    String extractedVersion = versionMatcher.find() ? versionMatcher.group(1) : ""
+    extractedVersion.replaceAll(" ", "_")
+}()
+
+tasks.register("compileXsd", JavaExec) {
+    dependsOn tasks.compileXsdCompilerJava
+    inputs.files(fileTree(sourceSets.xsdCompiler.java.srcDirs[0]) {
+        include "**/*.java"
+    })
+    inputs.file("src/xsdCompiler/resources/freemind_actions.xsd")
+    outputs.files(fileTree(sourceSets.binding.java.srcDirs[0]) {
+        include "**/*.java"
+        include "**/*.xml"
+    })
+    classpath = sourceSets.xsdCompiler.runtimeClasspath
+    mainClass = "de.foltin.CompileXsdStart"
+    args = [sourceSets.binding.java.srcDirs[0], "src/xsdCompiler/resources/freemind_actions.xsd"]
+    doLast {
+        def targetDir = file("${sourceSets.binding.java.srcDirs[0]}/de/foltin")
+        if (!targetDir.exists()) {
+            targetDir.mkdirs()
+        }
+        copy {
+            from "${sourceSets.xsdCompiler.java.srcDirs[0]}/de/foltin/StringEncoder.java"
+            into targetDir
+        }
+    }
+}
+
+tasks.named("compileBindingJava") {
+    dependsOn tasks.compileXsd
+    doLast {
+        ant.taskdef(name: "bind",
+            classname: "org.jibx.binding.ant.CompileTask",
+            classpath: configurations.bindingAntTask.asPath + sourceSets.binding.output.classesDirs)
+        ant.bind(verbose: true, load: true) {
+            bindingfileset(dir: sourceSets.binding.java.srcDirs[0]) {
+                include(name: "**/*.xml")
+            }
+            classpathset(dir: sourceSets.binding.output.classesDirs.asPath)
+        }
+    }
+}
+
+tasks.named("compileJava") {
+    dependsOn tasks.compileBindingJava
+    classpath += sourceSets.binding.output.classesDirs
+}
+
+// Applies to all tasks inheriting from ArchiveTask (such as jar, war, zip, tar, etc.)
+tasks.withType(org.gradle.api.tasks.bundling.AbstractArchiveTask) {
+    archiveBaseName.set(parent.name)
+}
+
+tasks.named("jar") {
+    archiveFileName.set(archiveBaseName.get() + ".jar")
+    doFirst {
+        ant.buildnumber(file: "src/main/resources/version.properties")
+        println "FreeMind Version = ${ver}, build ${ant.project.properties['build.number']}."
+        manifest {
+            attributes 'Built-By': "${System.getProperty('user.name')}",
+                    'Build-Number': "${ant.project.properties['build.number']}",
+                    'Authors': "Joerg Mueller, Daniel Polansky, Christian Foltin, Dimitry Polivaev, and others.",
+                    'Created-By': "Gradle ${gradle.gradleVersion} (Java ${System.properties['java.version']} ${System.properties['java.vendor']})",
+                    'Main-Class': application.mainClass,
+                    'Class-Path': ".. " + configurations.runtimeClasspath.collect { it.getName() }.join(" ")
+        }
+    }
+}
+
+tasks.named("run") {
+    dependsOn tasks.jar
+    systemProperties += ["freemind.base.dir": projectDir.absolutePath]
+    doFirst {
+        println "FreeMind Version = ${ver}, build ${ant.project.properties['build.number']}."
+        println "Running FreeMind with Java version: ${System.getProperty('java.version')}"
+        println "Java home: ${System.getProperty('java.home')}"
+        println "Java vendor: ${System.getProperty('java.vendor')}"
+        println "Java vendor URL: ${System.getProperty('java.vendor.url')}"
+        println "Java classpath: ${sourceSets.main.runtimeClasspath.asPath}"
+        println "======== Freemind starting ========"
+    }
+    doLast {
+        println "======== Gradle run task completed ========"
+    }
+}
+
+tasks.named('startScripts') {
+    enabled = false
+}
+
+distributions {
+    main {
+        contents {
+            into(".") {
+                from "../license"
+                from(sourceSets.main.resources.srcDirs[0]) {
+                    include "patterns.xml"
+                    include "dictionar*"
+                }
+            }
+            into("accessories") {
+                from "/accessories"
+                from "/src/test/resources/accessories"
+            }
+            into("doc") {
+                from("../doc") {
+                    exclude "development"
+                }
+            }
+        }
+    }
+}
+
+eclipse {
+    classpath {
+        containsTestFixtures = true
+        file {
+            whenMerged { classpath ->
+                classpath.entries.findAll { it.path == "build/generated/sources/bindings/java/main" }*.excludes = ["**/StringEncoder.java"]
+            }
+        }
+    }
+}
