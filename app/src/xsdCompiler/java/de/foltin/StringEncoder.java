@@ -39,25 +39,20 @@ public final class StringEncoder {
 		for (int i = 0; i < limit; i++) {
 			final char ch = value.charAt(i);
 
-			// Handle escape character
 			if (ch == '\\') {
-				buf.append('\\');
-				buf.append('\\');
-				continue;
-			}
-
-			// If character is an otherwise valid XML character, pass it through
-			// unchanged
-			if (isValidXMLChar(ch)) {
+				// Handle escape character
+				buf.append("\\\\");
+			} else if (isValidXMLChar(ch)) {
+				// If character is an otherwise valid XML character, pass it through
+				// unchanged
 				buf.append(ch);
-				continue;
+			} else {
+				// Escape it
+				buf.append("\\u");
+				for (int shift = 12; shift >= 0; shift -= 4)
+					buf.append(HEXDIGITS.charAt((ch >> shift) & 0x0f));
 			}
 
-			// Escape it
-			buf.append('\\');
-			buf.append('u');
-			for (int shift = 12; shift >= 0; shift -= 4)
-				buf.append(HEXDIGITS.charAt((ch >> shift) & 0x0f));
 		}
 		return buf.toString();
 	}
@@ -124,7 +119,6 @@ public final class StringEncoder {
 									+ text.substring(i - j - 2, i - j + 4)
 									+ "' in encoded string");
 				}
-				// assert nibble >= 0 && nibble <= 0xf;
 				value = (value << 4) | nibble;
 			}
 
