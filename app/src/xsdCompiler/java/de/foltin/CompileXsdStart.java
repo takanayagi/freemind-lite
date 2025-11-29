@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -48,8 +49,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class CompileXsdStart extends DefaultHandler {
 	public static final String FREEMIND_PACKAGE = "freemind.controller.actions.generated.instance";
-	private static String DESTINATION_DIR;
-	private static String FREEMIND_ACTIONS_XSD;
 	private static final String KEY_PACKAGE = "000_KEY_PACKAGE";
 	private static final String FILE_START = "010_start";
 	private static final String KEY_IMPORT_ARRAY_LIST = "020_import_array_list";
@@ -68,68 +67,52 @@ public class CompileXsdStart extends DefaultHandler {
 	private static final String KEY_CLASS_SEQUENCE = "120_sequence";
 	private static final String KEY_CLASS_END = "500_CLASS_END";
 
+	private final String destinationDir;
 	private final InputStream mInputStream;
 	private XsdHandler mCurrentHandler;
-	private TreeSet<String> mKeyOrder = new TreeSet<String>();
-	private HashMap<String, HashMap<String, String>> mClassMap = new HashMap<>();
-	private StringBuffer mBindingXml = new StringBuffer();
+	private TreeSet<String> mKeyOrder = new TreeSet<>();
+	private Map<String, Map<String, String>> mClassMap = new HashMap<>();
+	private StringBuilder mBindingXml = new StringBuilder();
 
-	private HashMap<String, ElementTypes> mElementMap = new HashMap<>();
-	private HashMap<String, String> mTypeMap = new HashMap<>();
+	private Map<String, ElementType> mElementMap = new HashMap<>();
+	private Map<String, String> mTypeMap = new HashMap<>();
 
-	private class ElementTypes {
+	private enum ElementType {
+		SCHEMA,
+		COMPLEX_TYPE,
+		SEQUENCE,
+		CHOICE,
+		ATTRIBUTE,
+		COMPLEX_CONTENT,
+		ELEMENT,
+		EXTENSION,
+		SIMPLE_TYPE,
+		RESTRICTION,
+		ENUMERATION,
+		GROUP
+	}
 
-		private final int mEnumerationId;
+	private enum InterfaceName {
+		MenuCategoryElement,
+		PluginSetting,
+		PluginActionElement
+	}
 
-		public ElementTypes(int pEnumerationId) {
-			mEnumerationId = pEnumerationId;
-		}
-
-		public int getId() {
-			return mEnumerationId;
-		}
-	};
-
-	public final int Schema_Id = 0;
-	public final int ComplexType_Id = 1;
-	public final int Sequence_Id = 2;
-	public final int Choice_Id = 3;
-	public final int Attribute_Id = 4;
-	public final int ComplexContent_Id = 5;
-	public final int Element_Id = 6;
-	public final int Extension_Id = 7;
-	public final int SimpleType_Id = 8;
-	public final int Restriction_Id = 9;
-	public final int Enumeration_Id = 10;
-	public final int Group_Id = 11;
-	ElementTypes Schema = new ElementTypes(Schema_Id);
-	ElementTypes ComplexType = new ElementTypes(ComplexType_Id);
-	ElementTypes Sequence = new ElementTypes(Sequence_Id);
-	ElementTypes Choice = new ElementTypes(Choice_Id);
-	ElementTypes Attribute = new ElementTypes(Attribute_Id);
-	ElementTypes ComplexContent = new ElementTypes(ComplexContent_Id);
-	ElementTypes Element = new ElementTypes(Element_Id);
-	ElementTypes Extension = new ElementTypes(Extension_Id);
-	ElementTypes SimpleType = new ElementTypes(SimpleType_Id);
-	ElementTypes Restriction = new ElementTypes(Restriction_Id);
-	ElementTypes Enumeration = new ElementTypes(Enumeration_Id);
-	ElementTypes Group = new ElementTypes(Group_Id);
-
-	public CompileXsdStart(InputStream pInputStream) {
+	public CompileXsdStart(String destinationDir, InputStream pInputStream) {
+		this.destinationDir = destinationDir;
 		mInputStream = pInputStream;
-		mElementMap.put("xs:schema", /* ElementTypes. */Schema);
-		mElementMap.put("xs:complexType", /* ElementTypes. */ComplexType);
-		mElementMap.put("xs:complexContent", /* ElementTypes. */ComplexContent);
-		mElementMap.put("xs:element", /* ElementTypes. */Element);
-		mElementMap.put("xs:extension", /* ElementTypes. */Extension);
-		mElementMap.put("xs:choice", /* ElementTypes. */Choice);
-		mElementMap.put("xs:sequence", /* ElementTypes. */Sequence);
-		mElementMap.put("xs:attribute", /* ElementTypes. */Attribute);
-		mElementMap.put("xs:simpleType", /* ElementTypes. */SimpleType);
-		mElementMap.put("xs:restriction", /* ElementTypes. */Restriction);
-		mElementMap.put("xs:enumeration", /* ElementTypes. */Enumeration);
-		mElementMap.put("xs:group", /* ElementTypes. */Group);
-
+		mElementMap.put("xs:schema", ElementType.SCHEMA);
+		mElementMap.put("xs:complexType", ElementType.COMPLEX_TYPE);
+		mElementMap.put("xs:complexContent", ElementType.COMPLEX_CONTENT);
+		mElementMap.put("xs:element", ElementType.ELEMENT);
+		mElementMap.put("xs:extension", ElementType.EXTENSION);
+		mElementMap.put("xs:choice", ElementType.CHOICE);
+		mElementMap.put("xs:sequence", ElementType.SEQUENCE);
+		mElementMap.put("xs:attribute", ElementType.ATTRIBUTE);
+		mElementMap.put("xs:simpleType", ElementType.SIMPLE_TYPE);
+		mElementMap.put("xs:restriction", ElementType.RESTRICTION);
+		mElementMap.put("xs:enumeration", ElementType.ENUMERATION);
+		mElementMap.put("xs:group", ElementType.GROUP);
 		mTypeMap.put("xs:long", "long");
 		mTypeMap.put("xs:int", "int");
 		mTypeMap.put("xs:string", "String");
@@ -139,51 +122,52 @@ public class CompileXsdStart extends DefaultHandler {
 	}
 
 	public static void main(String[] args) throws Exception {
-		DESTINATION_DIR = args[0] + File.separatorChar
-				+ FREEMIND_PACKAGE.replace('.', File.separatorChar);
-		FREEMIND_ACTIONS_XSD = args[1];
-		CompileXsdStart cXS = new CompileXsdStart(new BufferedInputStream(
-				new FileInputStream(FREEMIND_ACTIONS_XSD)));
+		String destinationDir =
+				args[0] + File.separatorChar + FREEMIND_PACKAGE.replace('.', File.separatorChar);
+		String freemindActionsXsd = args[1];
+		CompileXsdStart cXS = new CompileXsdStart(destinationDir,
+				new BufferedInputStream(new FileInputStream(freemindActionsXsd)));
 		cXS.generate();
 		cXS.print();
 	}
 
-	private void print() throws Exception {
-		File dir = new File(DESTINATION_DIR);
+	private void print() throws IOException {
+		File dir = new File(destinationDir);
 		dir.mkdirs();
-		for (String className : mClassMap.keySet()) {
-
+		for (Map.Entry<String, Map<String, String>> classMapEntry : mClassMap.entrySet()) {
+			String className = classMapEntry.getKey();
 			// special handling for strange group tag.
 			if (className == null)
 				continue;
-			HashMap<String, String> classMap = mClassMap.get(className);
-			// System.out.println("\nClass:" + keys);
-			FileOutputStream fs = new FileOutputStream(DESTINATION_DIR + "/" + className + ".java");
-			for (String orderString : mKeyOrder) {
-				if (classMap.containsKey(orderString)) {
-					String string = classMap.get(orderString);
-					fs.write(string.getBytes());
-					// System.out.print(string);
+			try (FileOutputStream fs = new FileOutputStream(destinationDir + "/" + className + ".java")) {
+				Map<String, String> classMap = classMapEntry.getValue();
+				for (String orderString : mKeyOrder) {
+					if (classMap.containsKey(orderString)) {
+						String string = classMap.get(orderString);
+						fs.write(string.getBytes());
+					}
 				}
 			}
-			fs.close();
 		}
 		// write binding to disk
-		if (true) {
-			FileOutputStream fs = new FileOutputStream(DESTINATION_DIR + "/binding.xml");
+		try (FileOutputStream fs = new FileOutputStream(destinationDir + "/binding.xml")) {
 			fs.write(mBindingXml.toString().getBytes());
-			fs.close();
 		}
 		// write interfaces
-		String[] interfaces = {"MenuCategoryElement", "PluginSetting", "PluginActionElement"};
-		for (String interfaceName : interfaces) {
-			FileOutputStream fs = new FileOutputStream(DESTINATION_DIR + "/" + interfaceName + ".java");
-			String content = "package " + FREEMIND_PACKAGE + ";\n\n"
-					+ "public interface " + interfaceName + " {\n"
-					+ "}\n";
-			fs.write(content.getBytes());
-			fs.close();
-		}
+		final String interfaceTemplate = """
+			package %s;
+
+			public interface %s {
+			}
+			""";
+		Arrays.stream(InterfaceName.values()).forEach(interfaceName -> {
+			String ifName = interfaceName.name();
+			try (FileOutputStream fs = new FileOutputStream(destinationDir + "/" + ifName + ".java")) {
+				fs.write(interfaceTemplate.formatted(FREEMIND_PACKAGE, ifName).getBytes());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	public void generate() throws ParserConfigurationException, SAXException,
@@ -192,14 +176,15 @@ public class CompileXsdStart extends DefaultHandler {
 		SAXParser saxParser = factory.newSAXParser();
 		mCurrentHandler = new XsdHandler(null);
 		mBindingXml.setLength(0);
-		mBindingXml
-				.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><binding>\n");
+		mBindingXml.append("""
+			<?xml version="1.0" encoding="UTF-8"?><binding>
+			""");
 		// introduce correct marshaling for newlines in strings:
-		mBindingXml
-				.append("<format type=\"java.lang.String\" serializer=\"de.foltin.StringEncoder.encode\" deserializer=\"de.foltin.StringEncoder.decode\"/>\n");
+		mBindingXml.append("""
+			<format type="java.lang.String" serializer="de.foltin.StringEncoder.encode" deserializer="de.foltin.StringEncoder.decode"/>
+			""");
 		saxParser.parse(mInputStream, this);
 		mBindingXml.append("</binding>\n");
-		// System.out.println(mBindingXml.toString());
 	}
 
 	private class XsdHandler extends DefaultHandler {
@@ -217,18 +202,17 @@ public class CompileXsdStart extends DefaultHandler {
 			}
 			if (mParent != null)
 				return mParent.getClassName();
-			else
-				return null;
+			return null;
 		}
 
-		HashMap<String, String> getClassMap() {
+		Map<String, String> getClassMap() {
 			String className = getClassName();
 			return createClass(className);
 		}
 
 		protected void appendToClassMap(String key, String value) {
 			mKeyOrder.add(key);
-			HashMap<String, String> classMap = getClassMap();
+			Map<String, String> classMap = getClassMap();
 
 			if (classMap.containsKey(key)) {
 				classMap.put(key, classMap.get(key) + value);
@@ -239,8 +223,12 @@ public class CompileXsdStart extends DefaultHandler {
 
 		protected void addArrayListImport() {
 			if (!getClassMap().containsKey(KEY_IMPORT_ARRAY_LIST)) {
-				appendToClassMap(KEY_IMPORT_ARRAY_LIST, "import java.util.ArrayList;\n"
-					+ "import java.util.Collections;\n" + "import java.util.List;\n\n");
+				appendToClassMap(KEY_IMPORT_ARRAY_LIST, """
+					import java.util.ArrayList;
+					import java.util.Collections;
+					import java.util.List;
+
+					""");
 			}
 		}
 
@@ -255,62 +243,33 @@ public class CompileXsdStart extends DefaultHandler {
 		}
 
 		public void startElement(String pName, Attributes pAttributes) {
-
+			// default: do nothing
 		}
 
+		@Override
 		public void startElement(String pUri, String pLocalName, String pName,
 				Attributes pAttributes) throws SAXException {
 			super.startElement(pUri, pLocalName, pName, pAttributes);
-			// System.out.print("[ " + pName + ", ");
-			// for (int i = 0; i < pAttributes.getLength(); ++i) {
-			// System.out.print(pAttributes.getLocalName(i) + "="
-			// + pAttributes.getValue(i));
-			// }
-			// System.out.println("]");
-			ElementTypes defaultHandlerType;
+			ElementType defaultHandlerType;
 			if (mElementMap.containsKey(pName)) {
-				defaultHandlerType = (ElementTypes) mElementMap.get(pName);
+				defaultHandlerType = mElementMap.get(pName);
 			} else {
 				throw new IllegalArgumentException("Element " + pName
 						+ " is not matched.");
 			}
-			XsdHandler nextHandler = null;
-			switch (defaultHandlerType.getId()) {
-				case Element_Id:
-					nextHandler = createElementHandler();
-					break;
-				case ComplexType_Id:
-					nextHandler = new ComplexTypeHandler(this);
-					break;
-				case ComplexContent_Id:
-					nextHandler = new ComplexContentHandler(this);
-					break;
-				case Schema_Id:
-					nextHandler = new SchemaHandler(this);
-					break;
-
-				case Sequence_Id:
-					nextHandler = new SequenceHandler(this);
-					break;
-				case Choice_Id:
-					nextHandler = new ChoiceHandler(this);
-					break;
-				case Extension_Id:
-					nextHandler = new ExtensionHandler(this);
-					break;
-				case Attribute_Id:
-					nextHandler = new AttributeHandler(this);
-					break;
-				case Enumeration_Id:
-					nextHandler = new EnumerationHandler(this);
-					break;
-				case Group_Id:
-					nextHandler = new GroupHandler(this);
-					break;
-				default:
-					nextHandler = new XsdHandler(this);
-					// throw new IllegalArgumentException("Wrong type " + pName);
-			}
+			XsdHandler nextHandler = switch (defaultHandlerType) {
+				case ELEMENT -> createElementHandler();
+				case COMPLEX_TYPE -> new ComplexTypeHandler(this);
+				case COMPLEX_CONTENT -> new ComplexContentHandler(this);
+				case SCHEMA -> new SchemaHandler(this);
+				case SEQUENCE -> new SequenceHandler(this);
+				case CHOICE -> new ChoiceHandler(this);
+				case EXTENSION -> new ExtensionHandler(this);
+				case ATTRIBUTE -> new AttributeHandler(this);
+				case ENUMERATION -> new EnumerationHandler(this);
+				case GROUP -> new GroupHandler(this);
+				default -> new XsdHandler(this);
+			};
 			mCurrentHandler = nextHandler;
 			nextHandler.startElement(pName, pAttributes);
 		}
@@ -319,6 +278,7 @@ public class CompileXsdStart extends DefaultHandler {
 			return new ComplexTypeHandler(this);
 		}
 
+		@Override
 		public void endElement(String pUri, String pLocalName, String pName)
 				throws SAXException {
 			super.endElement(pUri, pLocalName, pName);
@@ -333,6 +293,7 @@ public class CompileXsdStart extends DefaultHandler {
 			super(pParent);
 		}
 
+		@Override
 		public void startElement(String arg0, Attributes arg1) {
 			super.startElement(arg0, arg1);
 			String base = arg1.getValue("base");
@@ -340,13 +301,13 @@ public class CompileXsdStart extends DefaultHandler {
 			mKeyOrder.add(KEY_CLASS_EXTENSION);
 			getClassMap().put(KEY_CLASS_EXTENSION,
 					" extends " + mExtendsClassName);
-			mBindingXml.append("    <structure map-as=\"" + base
-					+ "_type\"/>\n");
+			mBindingXml.append("""
+				    <structure map-as="%s_type"/>
+				""".formatted(base));
 			// inform parents:
 			XsdHandler xsdHandlerHierarchy = this;
 			do {
-				if (xsdHandlerHierarchy instanceof ComplexTypeHandler) {
-					ComplexTypeHandler complexHandler = (ComplexTypeHandler) xsdHandlerHierarchy;
+				if (xsdHandlerHierarchy instanceof ComplexTypeHandler complexHandler) {
 					complexHandler.mExtendsClassName = mExtendsClassName;
 				}
 				xsdHandlerHierarchy = xsdHandlerHierarchy.mParent;
@@ -370,6 +331,7 @@ public class CompileXsdStart extends DefaultHandler {
 			super(pParent);
 		}
 
+		@Override
 		protected XsdHandler createElementHandler() {
 			return new ChoiceElementHandler(this);
 		}
@@ -378,62 +340,64 @@ public class CompileXsdStart extends DefaultHandler {
 			return isSingleChoice;
 		}
 
+		@Override
 		public void startElement(String arg0, Attributes arg1) {
 			super.startElement(arg0, arg1);
 			if (arg1.getValue("maxOccurs") != null) {
 				// single array list:
 				isSingleChoice = true;
-				String contentType = getContentType(arg1);
+				String contentType = getContentType();
 				appendToClassMap(
-						KEY_CLASS_SINGLE_CHOICE,
-						"  public void addChoice(" + contentType + " choice) {\n"
-								+ "    choiceList.add(choice);\n"
-								+ "  }\n"
-								+ "\n"
-								+ "  public void addAtChoice(int position, " + contentType + " choice) {\n"
-								+ "    choiceList.add(position, choice);\n"
-								+ "  }\n"
-								+ "\n"
-								+ "  public void setAtChoice(int position, " + contentType + " choice) {\n"
-								+ "    choiceList.set(position, choice);\n"
-								+ "  }\n"
-								+ "  public " + contentType + " getChoice(int index) {\n"
-								+ "    return choiceList.get( index );\n"
-								+ "  }\n"
-								+ "\n"
-								+ "  public int sizeChoiceList() {\n"
-								+ "    return choiceList.size();\n"
-								+ "  }\n"
-								+ "\n"
-								+ "  public void clearChoiceList() {\n"
-								+ "    choiceList.clear();\n"
-								+ "  }\n"
-								+ "\n"
-								+ "  public List<" + contentType + "> getListChoiceList() {\n"
-								+ "    return Collections.unmodifiableList(choiceList);\n"
-								+ "  }\n"
-								+ "\n"
-								+ "  protected ArrayList<" + contentType + "> choiceList = new ArrayList<>();\n"
-								+ "\n");
+					KEY_CLASS_SINGLE_CHOICE, """
+					  public void addChoice(%1$s choice) {
+					    choiceList.add(choice);
+					  }
+
+					  public void addAtChoice(int position, %1$s choice) {
+					    choiceList.add(position, choice);
+					  }
+
+					  public void setAtChoice(int position, %1$s choice) {
+					    choiceList.set(position, choice);
+					  }
+					  public %1$s getChoice(int index) {
+					    return choiceList.get( index );
+					  }
+
+					  public int sizeChoiceList() {
+					    return choiceList.size();
+					  }
+
+					  public void clearChoiceList() {
+					    choiceList.clear();
+					  }
+
+					  public List<%1$s> getListChoiceList() {
+					    return Collections.unmodifiableList(choiceList);
+					  }
+
+					  protected ArrayList<%1$s> choiceList = new ArrayList<>();
+
+					""".formatted(contentType));
 				addArrayListImport();
-				mBindingXml
-						.append("    <collection field='choiceList' ordered='false'>\n");
+				mBindingXml.append("    <collection field='choiceList' ordered='false'>\n");
 			}
 		}
 
-		private String getContentType(Attributes arg1) {
+		private String getContentType() {
 			String name = getClassName();
 			return switch (name) {
 				case "CompoundAction" -> "XmlAction";
-				case "MenuCategoryBase" -> "MenuCategoryElement";
+				case "MenuCategoryBase" -> InterfaceName.MenuCategoryElement.name();
 				case "MenuStructure" -> "MenuCategory";
 				case "Patterns" -> "Pattern";
-				case "Plugin" -> "PluginSetting";
-				case "PluginAction" -> "PluginActionElement";
+				case "Plugin" -> InterfaceName.PluginSetting.name();
+				case "PluginAction" -> InterfaceName.PluginActionElement.name();
 				default -> "Object";
 			};
 		}
 
+		@Override
 		public void endElement(String arg0, String arg1, String arg2)
 				throws SAXException {
 			if (isSingleChoice) {
@@ -448,8 +412,7 @@ public class CompileXsdStart extends DefaultHandler {
 
 		public ChoiceElementHandler(XsdHandler pParent) {
 			super(pParent);
-			if (pParent instanceof ChoiceHandler) {
-				ChoiceHandler choiceParent = (ChoiceHandler) pParent;
+			if (pParent instanceof ChoiceHandler choiceParent) {
 				mIsSingle = choiceParent.isSingleChoice();
 
 			} else {
@@ -458,6 +421,7 @@ public class CompileXsdStart extends DefaultHandler {
 			}
 		}
 
+		@Override
 		public void startElement(String arg0, Attributes arg1) {
 			super.startElement(arg0, arg1);
 			String rawName = arg1.getValue("ref");
@@ -465,24 +429,31 @@ public class CompileXsdStart extends DefaultHandler {
 			String memberName = name.substring(0, 1).toLowerCase()
 					+ name.substring(1);
 			if (mIsSingle) {
-				mBindingXml
-						.append("      <structure usage=\"optional\" map-as=\""
-								+ FREEMIND_PACKAGE + "." + name + "\"/>\n");
+				mBindingXml.append("""
+					      <structure usage="optional" map-as="%1$s.%2$s"/>
+					""".formatted(FREEMIND_PACKAGE, name));
 				return;
 			}
 			// do multiple choices.
-			appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_MEMBERS, "  protected "
-					+ name + " " + memberName + ";\n\n");
-			appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_SETGET, "  public "
-					+ name + " get" + name + "() {\n    return this."
-					+ memberName + ";\n" + "  }\n\n");
-			appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_SETGET,
-					"  public void set" + name + "(" + name + " value) {\n"
-							+ "    this." + memberName + " = value;\n"
-							+ "  }\n\n");
-			mBindingXml.append("    <structure field=\"" + memberName
-					+ "\" usage=\"" + "optional" + "\" map-as=\""
-					+ FREEMIND_PACKAGE + "." + name + "\"/>\n");
+			appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_MEMBERS, """
+				  protected %s %s;
+
+				""".formatted(name, memberName));
+			appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_SETGET, """
+				  public %1$s get%1$s() {
+				    return this.%2$s;
+				  }
+
+				""".formatted(name, memberName));
+			appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_SETGET, """
+				  public void set%1$s(%1$s value) {
+				    this.%2$s = value;
+				  }
+
+				""".formatted(name, memberName));
+			mBindingXml.append("""
+				    <structure field="%3$s" usage="optional" map-as="%1$s.%2$s"/>
+				""".formatted(FREEMIND_PACKAGE, name, memberName));
 		}
 
 	}
@@ -493,10 +464,9 @@ public class CompileXsdStart extends DefaultHandler {
 			super(pParent);
 		}
 
+		@Override
 		public void startElement(String arg0, String arg1, String arg2,
 				Attributes arg3) throws SAXException {
-			// super.startElement(arg0, arg1, arg2, arg3);
-			// omit the output.
 			mCurrentHandler = new GroupHandler(this);
 		}
 	}
@@ -507,6 +477,7 @@ public class CompileXsdStart extends DefaultHandler {
 			super(pParent);
 		}
 
+		@Override
 		protected XsdHandler createElementHandler() {
 			return new SequenceElementHandler(this);
 		}
@@ -519,6 +490,7 @@ public class CompileXsdStart extends DefaultHandler {
 			super(pParent);
 		}
 
+		@Override
 		public void startElement(String arg0, Attributes arg1) {
 			super.startElement(arg0, arg1);
 			String rawName = arg1.getValue("name");
@@ -540,60 +512,76 @@ public class CompileXsdStart extends DefaultHandler {
 			String minOccurs = arg1.getValue("minOccurs");
 			if (maxOccurs != null && maxOccurs.trim().equals("1")) {
 				// single ref:
-				appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_MEMBERS,
-						"  protected " + type + " " + memberName + ";\n\n");
-				appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_SETGET, "  public "
-						+ type + " get" + name + "() {\n    return this."
-						+ memberName + ";\n" + "  }\n\n");
-				appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_SETGET,
-						"  public void set" + name + "(" + type + " value) {\n"
-								+ "    this." + memberName + " = value;\n"
-								+ "  }\n\n");
+				appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_MEMBERS, """
+					  protected %1$s %2$s;
+
+					""".formatted(type, memberName));
+				appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_SETGET, """
+					  public %1$s get%2$s() {
+					    return this.%3$s;
+					  }
+
+					""".formatted(type, name, memberName));
+				appendToClassMap(KEY_CLASS_MULTIPLE_CHOICES_SETGET, """
+					  public void set%2$s(%1$s value) {
+					    this.%3$s = value;
+					  }
+
+					""".formatted(type, name, memberName));
 				String optReq = "optional";
 				if (minOccurs != null && minOccurs.trim().equals("1")) {
 					optReq = "required";
 				}
 				if (isRef) {
-					mBindingXml.append("      <structure field=\"" + memberName
-							+ "\" usage=\"" + optReq + "\" map-as=\""
-							+ FREEMIND_PACKAGE + "." + type + "\"/>\n");
+					mBindingXml.append("""
+						      <structure field="%1$s" usage="%2$s" map-as="%3$s.%4$s"/>
+						""".formatted(memberName, optReq, FREEMIND_PACKAGE, type));
 				} else {
-					mBindingXml.append("      <value name=\"" + rawName
-							+ "\" field=\"" + memberName + "\" usage=\""
-							+ optReq + "\"/>\n");
+					mBindingXml.append("""
+						      <value name="%1$s" field="%2$s" usage="%3$s"/>
+						""".formatted(rawName, memberName, optReq));
 					// whitespace='preserve' doesn't work
 				}
 			} else {
 				// list ref:
-				appendToClassMap(KEY_CLASS_SEQUENCE, "  public void add" + name
-						+ "(" + name + " " + memberName + ") {\n" + "    "
-						+ memberName + "List.add(" + memberName + ");\n"
-						+ "  }\n" + "\n" + "  public void addAt" + name
-						+ "(int position, " + name + " " + memberName + ") {\n"
-						+ "    " + memberName + "List.add(position, "
-						+ memberName + ");\n" + "  }\n" + "\n" + "  public "
-						+ name + " get" + name + "(int index) {\n"
-						+ "    return (" + name + ")" + memberName
-						+ "List.get( index );\n" + "  }\n" + "\n"
-						+ "  public void removeFrom" + name
-						+ "ElementAt(int index) {\n" + "    " + memberName
-						+ "List.remove( index );\n" + "  }\n" + "\n"
-						+ "  public int size" + name + "List() {\n"
-						+ "    return " + memberName + "List.size();\n"
-						+ "  }\n" + "\n" + "  public void clear" + name
-						+ "List() {\n" + "    " + memberName
-						+ "List.clear();\n" + "  }\n" + "\n"
-						+ "  public List<" + name + "> getList" + name
-						+ "List() {\n"
-						+ "    return Collections.unmodifiableList("
-						+ memberName + "List);\n" + "  }\n"
-						+ "    protected ArrayList<" + name + "> " + memberName
-						+ "List = new ArrayList<>();\n\n");
+				appendToClassMap(KEY_CLASS_SEQUENCE, """
+					  public void add%1$s(%1$s %2$s) {
+					    %2$sList.add(%2$s);
+					  }
+
+					  public void addAt%1$s(int position, %1$s %2$s) {
+					    %2$sList.add(position, %2$s);
+					  }
+
+					  public %1$s get%1$s(int index) {
+					    return %2$sList.get( index );
+					  }
+
+					  public void removeFrom%1$sElementAt(int index) {
+					    %2$sList.remove( index );
+					  }
+
+					  public int size%1$sList() {
+					    return %2$sList.size();
+					  }
+
+					  public void clear%1$sList() {
+					    %2$sList.clear();
+					  }
+
+					  public List<%1$s> getList%1$sList() {
+					    return Collections.unmodifiableList(%2$sList);
+					  }
+
+					  protected ArrayList<%1$s> %2$sList = new ArrayList<>();
+
+					""".formatted(name, memberName));
 				addArrayListImport();
-				mBindingXml.append("    <collection field=\"" + memberName
-						+ "List\">\n" + "      <structure map-as=\""
-						+ FREEMIND_PACKAGE + "." + name + "\"/>\n"
-						+ "    </collection>\n");
+				mBindingXml.append("""
+					    <collection field="%1$sList">
+					      <structure map-as="%2$s.%3$s"/>
+					    </collection>
+					""".formatted(memberName, FREEMIND_PACKAGE, name));
 			}
 		}
 
@@ -609,6 +597,7 @@ public class CompileXsdStart extends DefaultHandler {
 			super(pParent);
 		}
 
+		@Override
 		public void startElement(String arg0, Attributes arg1) {
 			super.startElement(arg0, arg1);
 
@@ -621,9 +610,9 @@ public class CompileXsdStart extends DefaultHandler {
 			if (getClassName() == null) {
 				mRawName = startClass(arg1);
 				// make binding:
-				mBindingXml.append("  <mapping class='" + FREEMIND_PACKAGE
-						+ "." + mClassName + "' type-name='" + mRawName
-						+ "_type' abstract='true'>\n");
+				mBindingXml.append("""
+				  <mapping class="%1$s.%2$s" type-name="%3$s_type" abstract="true">
+				""".formatted(FREEMIND_PACKAGE, mClassName, mRawName));
 				mIsClassDefinedHere = true;
 			}
 		}
@@ -639,7 +628,7 @@ public class CompileXsdStart extends DefaultHandler {
 			mKeyOrder.add(KEY_CLASS_END);
 			String rawName = arg1.getValue("name");
 			String name = getNameFromXml(rawName);
-			HashMap<String, String> class1 = createClass(name);
+			Map<String, String> class1 = createClass(name);
 			mClassName = name;
 			class1.put(FILE_START, "/* " + name + "...*/\n");
 			class1.put(KEY_PACKAGE, "package " + FREEMIND_PACKAGE + ";\n\n");
@@ -651,9 +640,16 @@ public class CompileXsdStart extends DefaultHandler {
 			class1.put(KEY_CLASS_CONSTANTS, "  /* constants from enums */\n");
 			if (mMixed) {
 				mKeyOrder.add(KEY_CLASS_MIXED);
-				class1.put(KEY_CLASS_MIXED, "  public String content;\n"
-						+ "  public String getContent() {\n    return content;\n  }\n"
-						+ "  public void setContent(String content) {\n    this.content = content;\n  }\n");
+				class1.put(KEY_CLASS_MIXED, """
+				  public String content;
+				  public String getContent() {
+				    return content;
+				  }
+				  public void setContent(String content) {
+				    this.content = content;
+				  }
+
+				""");
 			}
 			class1.put(KEY_CLASS_END, "} /* " + name + " */\n");
 			return rawName;
@@ -661,9 +657,9 @@ public class CompileXsdStart extends DefaultHandler {
 
 		private void addHackingForTypeSafety(String name, Map<String, String> class1) {
 			String interfaceName = switch (name) {
-				case "MenuCategory", "MenuSubmenu", "MenuAction", "MenuCheckedAction", "MenuRadioAction", "MenuSeparator" -> "MenuCategoryElement";
-				case "PluginMode", "PluginMenu", "PluginProperty" -> "PluginActionElement";
-				case "PluginClasspath", "PluginRegistration", "PluginAction", "PluginStrings" -> "PluginSetting";
+				case "MenuCategory", "MenuSubmenu", "MenuAction", "MenuCheckedAction", "MenuRadioAction", "MenuSeparator" -> InterfaceName.MenuCategoryElement.name();
+				case "PluginMode", "PluginMenu", "PluginProperty" -> InterfaceName.PluginActionElement.name();
+				case "PluginClasspath", "PluginRegistration", "PluginAction", "PluginStrings" -> InterfaceName.PluginSetting.name();
 				default -> null;
 			};
 			if (interfaceName != null) {
@@ -672,6 +668,7 @@ public class CompileXsdStart extends DefaultHandler {
 			}
 		}
 
+		@Override
 		public void endElement(String arg0, String arg1, String arg2)
 				throws SAXException {
 			if (mIsClassDefinedHere) {
@@ -681,14 +678,14 @@ public class CompileXsdStart extends DefaultHandler {
 							+ getExtendsClassName() + "\"";
 				}
 				if (mMixed) {
-					mBindingXml
-							.append("     <value field='content' style='text'/>\n");
+					mBindingXml.append("     <value field='content' style='text'/>\n");
 				}
-				mBindingXml.append("  </mapping>\n" + "  <mapping name=\""
-						+ mRawName + "\"" + extendString + " class=\""
-						+ FREEMIND_PACKAGE + "." + mClassName
-						+ "\"><structure map-as=\"" + mRawName
-						+ "_type\"/></mapping>\n" + "\n");
+				mBindingXml.append("""
+					  </mapping>
+					  <mapping name="%1$s"%2$s class="%3$s.%4$s">
+					    <structure map-as="%1$s_type"/>
+					  </mapping>
+					""".formatted(mRawName, extendString, FREEMIND_PACKAGE, mClassName));
 			}
 			super.endElement(arg0, arg1, arg2);
 		}
@@ -708,6 +705,7 @@ public class CompileXsdStart extends DefaultHandler {
 			super(pParent);
 		}
 
+		@Override
 		public void startElement(String arg0, Attributes arg1) {
 			super.startElement(arg0, arg1);
 			String type = arg1.getValue("type");
@@ -720,20 +718,24 @@ public class CompileXsdStart extends DefaultHandler {
 				name = getNameFromXml(rawName);
 			}
 			String memberName = decapitalizeFirstLetter(name);
-			appendToClassMap(KEY_CLASS_PRIVATE_MEMBERS, "  protected " + type
-					+ " " + memberName + ";\n");
-			appendToClassMap(KEY_CLASS_GETTERS, "  public " + type + " get"
-					+ name + "() {\n" + "    return " + memberName + ";\n"
-					+ "  }\n");
-			appendToClassMap(KEY_CLASS_SETTERS, "  public void set" + name
-					+ "(" + type + " value) {\n" + "    this." + memberName
-					+ " = value;\n" + "  }\n");
-			mBindingXml.append("    <value name='" + rawName + "' field='"
-					+ memberName + "' " + "usage='"
-					+ (("required".equals(usage)) ? "required" : "optional")
-					+ "' "
-					+ (("0".equals(minOccurs)) ? "" : "style='attribute'")
-					+ "/>\n");
+			appendToClassMap(KEY_CLASS_PRIVATE_MEMBERS, """
+				  protected %s %s;
+				""".formatted(type, memberName));
+			appendToClassMap(KEY_CLASS_GETTERS, """
+				  public %s get%s() {
+				    return %s;
+				  }
+				""".formatted(type, name, memberName));
+			appendToClassMap(KEY_CLASS_SETTERS, """
+				  public void set%2$s(%1$s value) {
+				    this.%3$s = value;
+				  }
+				""".formatted(type, name, memberName));
+			mBindingXml.append("""
+				    <value name='%s' field='%s' usage='%s' %s/>
+				""".formatted(rawName, memberName,
+				("required".equals(usage)) ? "required" : "optional",
+				("0".equals(minOccurs)) ? "" : "style='attribute'"));
 			// whitespace='preserve' doesn't work
 		}
 
@@ -749,36 +751,40 @@ public class CompileXsdStart extends DefaultHandler {
 			super(pParent);
 		}
 
+		@Override
 		public void startElement(String arg0, Attributes arg1) {
 			super.startElement(arg0, arg1);
 			String val = arg1.getValue("value");
-			appendToClassMap(KEY_CLASS_CONSTANTS, "  public static final String " + val.toUpperCase()
-					+ " = \"" + val + "\";\n");
+			appendToClassMap(KEY_CLASS_CONSTANTS, """
+				  public static final String %s = "%s";
+				""".formatted(val.toUpperCase(), val));
 		}
 
 	}
 
+		@Override
 	public void endElement(String pUri, String pLocalName, String pName)
 			throws SAXException {
 		mCurrentHandler.endElement(pUri, pLocalName, pName);
 	}
 
-	public HashMap<String, String> createClass(String pName) {
+	public Map<String, String> createClass(String pName) {
 		if (mClassMap.containsKey(pName)) {
 			return mClassMap.get(pName);
 		}
-		HashMap<String, String> newValue = new HashMap<>();
+		Map<String, String> newValue = new HashMap<>();
 		mClassMap.put(pName, newValue);
 		return newValue;
 	}
 
+		@Override
 	public void startElement(String pUri, String pLocalName, String pName,
 			Attributes pAttributes) throws SAXException {
 		mCurrentHandler.startElement(pUri, pLocalName, pName, pAttributes);
 	}
 
 	public String firstLetterCapitalized(String text) {
-		if (text == null || text.length() == 0) {
+		if (text == null || text.isEmpty()) {
 			return text;
 		}
 		return text.substring(0, 1).toUpperCase()
@@ -787,22 +793,15 @@ public class CompileXsdStart extends DefaultHandler {
 
 	private String getNameFromXml(String pXmlString) {
 		StringTokenizer st = new StringTokenizer(pXmlString, "_");
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		while (st.hasMoreTokens()) {
-			result += firstLetterCapitalized(st.nextToken());
+			result.append(firstLetterCapitalized(st.nextToken()));
 		}
-		return result;
+		return result.toString();
 	}
 
 	private String getType(String type) {
-		if (mTypeMap.containsKey(type)) {
-			type = (String) mTypeMap.get(type);
-		} else {
-			// FIXME: Bad hack for tokens:
-			type = "String";
-			// throw new IllegalArgumentException("Unknown type " + type);
-		}
-		return type;
+		return mTypeMap.containsKey(type) ? mTypeMap.get(type) : "String";
 	}
 
 }
