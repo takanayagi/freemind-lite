@@ -1,1 +1,1 @@
-@start /b javaw -jar %~dp0lib\freemind.jar %*
+@start /b javaw -jar %~dp0lib\freemind-lite.jar %*

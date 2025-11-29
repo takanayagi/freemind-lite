@@ -217,8 +217,6 @@ public class FreeMind extends JFrame implements FreeMindMain, ActionListener {
 
 	public static final String RESOURCES_CALENDAR_FONT_SIZE = "calendar_font_size";
 
-	// public static final String defaultPropsURL = "freemind.properties";
-	// public static Properties defaultProps;
 	public static Properties props;
 
 	private static Properties defProps;

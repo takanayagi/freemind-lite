@@ -165,7 +165,7 @@ public class FreeMindMainMock implements FreeMindMain {
 	}
 
 	public VersionInformation getFreemindVersion() {
-		return new VersionInformation(1, 0, 0, FreeMindMain.VERSION_TYPE_ALPHA, 42);
+		return new VersionInformation("1.0.0 Alpha 42");
 	}
 
 	public Logger getLogger(String forClass) {

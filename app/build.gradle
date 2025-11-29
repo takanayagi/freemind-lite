@@ -5,7 +5,7 @@ plugins {
 }
 
 group = parent.name
-version = "1.1.0"
+version = "1.1.0-beta_3"
 
 application {
     mainClass = "freemind.main.FreeMindStarter"
@@ -67,7 +67,7 @@ sourceSets {
 
 ext.ver = { ->
     def versionMatcher = file("src/main/java/freemind/main/FreeMind.java").text =~ /(?s).*new VersionInformation\("(.*?)".*/
-    String extractedVersion = versionMatcher.find() ? versionMatcher.group(1) : ""
+    String extractedVersion = "Lite " + (versionMatcher.find() ? versionMatcher.group(1) : "")
     extractedVersion.replaceAll(" ", "_")
 }()
 
