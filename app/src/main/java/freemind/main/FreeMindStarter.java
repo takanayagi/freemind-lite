@@ -103,7 +103,7 @@ public class FreeMindStarter {
 			auto.load(in);
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			System.err.println("Panic! Error while loading default properties.");
+			System.err.println("Panic! Error while loading user preferences.");
 		}
 		return auto;
 	}

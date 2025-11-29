@@ -1,2 +1,2 @@
 @echo off
-java -jar %~dp0lib\freemind.jar %*
+java -jar %~dp0lib\freemind-lite.jar %*

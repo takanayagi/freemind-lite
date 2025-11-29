@@ -121,7 +121,7 @@ public class Controller implements MapModuleChangeObserver {
 	private static JColorChooser colorChooser = new JColorChooser();
 	private LastOpenedList lastOpened;// A list of the pathnames of all the maps
 										// that were opened in the last time
-	private MapModuleManager mapModuleManager;// new MapModuleManager();
+	private MapModuleManager mapModuleManager;
 	/** The current mode */
 	private Mode mMode;
 	private FreeMindMain frame;
@@ -489,6 +489,7 @@ public class Controller implements MapModuleChangeObserver {
 	}
 
 	static class Closer extends WindowAdapter implements Serializable {
+		@Override
 		public void windowClosing(WindowEvent e) {
 			Window w = e.getWindow();
 			w.setVisible(false);
@@ -496,6 +497,7 @@ public class Controller implements MapModuleChangeObserver {
 	}
 
 	static class DisposeOnClose extends ComponentAdapter implements Serializable {
+		@Override
 		public void componentHidden(ComponentEvent e) {
 			Window w = (Window) e.getComponent();
 			w.dispose();
@@ -1267,7 +1269,7 @@ public class Controller implements MapModuleChangeObserver {
 
 		public void actionPerformed(ActionEvent e) {
 			JOptionPane.showMessageDialog(getView(),
-					controller.getResourceString("about_text") + getFrame().getFreemindVersion(),
+					controller.getResourceString("about_text") + " Lite " + getFrame().getFreemindVersion(),
 					controller.getResourceString("about"), JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
@@ -1602,6 +1604,7 @@ public class Controller implements MapModuleChangeObserver {
 			dialog.setTitle("Freemind Properties");
 			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			dialog.addWindowListener(new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent event) {
 					options.closeWindow();
 				}

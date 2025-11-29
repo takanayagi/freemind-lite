@@ -24,8 +24,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
@@ -121,27 +119,21 @@ public interface FreeMindMain {
 
 	int getWinY();
 
-	int VERSION_TYPE_ALPHA = 0;
-	int VERSION_TYPE_BETA = 1;
-	int VERSION_TYPE_RC = 2;
-	int VERSION_TYPE_RELEASE = 3;
 	String ENABLE_NODE_MOVEMENT = "enable_node_movement";
 
 	class VersionInformation {
-		public int mMaj = 0;
-		public int mMid = 9;
-		public int mMin = 0;
-		public int mType = VERSION_TYPE_BETA;
-		public int mNum = 17;
-
-		public VersionInformation(int pMaj, int pMid, int pMin, int pType, int pNum) {
-			super();
-			mMaj = pMaj;
-			mMid = pMid;
-			mMin = pMin;
-			mType = pType;
-			mNum = pNum;
+		enum VersionType {
+			Alpha,
+			Beta,
+			RC,
+			RELEASE
 		}
+
+		private final int mMaj;
+		private final int mMid;
+		private final int mMin;
+		private final VersionType mType;
+		private final int mNum;
 
 		/**
 		 * Sets the version number from a string.
@@ -150,12 +142,7 @@ public interface FreeMindMain {
 		 *        "Beta", "RC". Separation by " " or by ".".
 		 */
 		public VersionInformation(String pString) {
-			StringTokenizer t = new StringTokenizer(pString, ". ", false);
-			String[] info = new String[t.countTokens()];
-			int i = 0;
-			while (t.hasMoreTokens()) {
-				info[i++] = t.nextToken();
-			}
+			String[] info = pString.split("[. ]+");
 			if (info.length != 3 && info.length != 5)
 				throw new IllegalArgumentException(
 						"Wrong number of tokens for version information: " + pString);
@@ -164,21 +151,12 @@ public interface FreeMindMain {
 			mMin = Integer.parseInt(info[2]);
 			if (info.length == 3) {
 				// release.
-				mType = VERSION_TYPE_RELEASE;
+				mType = VersionType.RELEASE;
 				mNum = 0;
 				return;
 			}
 			// here,we have info.length == 5!
-			Vector<String> types = new Vector<>();
-			types.add("Alpha");
-			types.add("Beta");
-			types.add("RC");
-			int typeIndex = types.indexOf(info[3]);
-			if (typeIndex < 0) {
-				throw new IllegalArgumentException(
-						"Wrong version type for version information: " + info[4]);
-			}
-			mType = typeIndex;
+			mType = VersionType.valueOf(info[3]);
 			mNum = Integer.parseInt(info[4]);
 		}
 
@@ -189,27 +167,8 @@ public interface FreeMindMain {
 			buf.append(mMid);
 			buf.append('.');
 			buf.append(mMin);
-			switch (mType) {
-				case VERSION_TYPE_ALPHA:
-					buf.append(' ');
-					buf.append("Alpha");
-					break;
-				case VERSION_TYPE_BETA:
-					buf.append(' ');
-					buf.append("Beta");
-					break;
-				case VERSION_TYPE_RC:
-					buf.append(' ');
-					buf.append("RC");
-					break;
-				case VERSION_TYPE_RELEASE:
-					break;
-				default:
-					throw new IllegalArgumentException("Unknown version type " + mType);
-			}
-			if (mType != VERSION_TYPE_RELEASE) {
-				buf.append(' ');
-				buf.append(mNum);
+			if (mType != VersionType.RELEASE) {
+				buf.append(' ').append(mType.name()).append(' ').append(mNum);
 			}
 			return buf.toString();
 		}

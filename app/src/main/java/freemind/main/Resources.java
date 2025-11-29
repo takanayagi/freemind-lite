@@ -25,6 +25,7 @@ import java.io.File;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -34,7 +35,6 @@ import javax.swing.filechooser.FileFilter;
 
 import freemind.common.NamedObject;
 import freemind.common.TextTranslator;
-import freemind.main.FreeMindMain.VersionInformation;
 import freemind.modes.FreeMindAwtFileDialog;
 import freemind.modes.FreeMindFileDialog;
 import freemind.modes.FreeMindJFileDialog;
@@ -55,7 +55,7 @@ public class Resources implements TextTranslator {
 		}
 	}
 
-	static public void createInstance(FreeMindMain frame) {
+	public static void createInstance(FreeMindMain frame) {
 		if (resourcesInstance == null) {
 			resourcesInstance = new Resources(frame);
 		}
@@ -73,9 +73,9 @@ public class Resources implements TextTranslator {
 		return main.getResourceString(key, resource);
 	}
 
-	static public Resources getInstance() {
+	public static Resources getInstance() {
 		if (resourcesInstance == null) {
-			new NullPointerException("Resources without FreeMind called.");
+			throw new NullPointerException("Resources without FreeMind called.");
 		}
 		return resourcesInstance;
 	}
@@ -86,10 +86,6 @@ public class Resources implements TextTranslator {
 
 	public String getFreemindBaseDir() {
 		return main.getFreemindBaseDir();
-	}
-
-	public VersionInformation getFreemindVersion() {
-		return main.getFreemindVersion();
 	}
 
 	public ClassLoader getFreeMindClassLoader() {
@@ -129,7 +125,7 @@ public class Resources implements TextTranslator {
 		return main.getResources();
 	}
 
-	public HashMap<String, String> getCountryMap() {
+	public Map<String, String> getCountryMap() {
 		if (countryMap == null) {
 			String[] countryMapArray = new String[] {"de", "DE", "en", "UK", "en", "US", "es", "ES",
 					"es", "MX", "fi", "FI", "fr", "FR", "hu", "HU", "it", "CH", "it", "IT", "nl",

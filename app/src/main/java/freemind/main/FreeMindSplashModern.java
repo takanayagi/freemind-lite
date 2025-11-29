@@ -125,7 +125,6 @@ public class FreeMindSplashModern extends JFrame implements IFreeMindSplash {
 		setDefaultLookAndFeelDecorated(false);
 		setUndecorated(true);
 		getRootPane().setWindowDecorationStyle(JRootPane.NONE); // Set no border
-		// lamentablemente since 1.5: setAlwaysOnTop(true);
 
 		final ImageIcon splashImage = imageFactory.createIcon(frame.getResource(FREEMIND_SPLASH));
 		JLabel splashImageLabel = new JLabel(splashImage) {
@@ -143,6 +142,7 @@ public class FreeMindSplashModern extends JFrame implements IFreeMindSplash {
 				return (int) (((float) x) / SPLASH_WIDTH * splashImage.getIconWidth());
 			}
 
+			@Override
 			public void paint(Graphics g) {
 				super.paint(g);
 				Graphics2D g2 = (Graphics2D) g;
@@ -150,7 +150,7 @@ public class FreeMindSplashModern extends JFrame implements IFreeMindSplash {
 						RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 				g2.setFont(versionTextFont);
 				// Determine width of string to center it
-				String freemindVersion = frame.getFreemindVersion().toString();
+				String freemindVersion = "Lite " + frame.getFreemindVersion().toString();
 				if (mWidth == null) {
 					mWidth = g2.getFontMetrics().stringWidth(freemindVersion);
 				}
