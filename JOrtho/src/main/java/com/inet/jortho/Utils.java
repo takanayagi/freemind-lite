@@ -38,6 +38,9 @@ import javax.swing.JTextField;
  */
 public class Utils {
 
+	private Utils() {
+	}
+
     /**
      * Translate a GUI string in one of the supported languages. If the value was not find then the key is returned.
      * 

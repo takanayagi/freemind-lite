@@ -16,7 +16,7 @@ tasks.named("jar") {
     archiveBaseName.set("jortho")
     archiveFileName.set(archiveBaseName.get() + "-" + version + ".jar")
     exclude("com/inet/jorthodictionaries/**")
-    exclude("SampleApp*.class")
+    exclude("sample/**")
     doFirst {
         manifest {
             attributes(
@@ -40,5 +40,5 @@ tasks.named("test") {
 
 tasks.named("run") {
     classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
-    mainClass = "SampleApplication"
+    mainClass = "sample.SampleApplication"
 }

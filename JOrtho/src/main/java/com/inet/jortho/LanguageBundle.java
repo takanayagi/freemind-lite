@@ -32,6 +32,10 @@ import java.util.ResourceBundle;
  */
 public class LanguageBundle extends ResourceBundle {
 
+	public LanguageBundle() {
+		super();
+	}
+
     /**
      * Get an implementations of this class for the given locale
      * @param locale the current spell checking language
