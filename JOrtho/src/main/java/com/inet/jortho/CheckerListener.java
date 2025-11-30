@@ -201,7 +201,7 @@ public class CheckerListener implements PopupMenuListener, LanguageChangeListene
      * @param needCapitalization
      *            if the first letter of the suggestion should be capitalized
      */
-    protected void addSuggestionMenuItem( final JTextComponent jText, final int begOffs, final int endOffs, List<Suggestion> list, boolean needCapitalization ) {
+    void addSuggestionMenuItem( final JTextComponent jText, final int begOffs, final int endOffs, List<Suggestion> list, boolean needCapitalization ) {
         for( int i = 0; i < list.size() && i < options.getSuggestionsLimitMenu(); i++ ) {
             Suggestion suggestion = list.get( i );
             String suggestionWord = suggestion.getWord();

@@ -28,6 +28,10 @@ package com.inet.jortho;
  */
 public class LanguageBundle_fr extends LanguageBundle {
 
+	public LanguageBundle_fr() {
+		super();
+    }
+
     @Override
     boolean existInDictionary( String word, Dictionary dictionary, SpellCheckerOptions options, boolean isFirstWordInSentence ) {
         if( super.existInDictionary( word, dictionary, options, isFirstWordInSentence ) ) {

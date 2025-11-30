@@ -1,3 +1,5 @@
+package sample;
+
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JTextPane;
