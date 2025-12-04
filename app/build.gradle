@@ -24,12 +24,12 @@ configurations.all {
 }
 
 dependencies {
-    implementation("com.jgoodies:jgoodies-forms:1.8.0")
+    implementation("com.jgoodies:jgoodies-forms:1.9.0")
     implementation("com.jgoodies:jgoodies-common:1.8.1")
-    implementation("org.jibx:jibx-run:1.4.2")
-    implementation("org.jsoup:jsoup:1.10.3")
+    implementation("org.jibx:jibx-run:1.4.5")
+    implementation("org.jsoup:jsoup:1.12.2")
     implementation project(":JOrtho")
-    implementation("org.freeplane.lightdev:simplyhtml:0.18.12")
+    implementation("org.freeplane.lightdev:simplyhtml:0.19.11")
     implementation("javax.help:javahelp:2.0.05")
     implementation("org.apache.xmlgraphics:batik-dom:1.7")
     implementation("org.apache.xmlgraphics:batik-svggen:1.7")
@@ -41,11 +41,11 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.jibx:jibx-bind:1.4.2")
-    testImplementation("org.jibx:jibx-extras:1.4.2")
-    bindingAntTask("org.jibx:jibx-bind:1.4.2")
-    bindingAntTask("org.jibx:jibx-extras:1.4.2")
-    bindingAntTask("org.apache.bcel:bcel:6.4.1")
+    testImplementation("org.jibx:jibx-bind:1.4.5")
+    testImplementation("org.jibx:jibx-extras:1.4.5")
+    bindingAntTask("org.jibx:jibx-bind:1.4.5")
+    bindingAntTask("org.jibx:jibx-extras:1.4.5")
+    bindingAntTask("org.apache.bcel:bcel:6.6.1") // jibx requires 6.5.0, but it is marked vulnerable
 }
 
 sourceSets {
