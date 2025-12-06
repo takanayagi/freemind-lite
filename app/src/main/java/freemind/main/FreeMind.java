@@ -693,7 +693,7 @@ public class FreeMind extends JFrame implements FreeMindMain, ActionListener {
 					url = new URL("file", null, decodedPath);
 				}
 				SpellChecker.registerDictionaries(url, Locale.getDefault().getLanguage());
-			} catch (MalformedURLException | UnsupportedEncodingException e) {
+			} catch (MalformedURLException e) {
 				freemind.main.Resources.getInstance().logException(e);
 			}
 		}
