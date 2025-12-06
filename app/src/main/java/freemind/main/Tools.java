@@ -52,7 +52,6 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
@@ -128,23 +127,18 @@ public class Tools {
 	/**
 	 * 
 	 */
-	public static final String FREEMIND_LIB_FREEMIND_JAR = "lib/freemind.jar";
+	public static final String FREEMIND_LIB_FREEMIND_JAR = "lib/freemind-lite.jar";
 
 	private static Logger logger = null;
 	static {
 		logger = freemind.main.Resources.getInstance().getLogger(Tools.class.getName());
 	}
 
-	public static final String CONTENTS_JAVA_FREEMIND_JAR = "Contents/Java/freemind.jar";
+	public static final String CLASSES_JAVA_MAIN = "classes/java/main/";
+	public static final String CONTENTS_JAVA_FREEMIND_JAR = "Contents/Java/freemind-lite.jar";
 
 	public static final String FREE_MIND_APP_CONTENTS_RESOURCES_JAVA = "Contents/Resources/Java/";
-
-	// public static final Set executableExtensions = new HashSet ({ "exe",
-	// "com", "vbs" });
-
-	// The Java programming language provides a shortcut syntax for creating and
-	// initializing an array. Here's an example of this syntax:
-	// boolean[] answers = { true, false, true, true, false };
+	public static final String FREE_MIND_BUILD_RESOURCES_MAIN = "resources/main/";
 
 	public static final Set<String> executableExtensions = new HashSet<>(5);
 	static {
@@ -166,8 +160,6 @@ public class Tools {
 	}
 
 	public static String colorToXml(Color col) {
-		// if (col == null) throw new IllegalArgumentException("Color was
-		// null");
 		if (col == null)
 			return null;
 		String red = Integer.toHexString(col.getRed());
@@ -199,8 +191,7 @@ public class Tools {
 
 	public static String PointToXml(Point col) {
 		if (col == null)
-			return null; // throw new IllegalArgumentException("Point was
-		// null");
+			return null;
 		Vector<String> l = new Vector<>();
 		l.add(Integer.toString(col.x));
 		l.add(Integer.toString(col.y));
@@ -437,11 +428,9 @@ public class Tools {
 	 * @return in case of trouble the absolute path.
 	 */
 	public static String fileToRelativeUrlString(File input, File pMapFile) {
-		URL link;
-		String relative;
 		try {
-			link = Tools.fileToUrl(input);
-			relative = link.toString();
+			URL link = Tools.fileToUrl(input);
+			String relative = link.toString();
 			if ("relative".equals(Resources.getInstance().getProperty("links"))) {
 				// Create relative URL
 				relative = Tools.toRelativeURL(Tools.fileToUrl(pMapFile), link);
@@ -1037,9 +1026,7 @@ public class Tools {
 		}
 		if (successful) {
 			String content = writer.getBuffer().toString();
-			// logger.info("Content before transformation: " + content);
 			String replacedContent = Tools.replaceUtf8AndIllegalXmlChars(content);
-			// logger.info("Content after transformation: " + replacedContent);
 			return new StringReader(replacedContent);
 		} else {
 			return new StringReader(
@@ -1503,7 +1490,6 @@ public class Tools {
 	public static void waitForEventQueue() {
 		try {
 			// wait until AWT thread starts
-			// final Exception e = new IllegalArgumentException("HERE");
 			if (!EventQueue.isDispatchThread()) {
 				EventQueue.invokeAndWait((Runnable) () -> {
 					// logger.info("Waited for event queue.");
@@ -1939,7 +1925,7 @@ public class Tools {
 		}
 	}
 
-	public static String getFreeMindBasePath() throws UnsupportedEncodingException {
+	public static String getFreeMindBasePath() {
 		String path =
 				FreeMindStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 		String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
@@ -1953,6 +1939,11 @@ public class Tools {
 			decodedPath = decodedPath.substring(0,
 					decodedPath.length() - FREEMIND_LIB_FREEMIND_JAR.length());
 			logger.info("reducded Path: " + decodedPath);
+		} else if (decodedPath.endsWith(CLASSES_JAVA_MAIN)) {
+			decodedPath = decodedPath.substring(0,
+					decodedPath.length() - CLASSES_JAVA_MAIN.length());
+			decodedPath = decodedPath + FREE_MIND_BUILD_RESOURCES_MAIN;
+			logger.info("development Path: " + decodedPath);
 		}
 		return decodedPath;
 	}
