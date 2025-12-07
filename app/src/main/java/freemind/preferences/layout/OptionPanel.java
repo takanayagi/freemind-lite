@@ -45,7 +45,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.factories.Borders;
+import com.jgoodies.forms.factories.Paddings;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
@@ -191,7 +191,7 @@ public class OptionPanel implements TextTranslator {
 				}
 				rightLayout = new FormLayout(newTab.getDescription(), "");
 				rightBuilder = new DefaultFormBuilder(rightLayout);
-				rightBuilder.border(Borders.DIALOG);
+				rightBuilder.border(Paddings.DIALOG);
 				lastTabName = newTab.getLabel();
 				// add a button to the left side:
 				JButton tabButton = new JButton(getText(lastTabName));

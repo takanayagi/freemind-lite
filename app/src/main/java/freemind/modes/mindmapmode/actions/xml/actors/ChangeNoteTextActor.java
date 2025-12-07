@@ -43,7 +43,7 @@ public class ChangeNoteTextActor extends XmlActorAdapter {
 			MindMapNode node = getNodeFromID(noteTextAction.getNode());
 			String newText = noteTextAction.getText();
 			String oldText = node.getNoteText();
-			if (!Tools.safeEquals(newText, oldText)) {
+			if (HtmlTools.compareHtmlBodies(newText, oldText) != 0) {
 				node.setNoteText(newText);
 				getExMapFeedback().nodeChanged(node);
 			}
@@ -67,7 +67,7 @@ public class ChangeNoteTextActor extends XmlActorAdapter {
 
 	public void setNoteText(MindMapNode node, String text) {
 		String oldNoteText = node.getNoteText();
-		if (Tools.safeEquals(text, oldNoteText)) {
+		if (HtmlTools.compareHtmlBodies(text, oldNoteText) == 0) {
 			// they are equal.
 			return;
 		}

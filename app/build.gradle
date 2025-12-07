@@ -27,7 +27,7 @@ dependencies {
     implementation("com.jgoodies:jgoodies-forms:1.9.0")
     implementation("com.jgoodies:jgoodies-common:1.8.1")
     implementation("org.jibx:jibx-run:1.4.5")
-    implementation("org.jsoup:jsoup:1.12.2")
+    implementation("org.jsoup:jsoup:1.15.4")
     implementation project(":JOrtho")
     implementation("org.freeplane.lightdev:simplyhtml:0.19.11")
     implementation("javax.help:javahelp:2.0.05")
@@ -147,10 +147,10 @@ tasks.named("run") {
         println "Java vendor: ${System.getProperty('java.vendor')}"
         println "Java vendor URL: ${System.getProperty('java.vendor.url')}"
         println "Java classpath: ${sourceSets.main.runtimeClasspath.asPath}"
-        println "======== Freemind starting ========"
+        println "======== FreeMind starting ========"
     }
     doLast {
-        println "======== Gradle run task completed ========"
+        println "======== FreeMind stopped ========"
     }
 }
 

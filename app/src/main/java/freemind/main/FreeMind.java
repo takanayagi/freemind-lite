@@ -41,7 +41,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -316,9 +315,10 @@ public class FreeMind extends JFrame implements FreeMindMain, ActionListener {
 			LoggingOutputStream los = new LoggingOutputStream(logger, StdFormatter.STDOUT);
 			System.setOut(new PrintStream(los, true));
 
-			logger = Logger.getLogger(StdFormatter.STDERR.getName());
-			los = new LoggingOutputStream(logger, StdFormatter.STDERR);
-			System.setErr(new PrintStream(los, true));
+			// commented out to avoid double logging to stderr:
+			// logger = Logger.getLogger(StdFormatter.STDERR.getName());
+			// los = new LoggingOutputStream(logger, StdFormatter.STDERR);
+			// System.setErr(new PrintStream(los, true));
 		} catch (SecurityException | IOException e) {
 			System.err.println("Error initializing logging system");
 			e.printStackTrace();

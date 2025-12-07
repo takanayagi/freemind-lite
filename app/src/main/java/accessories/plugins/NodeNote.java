@@ -31,12 +31,12 @@ public class NodeNote extends MindMapNodeHookAdapter {
 	public final static String NODE_NOTE_PLUGIN = "accessories/plugins/NodeNote.properties";
 
 	public final static String EMPTY_EDITOR_STRING =
-			"<html>\n  <head>\n\n  </head>\n  <body>\n    <p>\n      \n    </p>\n  </body>\n</html>\n";
+			"<html>\n  <body>\n    <p>\n      \n    </p>\n  </body>\n</html>\n";
 
 	public final static String EMPTY_EDITOR_STRING_ALTERNATIVE =
-			"<html>\n  <head>\n    \n  </head>\n  <body>\n    <p>\n      \n    </p>\n  </body>\n</html>\n";
+			"<html>\n  <body>\n    <p>\n      \n    </p>\n  </body>\n</html>\n";
 	public final static String EMPTY_EDITOR_STRING_ALTERNATIVE2 =
-			"<html>\n  <head>\n    \n    \n  </head>\n  <body>\n    <p>\n      \n    </p>\n  </body>\n</html>\n";
+			"<html>\n  <body>\n    <p>\n      \n    </p>\n  </body>\n</html>\n";
 
 	public void startupMapHook() {
 		super.startupMapHook();

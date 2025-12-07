@@ -219,6 +219,7 @@ public abstract class MapAdapter extends DefaultTreeModel implements MindMap {
 				setTitle = true;
 			}
 			++changesPerformedSinceLastSave;
+			logger.finest("Changes performed since last save: " + changesPerformedSinceLastSave);
 		}
 		return setTitle;
 	}

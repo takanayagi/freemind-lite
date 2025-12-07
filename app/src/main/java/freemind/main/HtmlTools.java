@@ -667,6 +667,21 @@ public class HtmlTools {
 		return output;
 	}
 
+	public static int compareHtmlBodies(String html1, String html2) {
+		if (html1 == null && html2 == null) {
+			return 0;
+		}
+		if (html1 == null) {
+			return -1;
+		}
+		if (html2 == null) {
+			return 1;
+		}
+		String body1 = extractHtmlBody(html1).replaceAll("\\s+", " ").replaceAll("  +", " ").trim();
+		String body2 = extractHtmlBody(html2).replaceAll("\\s+", " ").replaceAll("  +", " ").trim();
+		return body1.compareTo(body2);
+	}
+
 	/**
 	 * Is used from XSLT! Don't change, unless you change the freemind_version_updater.xslt, too.
 	 * 
@@ -822,6 +837,6 @@ public class HtmlTools {
 	 * Uses JSoup to parse HTML
 	 */
 	public void insertHtmlIntoNodes(String pText, MindMapNode pParentNode, NodeCreator pCreator) {
-		new NodeTraversor(new HtmlNodeVisitor(pParentNode, pCreator)).traverse(Jsoup.parse(pText));
+		NodeTraversor.traverse(new HtmlNodeVisitor(pParentNode, pCreator), Jsoup.parse(pText));
 	}
 }
