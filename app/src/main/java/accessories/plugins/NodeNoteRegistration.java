@@ -54,6 +54,7 @@ import freemind.controller.MenuItemSelectedListener;
 import freemind.extensions.HookRegistration;
 import freemind.main.FreeMind;
 import freemind.main.FreeMindCommon;
+import freemind.main.HtmlTools;
 import freemind.main.Resources;
 import freemind.main.Tools;
 import freemind.modes.MindMap;
@@ -125,10 +126,9 @@ public class NodeNoteRegistration implements HookRegistration, MenuItemSelectedL
 				String noteText = normalizeString(mNode.getNoteText());
 				logger.fine("Old doc =\n'" + noteText + "', Current document: \n'" + documentText
 						+ "'. Comparison: '" + Tools.compareText(noteText, documentText) + "'.");
-				if (!Tools.safeEquals(noteText, documentText)) {
+				if (HtmlTools.compareHtmlBodies(noteText, documentText) != 0) {
 					logger.finest("Making map dirty.");
-					// make map dirty in order to enable automatic save on note
-					// change.
+					// make map dirty in order to enable automatic save on note change.
 					getMindMapController().setSaved(false);
 				}
 			}
@@ -238,8 +238,8 @@ public class NodeNoteRegistration implements HookRegistration, MenuItemSelectedL
 		public void onUpdateNodeHook(MindMapNode node) {
 			// update display only, if the node is displayed.
 			String newText = node.getNoteText();
-			if (node == controller.getSelected()
-					&& (!Tools.safeEquals(newText, getHtmlEditorPanel().getDocumentText()))) {
+			if (node == controller.getSelected() && (HtmlTools.compareHtmlBodies(newText,
+					getHtmlEditorPanel().getDocumentText()) != 0)) {
 				getHtmlEditorPanel().setCurrentDocumentContent(newText == null ? "" : newText);
 			}
 			setStateIcon(node, !(newText == null || newText.equals("")));
