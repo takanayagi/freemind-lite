@@ -27,7 +27,7 @@ dependencies {
     implementation("com.jgoodies:jgoodies-forms:1.9.0")
     implementation("com.jgoodies:jgoodies-common:1.8.1")
     implementation("org.jibx:jibx-run:1.4.5")
-    implementation("org.jsoup:jsoup:1.15.4")
+    implementation("org.jsoup:jsoup:1.21.2")
     implementation project(":JOrtho")
     implementation("org.freeplane.lightdev:simplyhtml:0.19.11")
     implementation("javax.help:javahelp:2.0.05")
