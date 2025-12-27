@@ -26,8 +26,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import freemind.swing.FreeMindFormBuilder;
 
 public class StringProperty extends PropertyBean implements PropertyControl {
 	String description;
@@ -57,28 +56,34 @@ public class StringProperty extends PropertyBean implements PropertyControl {
 		mTextField = new JTextField();
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public void setValue(String value) {
 		mTextField.setText(value);
 		mTextField.selectAll();
 	}
 
+	@Override
 	public String getValue() {
 		return mTextField.getText();
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		JLabel label = builder.append(pTranslator.getText(getLabel()), mTextField);
 		label.setToolTipText(pTranslator.getText(getDescription()));
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 		mTextField.setEnabled(pEnabled);
 	}

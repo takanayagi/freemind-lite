@@ -34,7 +34,6 @@ import java.util.Vector;
 
 import javax.swing.JPanel;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -74,6 +73,7 @@ import freemind.modes.MindMapNode;
 import freemind.modes.mindmapmode.MindMapController;
 import freemind.modes.mindmapmode.actions.ApplyPatternAction;
 import freemind.modes.mindmapmode.actions.IconAction;
+import freemind.swing.FreeMindFormBuilder;
 
 /**
  * @author foltin
@@ -258,7 +258,7 @@ public class StylePatternFrame extends JPanel implements TextTranslator,
 		JPanel rightStack = new JPanel(cardLayout);
 		String form = "right:max(40dlu;p), 4dlu, 20dlu, 7dlu,right:max(40dlu;p), 4dlu, 80dlu, 7dlu";
 		FormLayout rightLayout = new FormLayout(form, "");
-		DefaultFormBuilder rightBuilder = new DefaultFormBuilder(rightLayout);
+		FreeMindFormBuilder rightBuilder = new FreeMindFormBuilder(rightLayout);
 		rightBuilder.border(Paddings.DIALOG);
 		mControls = getControls();
 		for (PropertyControl control : mControls) {

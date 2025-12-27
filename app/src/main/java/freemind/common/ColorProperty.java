@@ -31,11 +31,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-
 import freemind.controller.Controller;
 import freemind.main.Tools;
+import freemind.swing.FreeMindFormBuilder;
 
 public class ColorProperty extends PropertyBean implements PropertyControl, ActionListener {
 	String description;
@@ -67,23 +65,28 @@ public class ColorProperty extends PropertyBean implements PropertyControl, Acti
 		color = Color.BLACK;
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public void setValue(String value) {
 		setColorValue(Tools.xmlToColor(value));
 	}
 
+	@Override
 	public String getValue() {
 		return Tools.colorToXml(getColorValue());
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		JLabel label = builder.append(pTranslator.getText(getLabel()), mButton);
 		label.setToolTipText(pTranslator.getText(getDescription()));
 		// add "reset to standard" popup:
@@ -95,12 +98,14 @@ public class ColorProperty extends PropertyBean implements PropertyControl, Acti
 
 		// Set the component to show the popup menu
 		mButton.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mousePressed(MouseEvent evt) {
 				if (evt.isPopupTrigger()) {
 					menu.show(evt.getComponent(), evt.getX(), evt.getY());
 				}
 			}
 
+			@Override
 			public void mouseReleased(MouseEvent evt) {
 				if (evt.isPopupTrigger()) {
 					menu.show(evt.getComponent(), evt.getX(), evt.getY());
@@ -109,6 +114,7 @@ public class ColorProperty extends PropertyBean implements PropertyControl, Acti
 		});
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		Color result = Controller.showCommonJColorChooserDialog(mButton.getRootPane(),
 				mTranslator.getText(getLabel()), getColorValue());
@@ -135,6 +141,7 @@ public class ColorProperty extends PropertyBean implements PropertyControl, Acti
 		return color;
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 		mButton.setEnabled(pEnabled);
 	}

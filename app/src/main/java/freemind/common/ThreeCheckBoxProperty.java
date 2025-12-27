@@ -25,11 +25,9 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-
 import freemind.controller.BlindIcon;
 import freemind.main.Resources;
+import freemind.swing.FreeMindFormBuilder;
 
 public class ThreeCheckBoxProperty extends PropertyBean implements PropertyControl {
 	protected String mFalseValue = "false";
@@ -83,14 +81,17 @@ public class ThreeCheckBoxProperty extends PropertyBean implements PropertyContr
 		return state;
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public void setValue(String value) {
 		if (value == null || !(value.toLowerCase().equals(mTrueValue)
 				|| value.toLowerCase().equals(mFalseValue)
@@ -113,6 +114,7 @@ public class ThreeCheckBoxProperty extends PropertyBean implements PropertyContr
 		return DON_T_TOUCH_VALUE_INT;
 	}
 
+	@Override
 	public String getValue() {
 		return switch (state) {
 			case TRUE_VALUE_INT -> mTrueValue;
@@ -122,13 +124,15 @@ public class ThreeCheckBoxProperty extends PropertyBean implements PropertyContr
 		};
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		JLabel label = builder.append(pTranslator.getText(getLabel()), mButton);
 		String toolTipText = pTranslator.getText(getDescription());
 		label.setToolTipText(toolTipText);
 		mButton.setToolTipText(toolTipText);
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 		mButton.setEnabled(pEnabled);
 	}

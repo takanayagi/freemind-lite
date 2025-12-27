@@ -15,7 +15,7 @@ configurations {
     bindingAntTask.extendsFrom compileOnly
 }
 
-configurations.all {
+configurations.configureEach {
     exclude group: "org.apache.xmlgraphics", module: "batik-js"
     exclude group: "batik"
     exclude group: "xalan", module: "xalan"
@@ -25,7 +25,6 @@ configurations.all {
 
 dependencies {
     implementation("com.jgoodies:jgoodies-forms:1.9.0")
-    implementation("com.jgoodies:jgoodies-common:1.8.1")
     implementation("org.jibx:jibx-run:1.4.5")
     implementation("org.jsoup:jsoup:1.21.2")
     implementation project(":JOrtho")

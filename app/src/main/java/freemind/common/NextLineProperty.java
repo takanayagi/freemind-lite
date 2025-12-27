@@ -21,7 +21,7 @@
 /* $Id: NextLineProperty.java,v 1.1.2.2 2006/03/14 21:56:27 christianfoltin Exp $ */
 package freemind.common;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import freemind.swing.FreeMindFormBuilder;
 
 public class NextLineProperty implements PropertyControl {
 
@@ -29,18 +29,22 @@ public class NextLineProperty implements PropertyControl {
 		super();
 	}
 
+	@Override
 	public String getDescription() {
 		return null;
 	}
 
+	@Override
 	public String getLabel() {
 		return null;
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		builder.nextLine();
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 
 	}

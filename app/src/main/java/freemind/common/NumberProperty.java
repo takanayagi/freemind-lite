@@ -24,8 +24,7 @@ package freemind.common;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import freemind.swing.FreeMindFormBuilder;
 
 public class NumberProperty extends PropertyBean implements PropertyControl {
 	String description;
@@ -51,14 +50,17 @@ public class NumberProperty extends PropertyBean implements PropertyControl {
 
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public void setValue(String value) {
 		int intValue = min;
 		try {
@@ -75,6 +77,7 @@ public class NumberProperty extends PropertyBean implements PropertyControl {
 		spinner.setValue(intValue);
 	}
 
+	@Override
 	public String getValue() {
 		return spinner.getValue().toString();
 	}
@@ -83,11 +86,13 @@ public class NumberProperty extends PropertyBean implements PropertyControl {
 		return (Integer) (spinner.getValue());
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		JLabel label = builder.append(pTranslator.getText(getLabel()), spinner);
 		label.setToolTipText(pTranslator.getText(getDescription()));
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 		spinner.setEnabled(pEnabled);
 	}

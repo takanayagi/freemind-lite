@@ -40,8 +40,6 @@ import javax.swing.event.ListSelectionListener;
 
 import accessories.plugins.dialogs.ChooseFormatPopupDialog;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-
 import freemind.common.PropertyBean;
 import freemind.common.PropertyControl;
 import freemind.common.SeparatorProperty;
@@ -60,6 +58,7 @@ import freemind.modes.mindmapmode.hooks.PermanentMindMapNodeHookAdapter;
 import freemind.preferences.FreemindPropertyContributor;
 import freemind.preferences.FreemindPropertyListener;
 import freemind.preferences.layout.OptionPanel;
+import freemind.swing.FreeMindFormBuilder;
 
 /**
  * @author foltin
@@ -156,14 +155,17 @@ public class AutomaticLayout extends PermanentMindMapNodeHookAdapter {
 			pattern = null;
 		}
 
+		@Override
 		public String getDescription() {
 			return description;
 		}
 
+		@Override
 		public String getLabel() {
 			return label;
 		}
 
+		@Override
 		public void setValue(String value) {
 			pattern = value;
 			Pattern resultPattern = getPatternFromString();
@@ -173,17 +175,20 @@ public class AutomaticLayout extends PermanentMindMapNodeHookAdapter {
 			mButton.setToolTipText(patternString);
 		}
 
+		@Override
 		public String getValue() {
 			return pattern;
 		}
 
-		public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+		@Override
+		public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 			JLabel label = builder.append(pTranslator.getText(getLabel()), mButton);
 			label.setToolTipText(pTranslator.getText(getDescription()));
 			// add "reset to standard" popup:
 
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// construct pattern:
 			Pattern pat = getPatternFromString();
@@ -206,6 +211,7 @@ public class AutomaticLayout extends PermanentMindMapNodeHookAdapter {
 			return StylePatternFactory.getPatternFromString(pattern);
 		}
 
+		@Override
 		public void setEnabled(boolean pEnabled) {
 			mButton.setEnabled(pEnabled);
 		}
@@ -246,14 +252,17 @@ public class AutomaticLayout extends PermanentMindMapNodeHookAdapter {
 			patterns = null;
 		}
 
+		@Override
 		public String getDescription() {
 			return description;
 		}
 
+		@Override
 		public String getLabel() {
 			return label;
 		}
 
+		@Override
 		public void setValue(String value) {
 			patterns = value;
 			Patterns resultPatterns = getPatternsFromString();
@@ -268,11 +277,13 @@ public class AutomaticLayout extends PermanentMindMapNodeHookAdapter {
 			}
 		}
 
+		@Override
 		public String getValue() {
 			return patterns;
 		}
 
-		public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+		@Override
+		public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 			JLabel label = builder.append(pTranslator.getText(getLabel()));
 			builder.append(new JLabel());
 			label.setToolTipText(pTranslator.getText(getDescription()));
@@ -285,10 +296,12 @@ public class AutomaticLayout extends PermanentMindMapNodeHookAdapter {
 			return StylePatternFactory.getPatternsFromString(patterns);
 		}
 
+		@Override
 		public void setEnabled(boolean pEnabled) {
 			mList.setEnabled(pEnabled);
 		}
 
+		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			// construct pattern:
 			final Patterns pat = getPatternsFromString();

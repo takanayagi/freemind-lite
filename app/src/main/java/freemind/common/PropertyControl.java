@@ -21,7 +21,7 @@
 /* $Id: PropertyControl.java,v 1.1.2.2.2.1 2007/08/05 20:33:13 christianfoltin Exp $ */
 package freemind.common;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import freemind.swing.FreeMindFormBuilder;
 
 public interface PropertyControl {
 
@@ -29,7 +29,7 @@ public interface PropertyControl {
 
 	String getLabel();
 
-	void layout(DefaultFormBuilder builder, TextTranslator pTranslator);
+	void layout(FreeMindFormBuilder builder, TextTranslator pTranslator);
 
 	void setEnabled(boolean pEnabled);
 }

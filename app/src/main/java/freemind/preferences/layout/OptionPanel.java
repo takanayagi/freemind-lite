@@ -44,7 +44,6 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
@@ -76,6 +75,7 @@ import freemind.modes.mindmapmode.MindMapController;
 import freemind.modes.mindmapmode.actions.IconAction;
 import freemind.preferences.FreemindPropertyContributor;
 import freemind.preferences.layout.GrabKeyDialog.KeyBinding;
+import freemind.swing.FreeMindFormBuilder;
 
 /**
  * @author foltin
@@ -171,13 +171,13 @@ public class OptionPanel implements TextTranslator {
 	public void buildPanel() {
 
 		FormLayout leftLayout = new FormLayout("80dlu", "");
-		DefaultFormBuilder leftBuilder = new DefaultFormBuilder(leftLayout);
+		FreeMindFormBuilder leftBuilder = new FreeMindFormBuilder(leftLayout);
 
 		CardLayout cardLayout = new VariableSizeCardLayout();
 		JPanel rightStack = new JPanel(cardLayout);
 
 		FormLayout rightLayout = null; // add rows dynamically
-		DefaultFormBuilder rightBuilder = null;
+		FreeMindFormBuilder rightBuilder = null;
 		String lastTabName = null;
 
 		controls = getControls();
@@ -190,7 +190,7 @@ public class OptionPanel implements TextTranslator {
 					rightStack.add(rightBuilder.getPanel(), lastTabName);
 				}
 				rightLayout = new FormLayout(newTab.getDescription(), "");
-				rightBuilder = new DefaultFormBuilder(rightLayout);
+				rightBuilder = new FreeMindFormBuilder(rightLayout);
 				rightBuilder.border(Paddings.DIALOG);
 				lastTabName = newTab.getLabel();
 				// add a button to the left side:
@@ -303,18 +303,22 @@ public class OptionPanel implements TextTranslator {
 			this.layoutFormat = layoutFormat;
 		}
 
+		@Override
 		public String getDescription() {
 			return layoutFormat;
 		}
 
+		@Override
 		public String getLabel() {
 			return label;
 		}
 
-		public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+		@Override
+		public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 
 		}
 
+		@Override
 		public void setEnabled(boolean pEnabled) {
 
 		}
@@ -363,24 +367,29 @@ public class OptionPanel implements TextTranslator {
 			modifierMask = KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK;
 		}
 
+		@Override
 		public String getDescription() {
 			return description;
 		}
 
+		@Override
 		public String getLabel() {
 			return label;
 		}
 
+		@Override
 		public void setValue(String value) {
 			mButton.setText(value);
 			mButton.setToolTipText(mButton.getText());
 		}
 
+		@Override
 		public String getValue() {
 			return mButton.getText();
 		}
 
-		public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+		@Override
+		public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 			if (labelText == null)
 				labelText = pTranslator.getText(getLabel());
 
@@ -401,6 +410,7 @@ public class OptionPanel implements TextTranslator {
 			builder.add(mButton);
 		}
 
+		@Override
 		public void setEnabled(boolean pEnabled) {
 			mButton.setEnabled(pEnabled);
 		}
