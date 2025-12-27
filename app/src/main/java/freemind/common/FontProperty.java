@@ -26,8 +26,7 @@ import java.awt.GraphicsEnvironment;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import freemind.swing.FreeMindFormBuilder;
 
 public class FontProperty extends PropertyBean implements PropertyControl {
 	String description;
@@ -51,20 +50,24 @@ public class FontProperty extends PropertyBean implements PropertyControl {
 		mFontComboBox.addActionListener(pE -> firePropertyChangeEvent());
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		JLabel label = builder.append(pTranslator.getText(getLabel()), mFontComboBox);
 		label.setToolTipText(pTranslator.getText(getDescription()));
 
 	}
 
+	@Override
 	public void setValue(String pValue) {
 		for (int i = 0; i < mAvailableFontFamilyNames.length; i++) {
 			String fontName = mAvailableFontFamilyNames[i];
@@ -79,10 +82,12 @@ public class FontProperty extends PropertyBean implements PropertyControl {
 		}
 	}
 
+	@Override
 	public String getValue() {
 		return mAvailableFontFamilyNames[mFontComboBox.getSelectedIndex()];
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 		mFontComboBox.setEnabled(pEnabled);
 	}

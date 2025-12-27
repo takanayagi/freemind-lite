@@ -23,8 +23,7 @@ package freemind.common;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import freemind.swing.FreeMindFormBuilder;
 
 public class BooleanProperty extends PropertyBean implements PropertyControl {
 	static public final String FALSE_VALUE = "false";
@@ -50,14 +49,17 @@ public class BooleanProperty extends PropertyBean implements PropertyControl {
 		mCheckBox.addItemListener(pE -> firePropertyChangeEvent());
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public void setValue(String value) {
 		if (value == null || !(value.toLowerCase().equals(mTrueValue)
 				|| value.toLowerCase().equals(mFalseValue))) {
@@ -67,15 +69,18 @@ public class BooleanProperty extends PropertyBean implements PropertyControl {
 		mCheckBox.setSelected(value.toLowerCase().equals(mTrueValue));
 	}
 
+	@Override
 	public String getValue() {
 		return mCheckBox.isSelected() ? mTrueValue : mFalseValue;
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		JLabel label = builder.append(pTranslator.getText(getLabel()), mCheckBox);
 		label.setToolTipText(pTranslator.getText(getDescription()));
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 		mCheckBox.setEnabled(pEnabled);
 	}

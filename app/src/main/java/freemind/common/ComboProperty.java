@@ -28,8 +28,7 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import freemind.swing.FreeMindFormBuilder;
 
 public class ComboProperty extends PropertyBean implements PropertyControl {
 	String description;
@@ -107,14 +106,17 @@ public class ComboProperty extends PropertyBean implements PropertyControl {
 		}
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public void setValue(String value) {
 		if (possibleValues.contains(value)) {
 			mComboBox.setSelectedIndex(possibleValues.indexOf(value));
@@ -127,15 +129,18 @@ public class ComboProperty extends PropertyBean implements PropertyControl {
 		}
 	}
 
+	@Override
 	public String getValue() {
 		return possibleValues.get(mComboBox.getSelectedIndex());
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		JLabel label = builder.append(pTranslator.getText(getLabel()), mComboBox);
 		label.setToolTipText(pTranslator.getText(getDescription()));
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 		mComboBox.setEnabled(pEnabled);
 	}

@@ -21,7 +21,7 @@
 /* $Id: SeparatorProperty.java,v 1.1.2.2 2006/03/14 21:56:27 christianfoltin Exp $ */
 package freemind.common;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import freemind.swing.FreeMindFormBuilder;
 
 public class SeparatorProperty implements PropertyControl {
 
@@ -32,18 +32,22 @@ public class SeparatorProperty implements PropertyControl {
 		this.label = label;
 	}
 
+	@Override
 	public String getDescription() {
 		return null;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		builder.appendSeparator(pTranslator.getText("separator." + getLabel()));
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 
 	}

@@ -27,13 +27,11 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-
 import freemind.main.FreeMindMain;
 import freemind.modes.IconInformation;
 import freemind.modes.MindIcon;
 import freemind.modes.common.dialogs.IconSelectionPopupDialog;
+import freemind.swing.FreeMindFormBuilder;
 
 public class IconProperty extends PropertyBean implements PropertyControl, ActionListener {
 	String description;
@@ -62,14 +60,17 @@ public class IconProperty extends PropertyBean implements PropertyControl, Actio
 		mButton.addActionListener(this);
 	}
 
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public void setValue(String value) {
 		for (MindIcon icon : mIcons) {
 			if (icon.getName().equals(value)) {
@@ -84,15 +85,18 @@ public class IconProperty extends PropertyBean implements PropertyControl, Actio
 		mButton.setToolTipText(actualIcon.getDescription());
 	}
 
+	@Override
 	public String getValue() {
 		return mActualIcon.getName();
 	}
 
-	public void layout(DefaultFormBuilder builder, TextTranslator pTranslator) {
+	@Override
+	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
 		JLabel label = builder.append(pTranslator.getText(getLabel()), mButton);
 		label.setToolTipText(pTranslator.getText(getDescription()));
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		Vector<IconInformation> icons = new Vector<>();
 		Vector<String> descriptions = new Vector<>();
@@ -113,6 +117,7 @@ public class IconProperty extends PropertyBean implements PropertyControl, Actio
 		}
 	}
 
+	@Override
 	public void setEnabled(boolean pEnabled) {
 		mButton.setEnabled(pEnabled);
 	}
