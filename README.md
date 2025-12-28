@@ -5,6 +5,7 @@ The original FreeMind repository is https://sourceforge.net/p/freemind/code/ci/1
 Based on the original FreeMind, this product is named **FreeMind Lite** because the following features have been removed:
 
 - Applet plugin
+- Export PDF plugin
 - Flash plugin
 - Map plugin
 - Script plugin
