@@ -19,7 +19,7 @@
 				<menu_category name="text"/>
 				<menu_separator/>
 				<menu_category name="picture"/>
-				<menu_category name="pdf"/>
+				<menu_category name="svg"/>
 				<menu_separator/>
 				<menu_category name="other"/>
 			</menu_submenu>

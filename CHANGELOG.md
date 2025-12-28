@@ -4,3 +4,5 @@
 - Change 'about text' and splash screen to display 'Lite'
 - Update some libraries versions.
 - Upgrade gradle 8.14 to 9.2
+- Remove pdf export feature
+- Upgrade batik 1.7 to 1.19
