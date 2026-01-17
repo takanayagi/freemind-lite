@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 import java.util.Vector;
@@ -113,7 +115,7 @@ public class ToolsTests extends FreeMindTestBase {
 		System.out.println("External form: " + externalForm);
 		// convert back:
 		String unescapeHTMLUnicodeEntity = HtmlTools.unescapeHTMLUnicodeEntity(externalForm);
-		File urlToFile = Tools.urlToFile(new URL(unescapeHTMLUnicodeEntity));
+		File urlToFile = new File(new URI(unescapeHTMLUnicodeEntity));
 		assertEquals(input.getAbsolutePath(), urlToFile.getAbsolutePath(),
 				"Forth and back should give the same");
 
@@ -192,10 +194,10 @@ public class ToolsTests extends FreeMindTestBase {
 	}
 
 	protected void testCorrectRelativism(File input, String expected, File mapFile)
-			throws MalformedURLException {
+			throws URISyntaxException, MalformedURLException {
 		String relative = Tools.fileToRelativeUrlString(input, mapFile);
 		assertEquals(expected, relative, "Correct relative result?");
-		URL u = new URL(Tools.fileToUrl(mapFile), relative);
+		URL u = Tools.fileToUrl(mapFile).toURI().resolve(relative).toURL();
 		URL e = Tools.fileToUrl(input);
 		assertEquals(e.toExternalForm(), u.toExternalForm(), "Correct absolute  result?");
 	}
@@ -277,7 +279,7 @@ public class ToolsTests extends FreeMindTestBase {
 	public void testKeyDocumentationPathConversion() throws Exception {
 		String file =
 				"c:\\home\\java\\freemind\\0_9_0\\bin\\dist\\doc/FM_Key_Mappings_Quick_Guide.pdf";
-		System.out.println(Tools.urlToFile(Tools.fileToUrl(new File(file))));
+		System.out.println(new File(Tools.fileToUrl(new File(file)).toURI()));
 	}
 
 	@Test

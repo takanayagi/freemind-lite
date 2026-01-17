@@ -42,6 +42,7 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -1696,7 +1697,7 @@ public class Controller implements MapModuleChangeObserver {
 
 		public void actionPerformed(ActionEvent e) {
 			try {
-				c.getFrame().openDocument(new URL(url));
+				c.getFrame().openDocument(new URI(url).toURL());
 			} catch (MalformedURLException ex) {
 				c.errorMessage(c.getResourceString("url_error") + "\n" + ex);
 			} catch (Exception ex) {

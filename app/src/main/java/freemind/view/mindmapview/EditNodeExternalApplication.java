@@ -66,11 +66,9 @@ public class EditNodeExternalApplication extends EditNodeBase {
 						.format(new String[] {temporaryFile.toString()});
 				// System.out.println("External application:"+expandedHtmlEditingCommand);
 				Process htmlEditorProcess =
-						Runtime.getRuntime().exec(expandedHtmlEditingCommand);
-				htmlEditorProcess.waitFor(); // Here we wait
-												// until the
-												// editor ends
-												// up itself
+						Runtime.getRuntime().exec(expandedHtmlEditingCommand.split("\\s+"));
+				htmlEditorProcess.waitFor();
+				// Here we wait until the editor ends editor ends up itself
 				// Waiting does not work if the process starts another
 				// process,
 				// like in case of Microsoft Word. It works with certain

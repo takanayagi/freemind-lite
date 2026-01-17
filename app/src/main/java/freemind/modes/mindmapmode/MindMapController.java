@@ -42,7 +42,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -667,7 +667,7 @@ public class MindMapController extends ControllerAdapter
 	protected void loadInternally(URL url, MapAdapter model)
 			throws URISyntaxException, XMLParseException, IOException {
 		logger.info("Loading file: " + url.toString());
-		File file = Tools.urlToFile(url);
+		File file = new File(url.toURI());
 		if (!file.exists()) {
 			throw new FileNotFoundException(
 					Tools.expandPlaceholders(getText("file_not_found"), file.getPath()));
@@ -1368,18 +1368,18 @@ public class MindMapController extends ControllerAdapter
 				JOptionPane.showMessageDialog(getView(), getText("import_linked_branch_no_link"));
 				return;
 			}
-			URL absolute = null;
+			URI absolute = null;
 			try {
 				String relative = selected.getLink();
-				absolute = new URL(Tools.fileToUrl(getMap().getFile()), relative);
-			} catch (MalformedURLException ex) {
+				absolute = getMap().getFile().toURI().resolve(relative);
+			} catch (RuntimeException ex) {
 				JOptionPane.showMessageDialog(getView(),
 						"Couldn't create valid URL for:" + getMap().getFile());
 				freemind.main.Resources.getInstance().logException(ex);
 				return;
 			}
 			try {
-				MindMapNode node = loadTree(Tools.urlToFile(absolute));
+				MindMapNode node = loadTree(new File(absolute));
 				paste(node, selected);
 				invokeHooksRecursively(node, getMindMapMapModel());
 			} catch (Exception ex) {
@@ -1403,16 +1403,16 @@ public class MindMapController extends ControllerAdapter
 				JOptionPane.showMessageDialog(getView(), getText("import_linked_branch_no_link"));
 				return;
 			}
-			URL absolute = null;
+			URI absolute = null;
 			try {
 				String relative = selected.getLink();
-				absolute = new URL(Tools.fileToUrl(getMap().getFile()), relative);
-			} catch (MalformedURLException ex) {
+				absolute = getMap().getFile().toURI().resolve(relative);
+			} catch (RuntimeException ex) {
 				JOptionPane.showMessageDialog(getView(), "Couldn't create valid URL.");
 				return;
 			}
 			try {
-				MindMapNode node = loadTree(Tools.urlToFile(absolute));
+				MindMapNode node = loadTree(new File(absolute));
 				for (ListIterator<? extends MindMapNode> i = node.childrenUnfolded(); i
 						.hasNext();) {
 					MindMapNodeModel importNode = (MindMapNodeModel) i.next();

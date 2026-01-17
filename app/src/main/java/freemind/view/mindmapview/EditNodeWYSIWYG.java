@@ -26,7 +26,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -89,7 +89,7 @@ public class EditNodeWYSIWYG extends EditNodeBase {
 			htmlEditorPanel.setOpenHyperlinkHandler(pE -> {
 				try {
 					getBase().getController().getFrame()
-							.openDocument(new URL(pE.getActionCommand()));
+							.openDocument(new URI(pE.getActionCommand()).toURL());
 				} catch (Exception e) {
 					Resources.getInstance().logException(e);
 				}

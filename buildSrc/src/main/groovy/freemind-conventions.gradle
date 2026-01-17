@@ -8,13 +8,13 @@ repositories {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:deprecation,all,-fallthrough,-serial'
-    options.release = 17
+    options.release = 21
 }
 
 tasks.named("test") {

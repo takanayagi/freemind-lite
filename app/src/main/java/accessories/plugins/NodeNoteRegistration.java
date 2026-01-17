@@ -28,7 +28,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.net.URL;
+import java.net.URI;
 import java.util.Optional;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -386,7 +386,7 @@ public class NodeNoteRegistration implements HookRegistration, MenuItemSelectedL
 
 			public void actionPerformed(ActionEvent pE) {
 				try {
-					getMindMapController().getFrame().openDocument(new URL(pE.getActionCommand()));
+					getMindMapController().getFrame().openDocument(new URI(pE.getActionCommand()).toURL());
 				} catch (Exception e) {
 					freemind.main.Resources.getInstance().logException(e);
 				}
