@@ -13,7 +13,7 @@ java {
 }
 
 tasks.withType(JavaCompile) {
-    options.compilerArgs << '-Xlint:deprecation,all,-fallthrough,-serial'
+    options.compilerArgs << '-Xlint:deprecation,all,-fallthrough,-serial,-this-escape'
     options.release = 21
 }
 

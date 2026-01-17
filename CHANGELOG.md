@@ -6,3 +6,4 @@
 - Upgrade gradle 8.14 to 9.2
 - Remove pdf export feature
 - Upgrade batik 1.7 to 1.19
+- Upgrade Java version to 21
