@@ -19,7 +19,6 @@
  * Created on 12.08.2004
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import java.awt.event.ActionEvent;
@@ -27,16 +26,14 @@ import java.awt.event.ActionEvent;
 import freemind.modes.mindmapmode.MindMapController;
 
 public class ToggleFoldedAction extends MindmapAction {
-	private final MindMapController modeController;
+  private final MindMapController modeController;
 
-	public ToggleFoldedAction(MindMapController controller) {
-		super("toggle_folded", controller);
-		this.modeController = controller;
-	}
+  public ToggleFoldedAction(MindMapController controller) {
+    super("toggle_folded", controller);
+    this.modeController = controller;
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		modeController.toggleFolded();
-	}
-
-
+  public void actionPerformed(ActionEvent e) {
+    modeController.toggleFolded();
+  }
 }

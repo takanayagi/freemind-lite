@@ -31,40 +31,39 @@ import freemind.modes.MindMapNode;
 
 public class NoFilteringCondition implements Condition {
 
-	private static String description;
-	private static JComponent renderer;
-	private static NoFilteringCondition condition;
+  private static String description;
+  private static JComponent renderer;
+  private static NoFilteringCondition condition;
 
-	private NoFilteringCondition() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+  private NoFilteringCondition() {
+    super();
+    // TODO Auto-generated constructor stub
+  }
 
-	public String toString() {
-		if (description == null) {
-			description = Resources.getInstance().getResourceString("filter_no_filtering");
-		}
-		return description;
-	}
+  public String toString() {
+    if (description == null) {
+      description = Resources.getInstance().getResourceString("filter_no_filtering");
+    }
+    return description;
+  }
 
-	public boolean checkNode(Controller c, MindMapNode node) {
-		return true;
-	}
+  public boolean checkNode(Controller c, MindMapNode node) {
+    return true;
+  }
 
-	public JComponent getListCellRendererComponent() {
-		if (renderer == null) {
-			renderer = new JLabel(description);
-		}
-		return renderer;
-	}
+  public JComponent getListCellRendererComponent() {
+    if (renderer == null) {
+      renderer = new JLabel(description);
+    }
+    return renderer;
+  }
 
-	public static Condition createCondition() {
-		if (condition == null) {
-			condition = new NoFilteringCondition();
-		}
-		return condition;
-	}
+  public static Condition createCondition() {
+    if (condition == null) {
+      condition = new NoFilteringCondition();
+    }
+    return condition;
+  }
 
-	public void save(XMLElement element) {}
-
+  public void save(XMLElement element) {}
 }

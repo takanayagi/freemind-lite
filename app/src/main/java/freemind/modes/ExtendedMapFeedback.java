@@ -34,91 +34,86 @@ import freemind.modes.mindmapmode.actions.xml.actors.XmlActorFactory;
 
 /**
  * MapFeedback extended by the xml based node change management.
- * 
+ *
  * @author foltin
  * @date 16.03.2014
  */
 public interface ExtendedMapFeedback extends MapFeedback, MindMapActions {
-	/**
-	 * @return the action factory that contains the actors definitions.
-	 */
-	ActionRegistry getActionRegistry();
+  /**
+   * @return the action factory that contains the actors definitions.
+   */
+  ActionRegistry getActionRegistry();
 
-	boolean doTransaction(String pName, ActionPair pPair);
+  boolean doTransaction(String pName, ActionPair pPair);
 
+  /**
+   * Given a node identifier, this method returns the corresponding node.
+   *
+   * @throws IllegalArgumentException if the id is unknown.
+   */
+  NodeAdapter getNodeFromID(String nodeID);
 
-	/**
-	 * Given a node identifier, this method returns the corresponding node.
-	 * 
-	 * @throws IllegalArgumentException if the id is unknown.
-	 */
-	NodeAdapter getNodeFromID(String nodeID);
+  /**
+   * Calling this method the map-unique identifier of the node is returned (and created before, if
+   * not present)
+   */
+  String getNodeID(MindMapNode selected);
 
-	/**
-	 * Calling this method the map-unique identifier of the node is returned (and created before, if
-	 * not present)
-	 */
-	String getNodeID(MindMapNode selected);
+  /**
+   * @return
+   */
+  MindMapNode getSelected();
 
-	/**
-	 * @return
-	 */
-	MindMapNode getSelected();
+  void select(MindMapNode pFocussed, List<MindMapNode> pSelecteds);
 
-	void select(MindMapNode pFocussed, List<MindMapNode> pSelecteds);
+  /**
+   * @param pNewNode
+   * @param pParent
+   * @param pIndex
+   */
+  void insertNodeInto(MindMapNode pNewNode, MindMapNode pParent, int pIndex);
 
-	/**
-	 * @param pNewNode
-	 * @param pParent
-	 * @param pIndex
-	 */
-	void insertNodeInto(MindMapNode pNewNode, MindMapNode pParent, int pIndex);
+  /**
+   * @param pUserObject is the string/html of the new node
+   * @param pMap
+   * @return the new node.
+   */
+  MindMapNode newNode(Object pUserObject, MindMap pMap);
 
-	/**
-	 * @param pUserObject is the string/html of the new node
-	 * @param pMap
-	 * @return the new node.
-	 */
-	MindMapNode newNode(Object pUserObject, MindMap pMap);
+  /**
+   * @param pSelectedNode
+   */
+  void removeNodeFromParent(MindMapNode pSelectedNode);
 
-	/**
-	 * @param pSelectedNode
-	 */
-	void removeNodeFromParent(MindMapNode pSelectedNode);
+  /**
+   * @return the factory used to create all xml actors.
+   */
+  XmlActorFactory getActorFactory();
 
-	/**
-	 * @return the factory used to create all xml actors.
-	 */
-	XmlActorFactory getActorFactory();
+  Transferable copy(MindMapNode node, boolean saveInvisible);
 
-	Transferable copy(MindMapNode node, boolean saveInvisible);
+  /**
+   * @param pNodeList
+   * @param pSaveInvisible
+   * @return a MindMapNode list as Transferable (special FM flavor).
+   */
+  Transferable copy(List<? extends MindMapNode> pNodeList, boolean pSaveInvisible);
 
-	/**
-	 * @param pNodeList
-	 * @param pSaveInvisible
-	 * @return a MindMapNode list as Transferable (special FM flavor).
-	 */
-	Transferable copy(List<? extends MindMapNode> pNodeList, boolean pSaveInvisible);
+  void setWaitingCursor(boolean waiting);
 
-	void setWaitingCursor(boolean waiting);
+  void nodeStyleChanged(MindMapNode pNode);
 
-	void nodeStyleChanged(MindMapNode pNode);
+  HookFactory getHookFactory();
 
-	HookFactory getHookFactory();
+  /**
+   * @param pFile loads a file into a new map.
+   */
+  MapFeedback load(File pFile) throws IOException, XMLParseException, URISyntaxException;
 
-	/**
-	 * @param pFile loads a file into a new map.
-	 */
-	MapFeedback load(File pFile)
-			throws IOException, XMLParseException, URISyntaxException;
-
-	/**
-	 * Closes the actual map.
-	 * 
-	 * @param pForce true= without save.
-	 */
-	void close(boolean pForce);
-
-
-
+  /**
+   * Closes the actual map.
+   *
+   * @param pForce true= without save.
+   */
+  void close(boolean pForce);
 }

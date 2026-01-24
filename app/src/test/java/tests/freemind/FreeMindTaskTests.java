@@ -38,72 +38,66 @@ import freemind.common.FreeMindTask;
  */
 public class FreeMindTaskTests extends FreeMindTestBase {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tests.freemind.FreeMindTestBase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see tests.freemind.FreeMindTestBase#setUp()
+   */
+  protected void setUp() throws Exception {
+    super.setUp();
+  }
 
-	private static class TestTask extends FreeMindTask {
+  private static class TestTask extends FreeMindTask {
 
-		/**
-		 * 
-		 */
-		private static final int AMOUNT_OF_TIME = 10;
+    /** */
+    private static final int AMOUNT_OF_TIME = 10;
 
-		/**
-		 * @param pFrame
-		 */
-		public TestTask(JFrame pFrame) {
-			super(pFrame, AMOUNT_OF_TIME, "TestTask");
-		}
+    /**
+     * @param pFrame
+     */
+    public TestTask(JFrame pFrame) {
+      super(pFrame, AMOUNT_OF_TIME, "TestTask");
+    }
 
-		private int i = AMOUNT_OF_TIME;
+    private int i = AMOUNT_OF_TIME;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.common.FreeMindTask#processAction()
-		 */
-		protected boolean processAction() throws Exception {
-			Thread.sleep(200);
-			i--;
-			mProgressDescription =
-					new ProgressDescription("Format {0}", new Object[] {i});
-			return true;
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.common.FreeMindTask#processAction()
+     */
+    protected boolean processAction() throws Exception {
+      Thread.sleep(200);
+      i--;
+      mProgressDescription = new ProgressDescription("Format {0}", new Object[] {i});
+      return true;
+    }
+  }
 
-	}
-
-	/**
-	 * @throws InterruptedException
-	 * @throws InvocationTargetException
-	 * 
-	 */
-	@Test
-	public void testTestTask() throws InterruptedException, InvocationTargetException {
-		JFrame frame = new JFrame("Hi");
-		final TestTask task = new TestTask(frame);
-		JButton button = new JButton("Hello from FreeMind");
-		frame.add(button, BorderLayout.CENTER);
-		button.addActionListener(pE -> task.i = -100);
-		frame.setLocationRelativeTo(null);
-		frame.setSize(500, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-		// the task is called by the event queue.
-		EventQueue.invokeAndWait((Runnable) task::start);
-		while (!task.isFinished()) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				freemind.main.Resources.getInstance().logException(e);
-			}
-		}
-		assertEquals(0, task.i);
-	}
-
+  /**
+   * @throws InterruptedException
+   * @throws InvocationTargetException
+   */
+  @Test
+  public void testTestTask() throws InterruptedException, InvocationTargetException {
+    JFrame frame = new JFrame("Hi");
+    final TestTask task = new TestTask(frame);
+    JButton button = new JButton("Hello from FreeMind");
+    frame.add(button, BorderLayout.CENTER);
+    button.addActionListener(pE -> task.i = -100);
+    frame.setLocationRelativeTo(null);
+    frame.setSize(500, 300);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setVisible(true);
+    // the task is called by the event queue.
+    EventQueue.invokeAndWait((Runnable) task::start);
+    while (!task.isFinished()) {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        freemind.main.Resources.getInstance().logException(e);
+      }
+    }
+    assertEquals(0, task.i);
+  }
 }

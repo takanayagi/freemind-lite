@@ -30,130 +30,121 @@ import freemind.modes.ModeController;
 
 /**
  * Implments MindMapHook as an Adapter class. Implementation is straight forward.
- * 
+ *
  * @author foltin
- * 
  */
 public class HookAdapter implements MindMapHook {
 
-	private String name;
-	private Properties properties;
-	private ModeController controller;
+  private String name;
+  private Properties properties;
+  private ModeController controller;
 
-	// Logging:
-	protected Logger logger;
-	/**
-	 * Stores the plugin base class as declared by the plugin_registration/isBaseClass attribute.
-	 */
-	private PluginBaseClassSearcher baseClass;
-	protected MapFeedback mapFeedback;
+  // Logging:
+  protected Logger logger;
 
-	/**
-	 */
-	public HookAdapter() {
-		if (logger == null)
-			logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
-		baseClass = null;
-	}
+  /** Stores the plugin base class as declared by the plugin_registration/isBaseClass attribute. */
+  private PluginBaseClassSearcher baseClass;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.NodeHook#getName()
-	 */
-	public String getName() {
-		return this.name;
-	}
+  protected MapFeedback mapFeedback;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  /** */
+  public HookAdapter() {
+    if (logger == null)
+      logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
+    baseClass = null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.NodeHook#startupMapHook(java.lang.String)
-	 */
-	public void startupMapHook() {
-		// TODO Auto-generated method stub
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.NodeHook#getName()
+   */
+  public String getName() {
+    return this.name;
+  }
 
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.NodeHook#shutdownMapHook()
-	 */
-	public void shutdownMapHook() {
-		controller = null;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.NodeHook#startupMapHook(java.lang.String)
+   */
+  public void startupMapHook() {
+    // TODO Auto-generated method stub
 
-	/**
-	 */
-	protected ModeController getController() {
-		return controller;
-	}
+  }
 
-	/**
-	 */
-	protected Properties getProperties() {
-		return properties;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.NodeHook#shutdownMapHook()
+   */
+  public void shutdownMapHook() {
+    controller = null;
+  }
 
-	/**
-	 */
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
+  /** */
+  protected ModeController getController() {
+    return controller;
+  }
 
-	/**
-	 */
-	public void setController(MapFeedback controller) {
-		this.mapFeedback = controller;
-		if (controller instanceof ModeController) {
-			this.controller = (ModeController) controller;
-		}
-	}
+  /** */
+  protected Properties getProperties() {
+    return properties;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.MindMapHook#getResourceString(java.lang.String)
-	 */
-	public String getResourceString(String property) {
-		String result = properties.getProperty(property);
-		if (result == null) {
-			result = getController().getText(property);
-		}
-		if (result == null) {
-			logger.warning("The following property was not found:" + property);
-		}
-		return result;
-	}
+  /** */
+  public void setProperties(Properties properties) {
+    this.properties = properties;
+  }
 
-	public URL getResource(String resourceName) {
-		return this.getClass().getClassLoader().getResource(resourceName);
-	}
+  /** */
+  public void setController(MapFeedback controller) {
+    this.mapFeedback = controller;
+    if (controller instanceof ModeController) {
+      this.controller = (ModeController) controller;
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.MindMapHook#getPluginBaseClass()
-	 */
-	public Object getPluginBaseClass() {
-		return baseClass.getPluginBaseObject();
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.MindMapHook#getResourceString(java.lang.String)
+   */
+  public String getResourceString(String property) {
+    String result = properties.getProperty(property);
+    if (result == null) {
+      result = getController().getText(property);
+    }
+    if (result == null) {
+      logger.warning("The following property was not found:" + property);
+    }
+    return result;
+  }
 
-	public void setPluginBaseClass(PluginBaseClassSearcher baseClass) {
-		this.baseClass = baseClass;
-	}
+  public URL getResource(String resourceName) {
+    return this.getClass().getClassLoader().getResource(resourceName);
+  }
 
-	/**
-	 * After tree node change, the focus must be obtained as it is invalid.
-	 */
-	protected void obtainFocusForSelected() {
-		// Focus fix
-		getController().getController().obtainFocusForSelected();
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.MindMapHook#getPluginBaseClass()
+   */
+  public Object getPluginBaseClass() {
+    return baseClass.getPluginBaseObject();
+  }
 
+  public void setPluginBaseClass(PluginBaseClassSearcher baseClass) {
+    this.baseClass = baseClass;
+  }
+
+  /** After tree node change, the focus must be obtained as it is invalid. */
+  protected void obtainFocusForSelected() {
+    // Focus fix
+    getController().getController().obtainFocusForSelected();
+  }
 }

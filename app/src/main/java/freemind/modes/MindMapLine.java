@@ -22,18 +22,18 @@ import java.awt.Color;
 
 public interface MindMapLine extends Cloneable {
 
-	Color getColor();
+  Color getColor();
 
-	String getStyle();
+  String getStyle();
 
-	int getWidth();
+  int getWidth();
 
-	int getRealWidth();
+  int getRealWidth();
 
-	String toString();
+  String toString();
 
-	/** The node to which this line is associated. */
-	void setTarget(MindMapNode node);
+  /** The node to which this line is associated. */
+  void setTarget(MindMapNode node);
 
-	Object clone();
+  Object clone();
 }

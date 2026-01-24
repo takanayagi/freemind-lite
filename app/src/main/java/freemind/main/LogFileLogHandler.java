@@ -28,59 +28,56 @@ import java.util.logging.LogRecord;
  */
 public class LogFileLogHandler extends Handler {
 
-	private LogReceiver mLogReceiver = null;
+  private LogReceiver mLogReceiver = null;
 
-	public interface LogReceiver {
-		void receiveLog(String formattedMessage);
-	}
+  public interface LogReceiver {
+    void receiveLog(String formattedMessage);
+  }
 
-	/**
-	 * 
-	 */
-	public LogFileLogHandler(LogReceiver pLogReceiver) {
-		mLogReceiver = pLogReceiver;
-	}
+  /** */
+  public LogFileLogHandler(LogReceiver pLogReceiver) {
+    mLogReceiver = pLogReceiver;
+  }
 
-	public LogFileLogHandler() {}
+  public LogFileLogHandler() {}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.logging.Handler#publish(java.util.logging.LogRecord)
-	 */
-	@Override
-	public void publish(LogRecord pRecord) {
-		if (mLogReceiver == null) {
-			return;
-		}
-		if (!isLoggable(pRecord)) {
-			return;
-		}
-		mLogReceiver.receiveLog(getFormatter().format(pRecord));
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.util.logging.Handler#publish(java.util.logging.LogRecord)
+   */
+  @Override
+  public void publish(LogRecord pRecord) {
+    if (mLogReceiver == null) {
+      return;
+    }
+    if (!isLoggable(pRecord)) {
+      return;
+    }
+    mLogReceiver.receiveLog(getFormatter().format(pRecord));
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.logging.Handler#flush()
-	 */
-	@Override
-	public void flush() {}
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.util.logging.Handler#flush()
+   */
+  @Override
+  public void flush() {}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.logging.Handler#close()
-	 */
-	@Override
-	public void close() throws SecurityException {}
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.util.logging.Handler#close()
+   */
+  @Override
+  public void close() throws SecurityException {}
 
-	public LogReceiver getLogReceiver() {
-		return mLogReceiver;
-	}
+  public LogReceiver getLogReceiver() {
+    return mLogReceiver;
+  }
 
-	public void setLogReceiver(LogReceiver pLogReceiver) {
-		mLogReceiver = pLogReceiver;
-	}
-
+  public void setLogReceiver(LogReceiver pLogReceiver) {
+    mLogReceiver = pLogReceiver;
+  }
 }

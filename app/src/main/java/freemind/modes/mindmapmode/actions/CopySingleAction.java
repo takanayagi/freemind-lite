@@ -29,20 +29,20 @@ import javax.swing.AbstractAction;
 import freemind.modes.mindmapmode.MindMapController;
 
 public class CopySingleAction extends AbstractAction {
-	private final MindMapController controller;
+  private final MindMapController controller;
 
-	public CopySingleAction(MindMapController controller) {
-		super(controller.getText("copy_single"));
-		this.controller = controller;
-		setEnabled(false);
-	}
+  public CopySingleAction(MindMapController controller) {
+    super(controller.getText("copy_single"));
+    this.controller = controller;
+    setEnabled(false);
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		if (controller.getMap() != null) {
-			Transferable copy = controller.copySingle();
-			if (copy != null) {
-				controller.setClipboardContents(copy);
-			}
-		}
-	}
+  public void actionPerformed(ActionEvent e) {
+    if (controller.getMap() != null) {
+      Transferable copy = controller.copySingle();
+      if (copy != null) {
+        controller.setClipboardContents(copy);
+      }
+    }
+  }
 }

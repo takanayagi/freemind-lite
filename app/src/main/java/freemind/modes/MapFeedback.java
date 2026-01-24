@@ -28,108 +28,97 @@ import freemind.view.mindmapview.ViewFeedback;
 /**
  * This interface describes the services, the {@link ModeController} provides to a MindMap and its
  * descendants.
- * 
+ *
  * @author foltin
  * @date 30.01.2014
  */
 public interface MapFeedback {
-	/**
-	 * Is issued before a node is deleted. It is issued via NodeLifetimeListener.
-	 */
-	void fireNodePreDeleteEvent(MindMapNode node);
+  /** Is issued before a node is deleted. It is issued via NodeLifetimeListener. */
+  void fireNodePreDeleteEvent(MindMapNode node);
 
-	/**
-	 * Is issued after a node is deleted. It is issued via NodeLifetimeListener.
-	 */
-	void fireNodePostDeleteEvent(MindMapNode node, MindMapNode parent);
+  /** Is issued after a node is deleted. It is issued via NodeLifetimeListener. */
+  void fireNodePostDeleteEvent(MindMapNode node, MindMapNode parent);
 
-	/**
-	 * @param pNode
-	 */
-	void firePreSaveEvent(MindMapNode pNode);
+  /**
+   * @param pNode
+   */
+  void firePreSaveEvent(MindMapNode pNode);
 
-	/**
-	 * Invoke this method after you've changed how a node is to be represented in the tree.
-	 */
-	void nodeChanged(MindMapNode node);
+  /** Invoke this method after you've changed how a node is to be represented in the tree. */
+  void nodeChanged(MindMapNode node);
 
-	void nodeRefresh(MindMapNode node);
+  void nodeRefresh(MindMapNode node);
 
-	void fireRecursiveNodeCreateEvent(MindMapNode node);
+  void fireRecursiveNodeCreateEvent(MindMapNode node);
 
-	/**
-	 * @see ModeController#paste(MindMapNode, MindMapNode)
-	 */
-	void paste(MindMapNode pNode, MindMapNode pParent);
+  /**
+   * @see ModeController#paste(MindMapNode, MindMapNode)
+   */
+  void paste(MindMapNode pNode, MindMapNode pParent);
 
-	/**
-	 * @param pTextId
-	 * @return the string from Resources_<lang>.properties belonging to the pResourceId.
-	 */
-	String getResourceString(String pTextId);
+  /**
+   * @param pTextId
+   * @return the string from Resources_<lang>.properties belonging to the pResourceId.
+   */
+  String getResourceString(String pTextId);
 
-	/**
-	 * @param pResourceId
-	 * @return the setting of freemind.properties resp. auto.properties.
-	 */
-	String getProperty(String pResourceId);
+  /**
+   * @param pResourceId
+   * @return the setting of freemind.properties resp. auto.properties.
+   */
+  String getProperty(String pResourceId);
 
-	int getIntProperty(String key, int defaultValue);
+  int getIntProperty(String key, int defaultValue);
 
+  /**
+   * @param pProperty
+   * @param pValue
+   */
+  void setProperty(String pProperty, String pValue);
 
-	/**
-	 * @param pProperty
-	 * @param pValue
-	 */
-	void setProperty(String pProperty, String pValue);
+  /**
+   * Show the message to the user.
+   *
+   * @param pFormat
+   */
+  void out(String pFormat);
 
-	/**
-	 * Show the message to the user.
-	 * 
-	 * @param pFormat
-	 */
-	void out(String pFormat);
+  /**
+   * @return
+   */
+  Font getDefaultFont();
 
-	/**
-	 * @return
-	 */
-	Font getDefaultFont();
+  /**
+   * @param pFont
+   * @return
+   */
+  Font getFontThroughMap(Font pFont);
 
-	/**
-	 * @param pFont
-	 * @return
-	 */
-	Font getFontThroughMap(Font pFont);
+  /** MapFeedback and MindMap are closely intertwined. */
+  MindMap getMap();
 
-	/**
-	 * MapFeedback and MindMap are closely intertwined.
-	 */
-	MindMap getMap();
+  /**
+   * @param pLoadName
+   * @param pNode
+   * @return
+   */
+  NodeHook createNodeHook(String pLoadName, MindMapNode pNode);
 
-	/**
-	 * @param pLoadName
-	 * @param pNode
-	 * @return
-	 */
-	NodeHook createNodeHook(String pLoadName, MindMapNode pNode);
+  /**
+   * @param pNode
+   * @param pModel
+   */
+  void invokeHooksRecursively(MindMapNode pNode, MindMap pModel);
 
-	/**
-	 * @param pNode
-	 * @param pModel
-	 */
-	void invokeHooksRecursively(MindMapNode pNode, MindMap pModel);
+  /**
+   * @return a ViewAbstraction, if a view is attached, null otherwise.
+   */
+  ViewAbstraction getViewAbstraction();
 
-	/**
-	 * @return a ViewAbstraction, if a view is attached, null otherwise.
-	 */
-	ViewAbstraction getViewAbstraction();
+  /**
+   * @return null, if no feedback is available.
+   */
+  ViewFeedback getViewFeedback();
 
-	/**
-	 * @return null, if no feedback is available.
-	 */
-	ViewFeedback getViewFeedback();
-
-	void sortNodesByDepth(List<MindMapNode> inPlaceList);
-
+  void sortNodesByDepth(List<MindMapNode> inPlaceList);
 }
-

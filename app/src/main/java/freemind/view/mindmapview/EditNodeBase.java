@@ -51,265 +51,266 @@ import freemind.modes.ModeController;
 
 /**
  * @author foltin
- * 
  */
 public class EditNodeBase {
-	protected static boolean checkSpelling =
-			Resources.getInstance().getBoolProperty(FreeMindCommon.CHECK_SPELLING);
-	protected static final int BUTTON_OK = 0;
-	protected static final int BUTTON_CANCEL = 1;
-	protected static final int BUTTON_SPLIT = 2;
-	protected NodeView node;
-	private EditControl editControl;
-	private ModeController controller;
-	protected String text;
-	// this enables from outside close the edit mode
-	protected FocusListener textFieldListener = null;
+  protected static boolean checkSpelling =
+      Resources.getInstance().getBoolProperty(FreeMindCommon.CHECK_SPELLING);
+  protected static final int BUTTON_OK = 0;
+  protected static final int BUTTON_CANCEL = 1;
+  protected static final int BUTTON_SPLIT = 2;
+  protected NodeView node;
+  private EditControl editControl;
+  private ModeController controller;
+  protected String text;
+  // this enables from outside close the edit mode
+  protected FocusListener textFieldListener = null;
 
-	EditNodeBase(final NodeView node, final String text, ModeController controller,
-			EditControl editControl) {
-		this.controller = controller;
-		this.editControl = editControl;
-		this.node = node;
-		this.text = text;
-	}
+  EditNodeBase(
+      final NodeView node, final String text, ModeController controller, EditControl editControl) {
+    this.controller = controller;
+    this.editControl = editControl;
+    this.node = node;
+    this.text = text;
+  }
 
-	abstract static class EditDialog extends JDialog {
-		private static final long serialVersionUID = 6064679828160694117L;
-		private EditNodeBase base;
+  abstract static class EditDialog extends JDialog {
+    private static final long serialVersionUID = 6064679828160694117L;
+    private EditNodeBase base;
 
-		class DialogWindowListener extends WindowAdapter {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent )
-			 */
-			public void windowClosing(WindowEvent e) {
-				if (isVisible()) {
-					confirmedSubmit();
-				}
-			}
-		}
+    class DialogWindowListener extends WindowAdapter {
+      /*
+       * (non-Javadoc)
+       *
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent )
+       */
+      public void windowClosing(WindowEvent e) {
+        if (isVisible()) {
+          confirmedSubmit();
+        }
+      }
+    }
 
-		class SubmitAction extends AbstractAction {
-			private static final long serialVersionUID = -859458051986869388L;
+    class SubmitAction extends AbstractAction {
+      private static final long serialVersionUID = -859458051986869388L;
 
-			public void actionPerformed(ActionEvent e) {
-				submit();
-			}
-		}
+      public void actionPerformed(ActionEvent e) {
+        submit();
+      }
+    }
 
-		class CancelAction extends AbstractAction {
-			private static final long serialVersionUID = -6277471363654329607L;
+    class CancelAction extends AbstractAction {
+      private static final long serialVersionUID = -6277471363654329607L;
 
-			public void actionPerformed(ActionEvent e) {
-				confirmedCancel();
-			}
-		}
+      public void actionPerformed(ActionEvent e) {
+        confirmedCancel();
+      }
+    }
 
-		EditDialog(EditNodeBase base) {
-			super((JFrame) base.getFrame(), base.getText("edit_long_node"), /* modal = */ true);
-			getContentPane().setLayout(new BorderLayout());
-			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			DialogWindowListener dfl = new DialogWindowListener();
-			addWindowListener(dfl);
-			this.base = base;
-		}
+    EditDialog(EditNodeBase base) {
+      super((JFrame) base.getFrame(), base.getText("edit_long_node"), /* modal= */ true);
+      getContentPane().setLayout(new BorderLayout());
+      setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+      DialogWindowListener dfl = new DialogWindowListener();
+      addWindowListener(dfl);
+      this.base = base;
+    }
 
-		protected void confirmedSubmit() {
-			if (isChanged()) {
-				final int action = JOptionPane.showConfirmDialog(this,
-						base.getText("long_node_changed_submit"), "",
-						JOptionPane.YES_NO_CANCEL_OPTION);
-				if (action == JOptionPane.CANCEL_OPTION)
-					return;
-				if (action == JOptionPane.YES_OPTION) {
-					submit();
-					return;
-				}
-			}
-			cancel();
-		}
+    protected void confirmedSubmit() {
+      if (isChanged()) {
+        final int action =
+            JOptionPane.showConfirmDialog(
+                this,
+                base.getText("long_node_changed_submit"),
+                "",
+                JOptionPane.YES_NO_CANCEL_OPTION);
+        if (action == JOptionPane.CANCEL_OPTION) return;
+        if (action == JOptionPane.YES_OPTION) {
+          submit();
+          return;
+        }
+      }
+      cancel();
+    }
 
-		protected void confirmedCancel() {
-			if (isChanged()) {
-				final int action = JOptionPane.showConfirmDialog(this,
-						base.getText("long_node_changed_cancel"), "", JOptionPane.OK_CANCEL_OPTION);
-				if (action == JOptionPane.CANCEL_OPTION)
-					return;
-			}
-			cancel();
-		}
+    protected void confirmedCancel() {
+      if (isChanged()) {
+        final int action =
+            JOptionPane.showConfirmDialog(
+                this, base.getText("long_node_changed_cancel"), "", JOptionPane.OK_CANCEL_OPTION);
+        if (action == JOptionPane.CANCEL_OPTION) return;
+      }
+      cancel();
+    }
 
-		protected void submit() {
-			setVisible(false);
-		}
+    protected void submit() {
+      setVisible(false);
+    }
 
-		protected void cancel() {
-			setVisible(false);
-		}
+    protected void cancel() {
+      setVisible(false);
+    }
 
-		protected void split() {
-			setVisible(false);
-		}
+    protected void split() {
+      setVisible(false);
+    }
 
-		abstract protected boolean isChanged();
+    protected abstract boolean isChanged();
 
-		/**
-		 * @param base The base to set.
-		 */
-		void setBase(EditNodeBase base) {
-			this.base = base;
-		}
+    /**
+     * @param base The base to set.
+     */
+    void setBase(EditNodeBase base) {
+      this.base = base;
+    }
 
-		/**
-		 * @return Returns the base.
-		 */
-		EditNodeBase getBase() {
-			return base;
-		}
-	}
+    /**
+     * @return Returns the base.
+     */
+    EditNodeBase getBase() {
+      return base;
+    }
+  }
 
-	public interface EditControl {
-		void cancel();
+  public interface EditControl {
+    void cancel();
 
-		void ok(String newText);
+    void ok(String newText);
 
-		void split(String newText, int position);
-	}
+    void split(String newText, int position);
+  }
 
-	protected MapView getView() {
-		return controller.getView();
-	}
+  protected MapView getView() {
+    return controller.getView();
+  }
 
-	protected ModeController getModeController() {
-		return controller;
-	}
+  protected ModeController getModeController() {
+    return controller;
+  }
 
-	protected Controller getController() {
-		return controller.getController();
-	}
+  protected Controller getController() {
+    return controller.getController();
+  }
 
-	protected String getText(String string) {
-		return controller.getText(string);
-	}
+  protected String getText(String string) {
+    return controller.getText(string);
+  }
 
-	protected FreeMindMain getFrame() {
-		return controller.getFrame();
-	}
+  protected FreeMindMain getFrame() {
+    return controller.getFrame();
+  }
 
-	protected boolean binOptionIsTrue(String option) {
-		return Resources.getInstance().getBoolProperty(option);
-	}
+  protected boolean binOptionIsTrue(String option) {
+    return Resources.getInstance().getBoolProperty(option);
+  }
 
-	protected class EditCopyAction extends AbstractAction {
-		private static final long serialVersionUID = 5104219263806454592L;
-		private JTextComponent textComponent;
+  protected class EditCopyAction extends AbstractAction {
+    private static final long serialVersionUID = 5104219263806454592L;
+    private JTextComponent textComponent;
 
-		public EditCopyAction(JTextComponent textComponent) {
-			super(getText("copy"));
-			this.textComponent = textComponent;
-		}
+    public EditCopyAction(JTextComponent textComponent) {
+      super(getText("copy"));
+      this.textComponent = textComponent;
+    }
 
-		public void actionPerformed(ActionEvent e) {
-			String selection = textComponent.getSelectedText();
-			if (selection != null) {
-				getClipboard().setContents(new StringSelection(selection), null);
-			}
-		}
-	}
+    public void actionPerformed(ActionEvent e) {
+      String selection = textComponent.getSelectedText();
+      if (selection != null) {
+        getClipboard().setContents(new StringSelection(selection), null);
+      }
+    }
+  }
 
-	protected class EditPopupMenu extends JPopupMenu {
-		private static final long serialVersionUID = -6667980271052571216L;
+  protected class EditPopupMenu extends JPopupMenu {
+    private static final long serialVersionUID = -6667980271052571216L;
 
-		public EditPopupMenu(JTextComponent textComponent) {
-			EditCopyAction editCopyAction = new EditCopyAction(textComponent);
-			String selectedText = textComponent.getSelectedText();
-			if (selectedText == null || selectedText.isEmpty()) {
-				editCopyAction.setEnabled(false);
-			}
-			this.add(editCopyAction);
-		}
-	}
+    public EditPopupMenu(JTextComponent textComponent) {
+      EditCopyAction editCopyAction = new EditCopyAction(textComponent);
+      String selectedText = textComponent.getSelectedText();
+      if (selectedText == null || selectedText.isEmpty()) {
+        editCopyAction.setEnabled(false);
+      }
+      this.add(editCopyAction);
+    }
+  }
 
-	public void closeEdit() {
-		if (textFieldListener != null) {
-			textFieldListener.focusLost(null); // hack to close the edit
-		}
-	}
+  public void closeEdit() {
+    if (textFieldListener != null) {
+      textFieldListener.focusLost(null); // hack to close the edit
+    }
+  }
 
-	protected String getText() {
-		return text;
-	}
+  protected String getText() {
+    return text;
+  }
 
-	public Clipboard getClipboard() {
-		return Tools.getClipboard();
-	}
+  public Clipboard getClipboard() {
+    return Tools.getClipboard();
+  }
 
-	public EditControl getEditControl() {
-		return editControl;
-	}
+  public EditControl getEditControl() {
+    return editControl;
+  }
 
-	public NodeView getNode() {
-		return node;
-	}
+  public NodeView getNode() {
+    return node;
+  }
 
-	public FocusListener getTextFieldListener() {
-		return textFieldListener;
-	}
+  public FocusListener getTextFieldListener() {
+    return textFieldListener;
+  }
 
-	public void setText(String string) {
-		text = string;
-	}
+  public void setText(String string) {
+    text = string;
+  }
 
-	public void setTextFieldListener(FocusListener listener) {
-		textFieldListener = listener;
-	}
+  public void setTextFieldListener(FocusListener listener) {
+    textFieldListener = listener;
+  }
 
-	protected void redispatchKeyEvents(final JTextComponent textComponent, KeyEvent firstKeyEvent) {
-		if (textComponent.hasFocus()) {
-			return;
-		}
-		final KeyboardFocusManager currentKeyboardFocusManager =
-				KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		class KeyEventQueue implements KeyEventDispatcher, FocusListener {
-			LinkedList<KeyEvent> events = new LinkedList<>();
+  protected void redispatchKeyEvents(final JTextComponent textComponent, KeyEvent firstKeyEvent) {
+    if (textComponent.hasFocus()) {
+      return;
+    }
+    final KeyboardFocusManager currentKeyboardFocusManager =
+        KeyboardFocusManager.getCurrentKeyboardFocusManager();
+    class KeyEventQueue implements KeyEventDispatcher, FocusListener {
+      LinkedList<KeyEvent> events = new LinkedList<>();
 
-			public boolean dispatchKeyEvent(KeyEvent e) {
-				events.add(e);
-				return true;
-			}
+      public boolean dispatchKeyEvent(KeyEvent e) {
+        events.add(e);
+        return true;
+      }
 
-			public void focusGained(FocusEvent e) {
-				e.getComponent().removeFocusListener(this);
-				currentKeyboardFocusManager.removeKeyEventDispatcher(this);
-				for (KeyEvent ke : events) {
-					ke.setSource(textComponent);
-					textComponent.dispatchEvent(ke);
-				}
-			}
+      public void focusGained(FocusEvent e) {
+        e.getComponent().removeFocusListener(this);
+        currentKeyboardFocusManager.removeKeyEventDispatcher(this);
+        for (KeyEvent ke : events) {
+          ke.setSource(textComponent);
+          textComponent.dispatchEvent(ke);
+        }
+      }
 
-			public void focusLost(FocusEvent e) {}
-		}
-		final KeyEventQueue keyEventDispatcher = new KeyEventQueue();
-		currentKeyboardFocusManager.addKeyEventDispatcher(keyEventDispatcher);
-		textComponent.addFocusListener(keyEventDispatcher);
-		if (firstKeyEvent == null) {
-			return;
-		}
-		if (firstKeyEvent.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-			switch (firstKeyEvent.getKeyCode()) {
-				case KeyEvent.VK_HOME:
-					textComponent.setCaretPosition(0);
-					break;
-				case KeyEvent.VK_END:
-					textComponent.setCaretPosition(textComponent.getDocument().getLength());
-					break;
-			}
-		} else {
-			textComponent.selectAll(); // to enable overwrite
-			// redispath all key events
-			textComponent.dispatchEvent(firstKeyEvent);
-		}
-	}
+      public void focusLost(FocusEvent e) {}
+    }
+    final KeyEventQueue keyEventDispatcher = new KeyEventQueue();
+    currentKeyboardFocusManager.addKeyEventDispatcher(keyEventDispatcher);
+    textComponent.addFocusListener(keyEventDispatcher);
+    if (firstKeyEvent == null) {
+      return;
+    }
+    if (firstKeyEvent.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+      switch (firstKeyEvent.getKeyCode()) {
+        case KeyEvent.VK_HOME:
+          textComponent.setCaretPosition(0);
+          break;
+        case KeyEvent.VK_END:
+          textComponent.setCaretPosition(textComponent.getDocument().getLength());
+          break;
+      }
+    } else {
+      textComponent.selectAll(); // to enable overwrite
+      // redispath all key events
+      textComponent.dispatchEvent(firstKeyEvent);
+    }
+  }
 }

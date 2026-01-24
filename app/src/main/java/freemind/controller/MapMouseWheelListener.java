@@ -21,25 +21,22 @@ package freemind.controller;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-/**
- * The MouseListener which belongs to MapView
- */
+/** The MouseListener which belongs to MapView */
 public class MapMouseWheelListener implements MouseWheelListener {
 
-	private MouseWheelListener mListener;
+  private MouseWheelListener mListener;
 
-	public MapMouseWheelListener(Controller controller) {}
+  public MapMouseWheelListener(Controller controller) {}
 
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (mListener != null)
-			mListener.mouseWheelMoved(e);
-	}
+  public void mouseWheelMoved(MouseWheelEvent e) {
+    if (mListener != null) mListener.mouseWheelMoved(e);
+  }
 
-	public void register(MouseWheelListener handler) {
-		mListener = handler;
-	}
+  public void register(MouseWheelListener handler) {
+    mListener = handler;
+  }
 
-	public void deregister() {
-		mListener = null;
-	}
+  public void deregister() {
+    mListener = null;
+  }
 }

@@ -19,7 +19,6 @@
  * Created on 09.05.2004
  */
 
-
 package freemind.modes.mindmapmode.actions.xml.actors;
 
 import freemind.controller.actions.generated.instance.CompoundAction;
@@ -29,41 +28,39 @@ import freemind.modes.mindmapmode.actions.xml.ActorXml;
 
 /**
  * @author foltin
- * 
  */
 public class CompoundActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public CompoundActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public CompoundActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
-	 * generated.instance.XmlAction)
-	 */
-	public void act(XmlAction action) {
-		CompoundAction compound = (CompoundAction) action;
-		Object[] actions = compound.getListChoiceList().toArray();
-		for (Object obj : actions) {
-			if (obj instanceof XmlAction xmlAction) {
-				ActorXml actor = getExMapFeedback().getActionRegistry().getActor(xmlAction);
-				actor.act(xmlAction);
-			}
-		}
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
+   * generated.instance.XmlAction)
+   */
+  public void act(XmlAction action) {
+    CompoundAction compound = (CompoundAction) action;
+    Object[] actions = compound.getListChoiceList().toArray();
+    for (Object obj : actions) {
+      if (obj instanceof XmlAction xmlAction) {
+        ActorXml actor = getExMapFeedback().getActionRegistry().getActor(xmlAction);
+        actor.act(xmlAction);
+      }
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#getDoActionClass()
-	 */
-	public Class<CompoundAction> getDoActionClass() {
-		return CompoundAction.class;
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#getDoActionClass()
+   */
+  public Class<CompoundAction> getDoActionClass() {
+    return CompoundAction.class;
+  }
 }

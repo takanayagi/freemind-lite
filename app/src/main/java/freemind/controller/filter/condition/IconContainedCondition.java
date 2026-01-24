@@ -32,54 +32,56 @@ import freemind.modes.MindIcon;
 import freemind.modes.MindMapNode;
 
 public class IconContainedCondition implements Condition {
-	static final String ICON = "icon";
-	static final String NAME = "icon_contained_condition";
-	private String iconName;
+  static final String ICON = "icon";
+  static final String NAME = "icon_contained_condition";
+  private String iconName;
 
-	public IconContainedCondition(String iconName) {
-		this.iconName = iconName;
-	}
+  public IconContainedCondition(String iconName) {
+    this.iconName = iconName;
+  }
 
-	public boolean checkNode(Controller c, MindMapNode node) {
-		return Tools.iconFirstIndex(node, iconName) != -1 || isStateIconContained(node, iconName);
-	}
+  public boolean checkNode(Controller c, MindMapNode node) {
+    return Tools.iconFirstIndex(node, iconName) != -1 || isStateIconContained(node, iconName);
+  }
 
-	private static boolean isStateIconContained(MindMapNode node, String iconName) {
-		Set<String> stateIcons = node.getStateIcons().keySet();
-		for (String nextIcon : stateIcons) {
-			if (iconName.equals(nextIcon))
-				return true;
-		}
-		return false;
-	}
+  private static boolean isStateIconContained(MindMapNode node, String iconName) {
+    Set<String> stateIcons = node.getStateIcons().keySet();
+    for (String nextIcon : stateIcons) {
+      if (iconName.equals(nextIcon)) return true;
+    }
+    return false;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing .JList,
-	 * java.lang.Object, int, boolean, boolean)
-	 */
-	public JComponent getListCellRendererComponent() {
-		JCondition component = new JCondition();
-		String text = Resources.getInstance().getResourceString("filter_icon") + ' '
-				+ Resources.getInstance().getResourceString("filter_contains") + ' ';
-		component.add(new JLabel(text));
-		component.add(MindIcon.factory(getIconName()).getRendererComponent());
-		return component;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing .JList,
+   * java.lang.Object, int, boolean, boolean)
+   */
+  public JComponent getListCellRendererComponent() {
+    JCondition component = new JCondition();
+    String text =
+        Resources.getInstance().getResourceString("filter_icon")
+            + ' '
+            + Resources.getInstance().getResourceString("filter_contains")
+            + ' ';
+    component.add(new JLabel(text));
+    component.add(MindIcon.factory(getIconName()).getRendererComponent());
+    return component;
+  }
 
-	private String getIconName() {
-		return iconName;
-	}
+  private String getIconName() {
+    return iconName;
+  }
 
-	public void save(XMLElement element) {
-		XMLElement child = new XMLElement();
-		child.setName(NAME);
-		child.setAttribute(ICON, iconName);
-		element.addChild(child);
-	}
+  public void save(XMLElement element) {
+    XMLElement child = new XMLElement();
+    child.setName(NAME);
+    child.setAttribute(ICON, iconName);
+    element.addChild(child);
+  }
 
-	static Condition load(XMLElement element) {
-		return new IconContainedCondition(element.getStringAttribute(ICON));
-	}
+  static Condition load(XMLElement element) {
+    return new IconContainedCondition(element.getStringAttribute(ICON));
+  }
 }

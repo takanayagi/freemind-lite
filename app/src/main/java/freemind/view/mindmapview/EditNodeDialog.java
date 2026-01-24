@@ -47,253 +47,268 @@ import freemind.modes.ModeController;
 
 /**
  * @author foltin
- * 
  */
 public class EditNodeDialog extends EditNodeBase {
-	private KeyEvent firstEvent;
+  private KeyEvent firstEvent;
 
-	/** Private variable to hold the last value of the "Enter confirms" state. */
-	private static Tools.BooleanHolder booleanHolderForConfirmState;
+  /** Private variable to hold the last value of the "Enter confirms" state. */
+  private static Tools.BooleanHolder booleanHolderForConfirmState;
 
-	public EditNodeDialog(final NodeView node, final String text, final KeyEvent firstEvent,
-			ModeController controller, EditControl editControl) {
-		super(node, text, controller, editControl);
-		this.firstEvent = firstEvent;
-	}
+  public EditNodeDialog(
+      final NodeView node,
+      final String text,
+      final KeyEvent firstEvent,
+      ModeController controller,
+      EditControl editControl) {
+    super(node, text, controller, editControl);
+    this.firstEvent = firstEvent;
+  }
 
-	class LongNodeDialog extends EditDialog {
-		private static final long serialVersionUID = 6185443281994675732L;
-		private JTextArea textArea;
+  class LongNodeDialog extends EditDialog {
+    private static final long serialVersionUID = 6185443281994675732L;
+    private JTextArea textArea;
 
-		LongNodeDialog() {
-			super(EditNodeDialog.this);
-			textArea = new JTextArea(getText());
-			textArea.setLineWrap(true);
-			textArea.setWrapStyleWord(true);
-			// wish from
-			// https://sourceforge.net/forum/message.php?msg_id=5923410
-			// textArea.setTabSize(4);
-			// wrap around words rather than characters
+    LongNodeDialog() {
+      super(EditNodeDialog.this);
+      textArea = new JTextArea(getText());
+      textArea.setLineWrap(true);
+      textArea.setWrapStyleWord(true);
+      // wish from
+      // https://sourceforge.net/forum/message.php?msg_id=5923410
+      // textArea.setTabSize(4);
+      // wrap around words rather than characters
 
-			final JScrollPane editorScrollPane = new JScrollPane(textArea);
-			editorScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+      final JScrollPane editorScrollPane = new JScrollPane(textArea);
+      editorScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-			// int preferredHeight = new
-			// Integer(getFrame().getProperty("el__default_window_height")).intValue();
-			int preferredHeight = getNode().getHeight();
-			preferredHeight = Math.max(preferredHeight,
-					Integer.parseInt(getFrame().getProperty("el__min_default_window_height")));
-			preferredHeight = Math.min(preferredHeight,
-					Integer.parseInt(getFrame().getProperty("el__max_default_window_height")));
+      // int preferredHeight = new
+      // Integer(getFrame().getProperty("el__default_window_height")).intValue();
+      int preferredHeight = getNode().getHeight();
+      preferredHeight =
+          Math.max(
+              preferredHeight,
+              Integer.parseInt(getFrame().getProperty("el__min_default_window_height")));
+      preferredHeight =
+          Math.min(
+              preferredHeight,
+              Integer.parseInt(getFrame().getProperty("el__max_default_window_height")));
 
-			int preferredWidth = getNode().getWidth();
-			preferredWidth = Math.max(preferredWidth,
-					Integer.parseInt(getFrame().getProperty("el__min_default_window_width")));
-			preferredWidth = Math.min(preferredWidth,
-					Integer.parseInt(getFrame().getProperty("el__max_default_window_width")));
+      int preferredWidth = getNode().getWidth();
+      preferredWidth =
+          Math.max(
+              preferredWidth,
+              Integer.parseInt(getFrame().getProperty("el__min_default_window_width")));
+      preferredWidth =
+          Math.min(
+              preferredWidth,
+              Integer.parseInt(getFrame().getProperty("el__max_default_window_width")));
 
-			editorScrollPane.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
-			// textArea.setPreferredSize(new Dimension(500, 160));
+      editorScrollPane.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
+      // textArea.setPreferredSize(new Dimension(500, 160));
 
-			final JPanel panel = new JPanel();
+      final JPanel panel = new JPanel();
 
-			// String performedAction;
-			final JButton okButton = new JButton();
-			final JButton cancelButton = new JButton();
-			final JButton splitButton = new JButton();
-			final JCheckBox enterConfirms =
-					new JCheckBox("", binOptionIsTrue("el__enter_confirms_by_default"));
+      // String performedAction;
+      final JButton okButton = new JButton();
+      final JButton cancelButton = new JButton();
+      final JButton splitButton = new JButton();
+      final JCheckBox enterConfirms =
+          new JCheckBox("", binOptionIsTrue("el__enter_confirms_by_default"));
 
-			Tools.setLabelAndMnemonic(okButton, getText("ok"));
-			Tools.setLabelAndMnemonic(cancelButton, getText("cancel"));
-			Tools.setLabelAndMnemonic(splitButton, getText("split"));
-			Tools.setLabelAndMnemonic(enterConfirms, getText("enter_confirms"));
+      Tools.setLabelAndMnemonic(okButton, getText("ok"));
+      Tools.setLabelAndMnemonic(cancelButton, getText("cancel"));
+      Tools.setLabelAndMnemonic(splitButton, getText("split"));
+      Tools.setLabelAndMnemonic(enterConfirms, getText("enter_confirms"));
 
-			if (booleanHolderForConfirmState == null) {
-				booleanHolderForConfirmState = new Tools.BooleanHolder();
-				booleanHolderForConfirmState.setValue(enterConfirms.isSelected());
-			} else {
-				enterConfirms.setSelected(booleanHolderForConfirmState.getValue());
-			}
+      if (booleanHolderForConfirmState == null) {
+        booleanHolderForConfirmState = new Tools.BooleanHolder();
+        booleanHolderForConfirmState.setValue(enterConfirms.isSelected());
+      } else {
+        enterConfirms.setSelected(booleanHolderForConfirmState.getValue());
+      }
 
-			okButton.addActionListener(e -> {
-				// next try to avoid bug 1159: focus jumps to file-menu after closing
-				// html-editing-window
-				EventQueue.invokeLater(this::submit);
-			});
+      okButton.addActionListener(
+          e -> {
+            // next try to avoid bug 1159: focus jumps to file-menu after closing
+            // html-editing-window
+            EventQueue.invokeLater(this::submit);
+          });
 
-			cancelButton.addActionListener(e -> cancel());
+      cancelButton.addActionListener(e -> cancel());
 
-			splitButton.addActionListener(e -> split());
+      splitButton.addActionListener(e -> split());
 
-			enterConfirms.addActionListener(e -> {
-				textArea.requestFocus();
-				booleanHolderForConfirmState.setValue(enterConfirms.isSelected());
-			});
+      enterConfirms.addActionListener(
+          e -> {
+            textArea.requestFocus();
+            booleanHolderForConfirmState.setValue(enterConfirms.isSelected());
+          });
 
-			// On Enter act as if OK button was pressed
+      // On Enter act as if OK button was pressed
 
-			textArea.addKeyListener(new KeyListener() {
-				public void keyPressed(KeyEvent e) {
-					// escape key in long text editor (PN)
-					if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-						e.consume();
-						confirmedCancel();
-					} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-						if (enterConfirms.isSelected()
-								&& (e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) != 0) {
-							e.consume();
-							textArea.insert("\n", textArea.getCaretPosition());
-						} else if (enterConfirms.isSelected()
-								|| ((e.getModifiersEx() & KeyEvent.ALT_DOWN_MASK) != 0)) {
-							e.consume();
-							submit();
-						} else {
-							e.consume();
-							textArea.insert("\n", textArea.getCaretPosition());
-						}
-					}
-				}
+      textArea.addKeyListener(
+          new KeyListener() {
+            public void keyPressed(KeyEvent e) {
+              // escape key in long text editor (PN)
+              if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                e.consume();
+                confirmedCancel();
+              } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (enterConfirms.isSelected()
+                    && (e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) != 0) {
+                  e.consume();
+                  textArea.insert("\n", textArea.getCaretPosition());
+                } else if (enterConfirms.isSelected()
+                    || ((e.getModifiersEx() & KeyEvent.ALT_DOWN_MASK) != 0)) {
+                  e.consume();
+                  submit();
+                } else {
+                  e.consume();
+                  textArea.insert("\n", textArea.getCaretPosition());
+                }
+              }
+            }
 
-				public void keyTyped(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {}
 
-				public void keyReleased(KeyEvent e) {}
-			});
+            public void keyReleased(KeyEvent e) {}
+          });
 
-			textArea.addMouseListener(new MouseListener() {
-				public void mouseClicked(MouseEvent e) {}
+      textArea.addMouseListener(
+          new MouseListener() {
+            public void mouseClicked(MouseEvent e) {}
 
-				public void mouseEntered(MouseEvent e) {}
+            public void mouseEntered(MouseEvent e) {}
 
-				public void mouseExited(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {}
 
-				public void mousePressed(MouseEvent e) {
-					conditionallyShowPopup(e);
-				}
+            public void mousePressed(MouseEvent e) {
+              conditionallyShowPopup(e);
+            }
 
-				public void mouseReleased(MouseEvent e) {
-					conditionallyShowPopup(e);
-				}
+            public void mouseReleased(MouseEvent e) {
+              conditionallyShowPopup(e);
+            }
 
-				private void conditionallyShowPopup(MouseEvent e) {
-					if (e.isPopupTrigger()) {
-						JPopupMenu popupMenu = new EditPopupMenu(textArea);
-						if (checkSpelling) {
-							popupMenu.add(SpellChecker.createCheckerMenu());
-							popupMenu.add(SpellChecker.createLanguagesMenu());
-						}
-						popupMenu.show(e.getComponent(), e.getX(), e.getY());
-						e.consume();
-					}
-				}
-			});
+            private void conditionallyShowPopup(MouseEvent e) {
+              if (e.isPopupTrigger()) {
+                JPopupMenu popupMenu = new EditPopupMenu(textArea);
+                if (checkSpelling) {
+                  popupMenu.add(SpellChecker.createCheckerMenu());
+                  popupMenu.add(SpellChecker.createLanguagesMenu());
+                }
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                e.consume();
+              }
+            }
+          });
 
-			Font font = getNode().getTextFont();
-			font = Tools.updateFontSize(font, getView().getZoom(), font.getSize());
-			textArea.setFont(font);
+      Font font = getNode().getTextFont();
+      font = Tools.updateFontSize(font, getView().getZoom(), font.getSize());
+      textArea.setFont(font);
 
-			final Color nodeTextColor = getNode().getTextColor();
-			textArea.setForeground(nodeTextColor);
-			final Color nodeTextBackground = getNode().getTextBackground();
-			textArea.setBackground(nodeTextBackground);
-			textArea.setCaretColor(nodeTextColor);
+      final Color nodeTextColor = getNode().getTextColor();
+      textArea.setForeground(nodeTextColor);
+      final Color nodeTextBackground = getNode().getTextBackground();
+      textArea.setBackground(nodeTextBackground);
+      textArea.setCaretColor(nodeTextColor);
 
-			// panel.setPreferredSize(new Dimension(500, 160));
-			// editorScrollPane.setPreferredSize(new Dimension(500, 160));
+      // panel.setPreferredSize(new Dimension(500, 160));
+      // editorScrollPane.setPreferredSize(new Dimension(500, 160));
 
-			JPanel buttonPane = new JPanel();
-			buttonPane.add(enterConfirms);
-			buttonPane.add(okButton);
-			buttonPane.add(cancelButton);
-			buttonPane.add(splitButton);
-			buttonPane.setMaximumSize(new Dimension(1000, 20));
+      JPanel buttonPane = new JPanel();
+      buttonPane.add(enterConfirms);
+      buttonPane.add(okButton);
+      buttonPane.add(cancelButton);
+      buttonPane.add(splitButton);
+      buttonPane.setMaximumSize(new Dimension(1000, 20));
 
-			if (getFrame().getProperty("el__buttons_position").equals("above")) {
-				panel.add(buttonPane);
-				panel.add(editorScrollPane);
-			} else {
-				panel.add(editorScrollPane);
-				panel.add(buttonPane);
-			}
+      if (getFrame().getProperty("el__buttons_position").equals("above")) {
+        panel.add(buttonPane);
+        panel.add(editorScrollPane);
+      } else {
+        panel.add(editorScrollPane);
+        panel.add(buttonPane);
+      }
 
-			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-			setContentPane(panel);
+      panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+      setContentPane(panel);
 
-			if (firstEvent != null) {
-				redispatchKeyEvents(textArea, firstEvent);
-			} // 1st key event defined
-			else {
-				textArea.setCaretPosition(getText().length());
-			}
+      if (firstEvent != null) {
+        redispatchKeyEvents(textArea, firstEvent);
+      } // 1st key event defined
+      else {
+        textArea.setCaretPosition(getText().length());
+      }
 
-			if (checkSpelling) {
-				SpellChecker.register(textArea, false, true, true, true);
-			}
-		}
+      if (checkSpelling) {
+        SpellChecker.register(textArea, false, true, true, true);
+      }
+    }
 
-		public void setVisible(boolean visible) {
-			if (visible) {
-				textArea.requestFocus();
-			}
-			super.setVisible(visible);
-		}
+    public void setVisible(boolean visible) {
+      if (visible) {
+        textArea.requestFocus();
+      }
+      super.setVisible(visible);
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.view.mindmapview.EditNodeBase.Dialog#cancel()
-		 */
-		protected void cancel() {
-			getEditControl().cancel();
-			super.cancel();
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.view.mindmapview.EditNodeBase.Dialog#cancel()
+     */
+    protected void cancel() {
+      getEditControl().cancel();
+      super.cancel();
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.view.mindmapview.EditNodeBase.Dialog#split()
-		 */
-		protected void split() {
-			getEditControl().split(textArea.getText(), textArea.getCaretPosition());
-			super.split();
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.view.mindmapview.EditNodeBase.Dialog#split()
+     */
+    protected void split() {
+      getEditControl().split(textArea.getText(), textArea.getCaretPosition());
+      super.split();
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.view.mindmapview.EditNodeBase.Dialog#submit()
-		 */
-		protected void submit() {
-			getEditControl().ok(textArea.getText());
-			super.submit();
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.view.mindmapview.EditNodeBase.Dialog#submit()
+     */
+    protected void submit() {
+      getEditControl().ok(textArea.getText());
+      super.submit();
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.view.mindmapview.EditNodeBase.Dialog#isChanged()
-		 */
-		protected boolean isChanged() {
-			return !getText().equals(textArea.getText());
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.view.mindmapview.EditNodeBase.Dialog#isChanged()
+     */
+    protected boolean isChanged() {
+      return !getText().equals(textArea.getText());
+    }
 
-		public Component getMostRecentFocusOwner() {
-			if (isFocused()) {
-				return getFocusOwner();
-			} else {
-				return textArea;
-			}
-		}
-	}
+    public Component getMostRecentFocusOwner() {
+      if (isFocused()) {
+        return getFocusOwner();
+      } else {
+        return textArea;
+      }
+    }
+  }
 
-	public void show() {
-		final EditDialog dialog = new LongNodeDialog();
+  public void show() {
+    final EditDialog dialog = new LongNodeDialog();
 
-		dialog.pack(); // calculate the size
+    dialog.pack(); // calculate the size
 
-		// set position
-		getView().scrollNodeToVisible(getNode(), 0);
-		Tools.setDialogLocationRelativeTo(dialog, getNode());
-		dialog.setVisible(true);
-	}
+    // set position
+    getView().scrollNodeToVisible(getNode(), 0);
+    Tools.setDialogLocationRelativeTo(dialog, getNode());
+    dialog.setVisible(true);
+  }
 }

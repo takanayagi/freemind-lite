@@ -31,147 +31,146 @@ import freemind.modes.MapFeedback;
 import freemind.modes.MindMapNode;
 
 public class HookInstanciationMethod {
-	private interface DestinationNodesGetter {
-		Collection<MindMapNode> getDestinationNodes(MapFeedback controller, MindMapNode focussed,
-				List<MindMapNode> selecteds);
+  private interface DestinationNodesGetter {
+    Collection<MindMapNode> getDestinationNodes(
+        MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds);
 
-		MindMapNode getCenterNode(MapFeedback controller, MindMapNode focussed,
-				List<MindMapNode> selecteds);
-	}
+    MindMapNode getCenterNode(
+        MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds);
+  }
 
-	private static class DefaultDestinationNodesGetter implements DestinationNodesGetter {
-		public Collection<MindMapNode> getDestinationNodes(MapFeedback controller,
-				MindMapNode focussed, List<MindMapNode> selecteds) {
-			return selecteds;
-		}
+  private static class DefaultDestinationNodesGetter implements DestinationNodesGetter {
+    public Collection<MindMapNode> getDestinationNodes(
+        MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds) {
+      return selecteds;
+    }
 
-		public MindMapNode getCenterNode(MapFeedback controller, MindMapNode focussed,
-				List<MindMapNode> selecteds) {
-			return focussed;
-		}
-	}
+    public MindMapNode getCenterNode(
+        MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds) {
+      return focussed;
+    }
+  }
 
-	private static class RootDestinationNodesGetter implements DestinationNodesGetter {
-		public Collection<MindMapNode> getDestinationNodes(MapFeedback controller,
-				MindMapNode focussed, List<MindMapNode> selecteds) {
-			Vector<MindMapNode> returnValue = new Vector<>();
-			returnValue.add(controller.getMap().getRootNode());
-			return returnValue;
-		}
+  private static class RootDestinationNodesGetter implements DestinationNodesGetter {
+    public Collection<MindMapNode> getDestinationNodes(
+        MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds) {
+      Vector<MindMapNode> returnValue = new Vector<>();
+      returnValue.add(controller.getMap().getRootNode());
+      return returnValue;
+    }
 
-		public MindMapNode getCenterNode(MapFeedback controller, MindMapNode focussed,
-				List<MindMapNode> selecteds) {
-			return controller.getMap().getRootNode();
-		}
-	}
+    public MindMapNode getCenterNode(
+        MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds) {
+      return controller.getMap().getRootNode();
+    }
+  }
 
-	private static class AllDestinationNodesGetter implements DestinationNodesGetter {
-		private void addChilds(MindMapNode node, Collection<MindMapNode> allNodeCollection) {
-			allNodeCollection.add(node);
-			for (Iterator<? extends MindMapNode> i = node.childrenFolded(); i.hasNext();) {
-				MindMapNode child = i.next();
-				addChilds(child, allNodeCollection);
-			}
-		}
+  private static class AllDestinationNodesGetter implements DestinationNodesGetter {
+    private void addChilds(MindMapNode node, Collection<MindMapNode> allNodeCollection) {
+      allNodeCollection.add(node);
+      for (Iterator<? extends MindMapNode> i = node.childrenFolded(); i.hasNext(); ) {
+        MindMapNode child = i.next();
+        addChilds(child, allNodeCollection);
+      }
+    }
 
-		public Collection<MindMapNode> getDestinationNodes(MapFeedback controller,
-				MindMapNode focussed, List<MindMapNode> selecteds) {
-			Vector<MindMapNode> returnValue = new Vector<>();
-			addChilds(controller.getMap().getRootNode(), returnValue);
-			return returnValue;
-		}
+    public Collection<MindMapNode> getDestinationNodes(
+        MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds) {
+      Vector<MindMapNode> returnValue = new Vector<>();
+      addChilds(controller.getMap().getRootNode(), returnValue);
+      return returnValue;
+    }
 
-		public MindMapNode getCenterNode(MapFeedback controller, MindMapNode focussed,
-				List<MindMapNode> selecteds) {
-			return focussed;
-		}
+    public MindMapNode getCenterNode(
+        MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds) {
+      return focussed;
+    }
+  }
 
-	}
+  private boolean isSingleton;
+  private DestinationNodesGetter getter;
+  private final boolean isPermanent;
+  private final boolean isUndoable;
 
-	private boolean isSingleton;
-	private DestinationNodesGetter getter;
-	private final boolean isPermanent;
-	private final boolean isUndoable;
+  public boolean isSingleton() {
+    return isSingleton;
+  }
 
-	public boolean isSingleton() {
-		return isSingleton;
-	}
+  /**
+   * @return Returns the isPermanent.
+   */
+  public boolean isPermanent() {
+    return isPermanent;
+  }
 
-	/**
-	 * @return Returns the isPermanent.
-	 */
-	public boolean isPermanent() {
-		return isPermanent;
-	}
+  private HookInstanciationMethod(
+      boolean isPermanent, boolean isSingleton, DestinationNodesGetter getter, boolean isUndoable) {
+    this.isPermanent = isPermanent;
+    this.isSingleton = isSingleton;
+    this.getter = getter;
+    this.isUndoable = isUndoable;
+  }
 
-	private HookInstanciationMethod(boolean isPermanent, boolean isSingleton,
-			DestinationNodesGetter getter, boolean isUndoable) {
-		this.isPermanent = isPermanent;
-		this.isSingleton = isSingleton;
-		this.getter = getter;
-		this.isUndoable = isUndoable;
-	}
+  public static final HookInstanciationMethod Once =
+      new HookInstanciationMethod(true, true, new DefaultDestinationNodesGetter(), true);
 
-	static final public HookInstanciationMethod Once =
-			new HookInstanciationMethod(true, true, new DefaultDestinationNodesGetter(), true);
-	/** The hook should only be added/removed to the root node. */
-	static final public HookInstanciationMethod OnceForRoot =
-			new HookInstanciationMethod(true, true, new RootDestinationNodesGetter(), true);
-	/** Each (or none) node should have the hook. */
-	static final public HookInstanciationMethod OnceForAllNodes =
-			new HookInstanciationMethod(true, true, new AllDestinationNodesGetter(), true);
-	/**
-	 * This is for MindMapHooks in general. Here, no undo- or redoaction are performed, the undo
-	 * information is given by the actions the hook performs.
-	 */
-	static final public HookInstanciationMethod Other =
-			new HookInstanciationMethod(false, false, new DefaultDestinationNodesGetter(), false);
-	/**
-	 * This is for MindMapHooks that wish to be applied to root, whereevery they are called from.
-	 * Here, no undo- or redoaction are performed, the undo information is given by the actions the
-	 * hook performs.
-	 */
-	static final public HookInstanciationMethod ApplyToRoot =
-			new HookInstanciationMethod(false, false, new RootDestinationNodesGetter(), false);
+  /** The hook should only be added/removed to the root node. */
+  public static final HookInstanciationMethod OnceForRoot =
+      new HookInstanciationMethod(true, true, new RootDestinationNodesGetter(), true);
 
-	static final public HashMap<String, HookInstanciationMethod> getAllInstanciationMethods() {
-		HashMap<String, HookInstanciationMethod> res = new HashMap<>();
-		res.put("Once", Once);
-		res.put("OnceForRoot", OnceForRoot);
-		res.put("OnceForAllNodes", OnceForAllNodes);
-		res.put("Other", Other);
-		res.put("ApplyToRoot", ApplyToRoot);
-		return res;
-	}
+  /** Each (or none) node should have the hook. */
+  public static final HookInstanciationMethod OnceForAllNodes =
+      new HookInstanciationMethod(true, true, new AllDestinationNodesGetter(), true);
 
-	/**
-	 */
-	public Collection<MindMapNode> getDestinationNodes(MapFeedback controller, MindMapNode focussed,
-			List<MindMapNode> selecteds) {
-		return getter.getDestinationNodes(controller, focussed, selecteds);
-	}
+  /**
+   * This is for MindMapHooks in general. Here, no undo- or redoaction are performed, the undo
+   * information is given by the actions the hook performs.
+   */
+  public static final HookInstanciationMethod Other =
+      new HookInstanciationMethod(false, false, new DefaultDestinationNodesGetter(), false);
 
-	/**
-	 */
-	public boolean isAlreadyPresent(String hookName, MindMapNode focussed) {
-		for (PermanentNodeHook hook : focussed.getActivatedHooks()) {
-			if (hookName.equals(hook.getName())) {
-				return true;
-			}
-		}
-		return false;
-	}
+  /**
+   * This is for MindMapHooks that wish to be applied to root, whereevery they are called from.
+   * Here, no undo- or redoaction are performed, the undo information is given by the actions the
+   * hook performs.
+   */
+  public static final HookInstanciationMethod ApplyToRoot =
+      new HookInstanciationMethod(false, false, new RootDestinationNodesGetter(), false);
 
-	/**
-	 */
-	public MindMapNode getCenterNode(MapFeedback controller, MindMapNode focussed,
-			List<MindMapNode> selecteds) {
-		return getter.getCenterNode(controller, focussed, selecteds);
-	}
+  public static final HashMap<String, HookInstanciationMethod> getAllInstanciationMethods() {
+    HashMap<String, HookInstanciationMethod> res = new HashMap<>();
+    res.put("Once", Once);
+    res.put("OnceForRoot", OnceForRoot);
+    res.put("OnceForAllNodes", OnceForAllNodes);
+    res.put("Other", Other);
+    res.put("ApplyToRoot", ApplyToRoot);
+    return res;
+  }
 
-	/**
-	 */
-	public boolean isUndoable() {
-		return isUndoable;
-	}
+  /** */
+  public Collection<MindMapNode> getDestinationNodes(
+      MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds) {
+    return getter.getDestinationNodes(controller, focussed, selecteds);
+  }
+
+  /** */
+  public boolean isAlreadyPresent(String hookName, MindMapNode focussed) {
+    for (PermanentNodeHook hook : focussed.getActivatedHooks()) {
+      if (hookName.equals(hook.getName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** */
+  public MindMapNode getCenterNode(
+      MapFeedback controller, MindMapNode focussed, List<MindMapNode> selecteds) {
+    return getter.getCenterNode(controller, focussed, selecteds);
+  }
+
+  /** */
+  public boolean isUndoable() {
+    return isUndoable;
+  }
 }

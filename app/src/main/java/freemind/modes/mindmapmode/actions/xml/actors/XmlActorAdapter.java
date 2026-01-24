@@ -35,90 +35,82 @@ import freemind.view.mindmapview.ViewFeedback;
  */
 public abstract class XmlActorAdapter implements ActorXml {
 
-	protected ExtendedMapFeedback mMapFeedback;
+  protected ExtendedMapFeedback mMapFeedback;
 
-	protected static Logger logger = null;
+  protected static Logger logger = null;
 
-	/**
-	 * 
-	 */
-	public XmlActorAdapter(ExtendedMapFeedback pMapFeedback) {
-		mMapFeedback = pMapFeedback;
-		if (logger == null) {
-			logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
-		}
-		addActor(this);
-	}
+  /** */
+  public XmlActorAdapter(ExtendedMapFeedback pMapFeedback) {
+    mMapFeedback = pMapFeedback;
+    if (logger == null) {
+      logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
+    }
+    addActor(this);
+  }
 
+  /**
+   * @deprecated replaced by {@link XmlActorAdapter#getExMapFeedback()}
+   * @return
+   */
+  @Deprecated
+  protected MindMapController getModeController() {
+    return (MindMapController) mMapFeedback;
+  }
 
-	/**
-	 * @deprecated replaced by {@link XmlActorAdapter#getExMapFeedback()}
-	 * @return
-	 */
-	@Deprecated
-	protected MindMapController getModeController() {
-		return (MindMapController) mMapFeedback;
-	}
+  /**
+   * @return the mapFeedback
+   */
+  public ExtendedMapFeedback getExMapFeedback() {
+    return mMapFeedback;
+  }
 
-	/**
-	 * @return the mapFeedback
-	 */
-	public ExtendedMapFeedback getExMapFeedback() {
-		return mMapFeedback;
-	}
+  public ViewFeedback getViewFeedback() {
+    return getExMapFeedback().getViewFeedback();
+  }
 
-	public ViewFeedback getViewFeedback() {
-		return getExMapFeedback().getViewFeedback();
-	}
+  /**
+   * @param pActionPair
+   */
+  protected void execute(ActionPair pActionPair) {
+    getExMapFeedback().doTransaction(getDoActionClass().getName(), pActionPair);
+  }
 
-	/**
-	 * @param pActionPair
-	 */
-	protected void execute(ActionPair pActionPair) {
-		getExMapFeedback().doTransaction(getDoActionClass().getName(), pActionPair);
+  /**
+   * @param pNodeId
+   * @return
+   */
+  protected NodeAdapter getNodeFromID(String pNodeId) {
+    return getExMapFeedback().getNodeFromID(pNodeId);
+  }
 
-	}
+  /**
+   * @return
+   */
+  protected MindMapNode getSelected() {
+    return getExMapFeedback().getSelected();
+  }
 
-	/**
-	 * @param pNodeId
-	 * @return
-	 */
-	protected NodeAdapter getNodeFromID(String pNodeId) {
-		return getExMapFeedback().getNodeFromID(pNodeId);
-	}
+  /**
+   * @param pNode
+   * @return
+   */
+  protected String getNodeID(MindMapNode pNode) {
+    return getExMapFeedback().getNodeID(pNode);
+  }
 
+  protected void addActor(ActorXml actor) {
+    if (actor != null) {
+      // registration:
+      getExMapFeedback().getActionRegistry().registerActor(actor, actor.getDoActionClass());
+    }
+  }
 
-	/**
-	 * @return
-	 */
-	protected MindMapNode getSelected() {
-		return getExMapFeedback().getSelected();
-	}
+  protected XmlActorFactory getXmlActorFactory() {
+    return getExMapFeedback().getActorFactory();
+  }
 
-	/**
-	 * @param pNode
-	 * @return
-	 */
-	protected String getNodeID(MindMapNode pNode) {
-		return getExMapFeedback().getNodeID(pNode);
-	}
-
-	protected void addActor(ActorXml actor) {
-		if (actor != null) {
-			// registration:
-			getExMapFeedback().getActionRegistry().registerActor(actor, actor.getDoActionClass());
-		}
-	}
-
-	protected XmlActorFactory getXmlActorFactory() {
-		return getExMapFeedback().getActorFactory();
-	}
-
-
-	/**
-	 */
-	protected MindMapLinkRegistry getLinkRegistry() {
-		return getExMapFeedback().getMap().getLinkRegistry();
-	}
-
+  /** */
+  protected MindMapLinkRegistry getLinkRegistry() {
+    return getExMapFeedback().getMap().getLinkRegistry();
+  }
 }

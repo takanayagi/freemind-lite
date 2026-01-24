@@ -34,92 +34,89 @@ import freemind.modes.common.dialogs.IconSelectionPopupDialog;
 import freemind.swing.FreeMindFormBuilder;
 
 public class IconProperty extends PropertyBean implements PropertyControl, ActionListener {
-	String description;
+  String description;
 
-	String label;
+  String label;
 
-	JButton mButton;
+  JButton mButton;
 
-	private final FreeMindMain mFreeMindMain;
+  private final FreeMindMain mFreeMindMain;
 
-	/**
-	 * Of IconInformation s.
-	 */
-	private final Vector<MindIcon> mIcons;
+  /** Of IconInformation s. */
+  private final Vector<MindIcon> mIcons;
 
-	private MindIcon mActualIcon = null;
+  private MindIcon mActualIcon = null;
 
-	public IconProperty(String description, String label, FreeMindMain frame,
-			Vector<MindIcon> icons) {
-		super();
-		this.description = description;
-		this.label = label;
-		this.mFreeMindMain = frame;
-		this.mIcons = icons;
-		mButton = new JButton();
-		mButton.addActionListener(this);
-	}
+  public IconProperty(
+      String description, String label, FreeMindMain frame, Vector<MindIcon> icons) {
+    super();
+    this.description = description;
+    this.label = label;
+    this.mFreeMindMain = frame;
+    this.mIcons = icons;
+    mButton = new JButton();
+    mButton.addActionListener(this);
+  }
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+  @Override
+  public String getDescription() {
+    return description;
+  }
 
-	@Override
-	public String getLabel() {
-		return label;
-	}
+  @Override
+  public String getLabel() {
+    return label;
+  }
 
-	@Override
-	public void setValue(String value) {
-		for (MindIcon icon : mIcons) {
-			if (icon.getName().equals(value)) {
-				mActualIcon = icon;
-				setIcon(mActualIcon);
-			}
-		}
-	}
+  @Override
+  public void setValue(String value) {
+    for (MindIcon icon : mIcons) {
+      if (icon.getName().equals(value)) {
+        mActualIcon = icon;
+        setIcon(mActualIcon);
+      }
+    }
+  }
 
-	private void setIcon(MindIcon actualIcon) {
-		mButton.setIcon(actualIcon.getIcon());
-		mButton.setToolTipText(actualIcon.getDescription());
-	}
+  private void setIcon(MindIcon actualIcon) {
+    mButton.setIcon(actualIcon.getIcon());
+    mButton.setToolTipText(actualIcon.getDescription());
+  }
 
-	@Override
-	public String getValue() {
-		return mActualIcon.getName();
-	}
+  @Override
+  public String getValue() {
+    return mActualIcon.getName();
+  }
 
-	@Override
-	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
-		JLabel label = builder.append(pTranslator.getText(getLabel()), mButton);
-		label.setToolTipText(pTranslator.getText(getDescription()));
-	}
+  @Override
+  public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
+    JLabel label = builder.append(pTranslator.getText(getLabel()), mButton);
+    label.setToolTipText(pTranslator.getText(getDescription()));
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		Vector<IconInformation> icons = new Vector<>();
-		Vector<String> descriptions = new Vector<>();
-		for (MindIcon icon : mIcons) {
-			icons.add(icon);
-			descriptions.add(icon.getDescription());
-		}
-		IconSelectionPopupDialog dialog =
-				new IconSelectionPopupDialog(mFreeMindMain.getJFrame(), icons, mFreeMindMain);
-		dialog.setLocationRelativeTo(mFreeMindMain.getJFrame());
-		dialog.setModal(true);
-		dialog.setVisible(true);
-		int result = dialog.getResult();
-		if (result >= 0) {
-			MindIcon icon = mIcons.get(result);
-			setValue(icon.getName());
-			firePropertyChangeEvent();
-		}
-	}
+  @Override
+  public void actionPerformed(ActionEvent arg0) {
+    Vector<IconInformation> icons = new Vector<>();
+    Vector<String> descriptions = new Vector<>();
+    for (MindIcon icon : mIcons) {
+      icons.add(icon);
+      descriptions.add(icon.getDescription());
+    }
+    IconSelectionPopupDialog dialog =
+        new IconSelectionPopupDialog(mFreeMindMain.getJFrame(), icons, mFreeMindMain);
+    dialog.setLocationRelativeTo(mFreeMindMain.getJFrame());
+    dialog.setModal(true);
+    dialog.setVisible(true);
+    int result = dialog.getResult();
+    if (result >= 0) {
+      MindIcon icon = mIcons.get(result);
+      setValue(icon.getName());
+      firePropertyChangeEvent();
+    }
+  }
 
-	@Override
-	public void setEnabled(boolean pEnabled) {
-		mButton.setEnabled(pEnabled);
-	}
-
+  @Override
+  public void setEnabled(boolean pEnabled) {
+    mButton.setEnabled(pEnabled);
+  }
 }

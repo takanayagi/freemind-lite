@@ -26,16 +26,16 @@ import freemind.main.IFreeMindSplash;
 /** */
 public class SplashTests extends FreeMindTestBase {
 
-	@Test
-	public void testLightBuldSplash() throws InterruptedException {
-		IFreeMindSplash splash = new FreeMindSplashModern(mFreeMindMain);
-		splash.setVisible(true);
-		splash.getFeedBack().setMaximumValue(11);
-		for (int i = 0; i < 10; i++) {
-			splash.getFeedBack().increase("test: " + i, null);
-			Thread.sleep(1000L);
-		}
-	}
+  @Test
+  public void testLightBuldSplash() throws InterruptedException {
+    IFreeMindSplash splash = new FreeMindSplashModern(mFreeMindMain);
+    splash.setVisible(true);
+    splash.getFeedBack().setMaximumValue(11);
+    for (int i = 0; i < 10; i++) {
+      splash.getFeedBack().increase("test: " + i, null);
+      Thread.sleep(1000L);
+    }
+  }
 }
 
 // private static java.util.logging.Logger logger =

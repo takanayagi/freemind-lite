@@ -29,22 +29,21 @@ import freemind.modes.MindMapNode;
 import freemind.modes.mindmapmode.MindMapController;
 
 public class NodeUpAction extends MindmapAction {
-	private final MindMapController modeController;
-	private static Logger logger;
+  private final MindMapController modeController;
+  private static Logger logger;
 
-	public NodeUpAction(MindMapController modeController) {
-		super("node_up", modeController);
-		this.modeController = modeController;
-		if (logger == null) {
-			logger = modeController.getFrame().getLogger(this.getClass().getName());
-		}
-	}
+  public NodeUpAction(MindMapController modeController) {
+    super("node_up", modeController);
+    this.modeController = modeController;
+    if (logger == null) {
+      logger = modeController.getFrame().getLogger(this.getClass().getName());
+    }
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		MindMapNode selected = modeController.getSelected();
-		List<MindMapNode> selecteds = modeController.getSelecteds();
-		modeController.moveNodes(selected, selecteds, -1);
-		modeController.select(selected, selecteds);
-	}
-
+  public void actionPerformed(ActionEvent e) {
+    MindMapNode selected = modeController.getSelected();
+    List<MindMapNode> selecteds = modeController.getSelecteds();
+    modeController.moveNodes(selected, selecteds, -1);
+    modeController.select(selected, selecteds);
+  }
 }

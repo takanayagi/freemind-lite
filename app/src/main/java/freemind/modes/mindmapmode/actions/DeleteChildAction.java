@@ -19,7 +19,6 @@
  * Created on 05.05.2004
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import java.awt.event.ActionEvent;
@@ -32,40 +31,45 @@ import freemind.modes.MindMapNode;
 import freemind.modes.mindmapmode.MindMapController;
 
 public class DeleteChildAction extends MindmapAction {
-	private final MindMapController mMindMapController;
+  private final MindMapController mMindMapController;
 
-	public DeleteChildAction(MindMapController modeController) {
-		super("remove_node", "images/editdelete.png", modeController);
-		this.mMindMapController = modeController;
-	}
+  public DeleteChildAction(MindMapController modeController) {
+    super("remove_node", "images/editdelete.png", modeController);
+    this.mMindMapController = modeController;
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		// ask user if not root is selected:
-		for (MindMapNode node : mMindMapController.getSelecteds()) {
-			if (node.isRoot()) {
-				mMindMapController.getController().errorMessage(
-						mMindMapController.getFrame().getResourceString("cannot_delete_root"));
-				return;
-			}
-		}
-		int showResult = new OptionalDontShowMeAgainDialog(
-				mMindMapController.getFrame().getJFrame(), mMindMapController.getSelectedView(),
-				"really_remove_node", "confirmation", mMindMapController,
-				new OptionalDontShowMeAgainDialog.StandardPropertyHandler(
-						mMindMapController.getController(),
-						FreeMind.RESOURCES_DELETE_NODES_WITHOUT_QUESTION),
-				OptionalDontShowMeAgainDialog.ONLY_OK_SELECTION_IS_STORED).show().getResult();
-		if (showResult != JOptionPane.OK_OPTION) {
-			return;
-		}
-		// because of multiple selection, cut is better.
-		mMindMapController.cut();
-		// this.c.deleteNode(c.getSelected());
-	}
+  public void actionPerformed(ActionEvent e) {
+    // ask user if not root is selected:
+    for (MindMapNode node : mMindMapController.getSelecteds()) {
+      if (node.isRoot()) {
+        mMindMapController
+            .getController()
+            .errorMessage(mMindMapController.getFrame().getResourceString("cannot_delete_root"));
+        return;
+      }
+    }
+    int showResult =
+        new OptionalDontShowMeAgainDialog(
+                mMindMapController.getFrame().getJFrame(),
+                mMindMapController.getSelectedView(),
+                "really_remove_node",
+                "confirmation",
+                mMindMapController,
+                new OptionalDontShowMeAgainDialog.StandardPropertyHandler(
+                    mMindMapController.getController(),
+                    FreeMind.RESOURCES_DELETE_NODES_WITHOUT_QUESTION),
+                OptionalDontShowMeAgainDialog.ONLY_OK_SELECTION_IS_STORED)
+            .show()
+            .getResult();
+    if (showResult != JOptionPane.OK_OPTION) {
+      return;
+    }
+    // because of multiple selection, cut is better.
+    mMindMapController.cut();
+    // this.c.deleteNode(c.getSelected());
+  }
 
-	public Class<DeleteNodeAction> getDoActionClass() {
-		return DeleteNodeAction.class;
-	}
-
-
+  public Class<DeleteNodeAction> getDoActionClass() {
+    return DeleteNodeAction.class;
+  }
 }

@@ -17,7 +17,6 @@
  *Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-
 package freemind.modes.mindmapmode;
 
 import java.io.File;
@@ -32,58 +31,52 @@ import freemind.modes.ModeController;
 
 public class MindMapMode extends Mode {
 
-	private Controller c;
-	private MindMapController modecontroller;
-	private final String MODENAME = "MindMap";
-	private boolean isRunning = false;
-	private static Logger logger = null;
+  private Controller c;
+  private MindMapController modecontroller;
+  private final String MODENAME = "MindMap";
+  private boolean isRunning = false;
+  private static Logger logger = null;
 
-	public MindMapMode() {
-	}
+  public MindMapMode() {}
 
-	public void init(Controller c) {
-		this.c = c;
-		if (logger == null) {
-			logger = c.getFrame().getLogger(this.getClass().getName());
-		}
-		modecontroller = (MindMapController) createModeController();
-	}
+  public void init(Controller c) {
+    this.c = c;
+    if (logger == null) {
+      logger = c.getFrame().getLogger(this.getClass().getName());
+    }
+    modecontroller = (MindMapController) createModeController();
+  }
 
-	public ModeController createModeController() {
-		logger.finest("Creating new MindMapController...");
-		MindMapController mindMapController = new MindMapController(this);
-		logger.finest("Creating new MindMapController. Done:"
-				+ mindMapController);
-		return mindMapController;
-	}
+  public ModeController createModeController() {
+    logger.finest("Creating new MindMapController...");
+    MindMapController mindMapController = new MindMapController(this);
+    logger.finest("Creating new MindMapController. Done:" + mindMapController);
+    return mindMapController;
+  }
 
-	public String toString() {
-		return MODENAME;
-	}
+  public String toString() {
+    return MODENAME;
+  }
 
-	/**
-	 * Called whenever this mode is chosen in the program. (updates Actions
-	 * etc.)
-	 */
-	public void activate() {
-		if (isRunning) {
-			c.getMapModuleManager().changeToMapOfMode(this);
-		} else {
-			isRunning = true;
-		}
-	}
+  /** Called whenever this mode is chosen in the program. (updates Actions etc.) */
+  public void activate() {
+    if (isRunning) {
+      c.getMapModuleManager().changeToMapOfMode(this);
+    } else {
+      isRunning = true;
+    }
+  }
 
-	public void restore(String restoreable) throws XMLParseException, IOException,
-			URISyntaxException {
-		getDefaultModeController().load(new File(restoreable));
-	}
+  public void restore(String restoreable)
+      throws XMLParseException, IOException, URISyntaxException {
+    getDefaultModeController().load(new File(restoreable));
+  }
 
-	public Controller getController() {
-		return c;
-	}
+  public Controller getController() {
+    return c;
+  }
 
-	public ModeController getDefaultModeController() {
-		return modecontroller;
-	}
-
+  public ModeController getDefaultModeController() {
+    return modecontroller;
+  }
 }

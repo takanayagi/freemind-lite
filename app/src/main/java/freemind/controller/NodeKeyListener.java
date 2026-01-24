@@ -27,32 +27,27 @@ import java.awt.event.KeyListener;
  */
 public class NodeKeyListener implements KeyListener {
 
-	private KeyListener mListener;
+  private KeyListener mListener;
 
-	public NodeKeyListener(Controller controller) {}
+  public NodeKeyListener(Controller controller) {}
 
-	public void register(KeyListener listener) {
-		this.mListener = listener;
+  public void register(KeyListener listener) {
+    this.mListener = listener;
+  }
 
-	}
+  public void deregister() {
+    mListener = null;
+  }
 
-	public void deregister() {
-		mListener = null;
-	}
+  public void keyPressed(KeyEvent e) {
+    if (mListener != null) mListener.keyPressed(e);
+  }
 
-	public void keyPressed(KeyEvent e) {
-		if (mListener != null)
-			mListener.keyPressed(e);
-	}
+  public void keyReleased(KeyEvent e) {
+    if (mListener != null) mListener.keyReleased(e);
+  }
 
-	public void keyReleased(KeyEvent e) {
-		if (mListener != null)
-			mListener.keyReleased(e);
-	}
-
-	public void keyTyped(KeyEvent e) {
-		if (mListener != null)
-			mListener.keyTyped(e);
-	}
-
+  public void keyTyped(KeyEvent e) {
+    if (mListener != null) mListener.keyTyped(e);
+  }
 }

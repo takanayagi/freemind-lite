@@ -34,61 +34,60 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class RemoveArrowLinkActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public RemoveArrowLinkActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public RemoveArrowLinkActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void removeReference(MindMapLink arrowLink) {
-		execute(getActionPair(arrowLink));
-	}
+  public void removeReference(MindMapLink arrowLink) {
+    execute(getActionPair(arrowLink));
+  }
 
-	/**
-	 */
-	private ActionPair getActionPair(MindMapLink arrowLink) {
-		return new ActionPair(createRemoveArrowLinkXmlAction(arrowLink.getUniqueId()),
-				createAddArrowLinkXmlAction(arrowLink));
-	}
+  /** */
+  private ActionPair getActionPair(MindMapLink arrowLink) {
+    return new ActionPair(
+        createRemoveArrowLinkXmlAction(arrowLink.getUniqueId()),
+        createAddArrowLinkXmlAction(arrowLink));
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof RemoveArrowLinkXmlAction removeAction) {
-			MindMapLink arrowLink = getLinkRegistry().getLinkForId(removeAction.getId());
-			if (arrowLink == null) {
-				// strange: link not found:
-				throw new IllegalArgumentException(
-						"Unknown link to id " + removeAction.getId() + " should be deleted.");
-			}
-			getLinkRegistry().deregisterLink(arrowLink);
-			getExMapFeedback().nodeChanged(arrowLink.getSource());
-			getExMapFeedback().nodeChanged(arrowLink.getTarget());
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof RemoveArrowLinkXmlAction removeAction) {
+      MindMapLink arrowLink = getLinkRegistry().getLinkForId(removeAction.getId());
+      if (arrowLink == null) {
+        // strange: link not found:
+        throw new IllegalArgumentException(
+            "Unknown link to id " + removeAction.getId() + " should be deleted.");
+      }
+      getLinkRegistry().deregisterLink(arrowLink);
+      getExMapFeedback().nodeChanged(arrowLink.getSource());
+      getExMapFeedback().nodeChanged(arrowLink.getTarget());
+    }
+  }
 
-	public Class<RemoveArrowLinkXmlAction> getDoActionClass() {
-		return RemoveArrowLinkXmlAction.class;
-	}
+  public Class<RemoveArrowLinkXmlAction> getDoActionClass() {
+    return RemoveArrowLinkXmlAction.class;
+  }
 
-	public RemoveArrowLinkXmlAction createRemoveArrowLinkXmlAction(String id) {
-		RemoveArrowLinkXmlAction action = new RemoveArrowLinkXmlAction();
-		action.setId(id);
-		return action;
-	}
+  public RemoveArrowLinkXmlAction createRemoveArrowLinkXmlAction(String id) {
+    RemoveArrowLinkXmlAction action = new RemoveArrowLinkXmlAction();
+    action.setId(id);
+    return action;
+  }
 
-	public AddArrowLinkXmlAction createAddArrowLinkXmlAction(MindMapLink link) {
-		AddArrowLinkXmlAction action = new AddArrowLinkXmlAction();
-		action.setNode(getNodeID(link.getSource()));
-		action.setDestination(getNodeID(link.getTarget()));
-		action.setNewId(link.getUniqueId());
-		action.setColor(Tools.colorToXml(link.getColor()));
-		if (link instanceof MindMapArrowLink arrowLink) {
-			action.setEndArrow(arrowLink.getEndArrow());
-			action.setEndInclination(Tools.PointToXml(arrowLink.getEndInclination()));
-			action.setStartArrow(arrowLink.getStartArrow());
-			action.setStartInclination(Tools.PointToXml(arrowLink.getStartInclination()));
-		}
-		return action;
-	}
-
+  public AddArrowLinkXmlAction createAddArrowLinkXmlAction(MindMapLink link) {
+    AddArrowLinkXmlAction action = new AddArrowLinkXmlAction();
+    action.setNode(getNodeID(link.getSource()));
+    action.setDestination(getNodeID(link.getTarget()));
+    action.setNewId(link.getUniqueId());
+    action.setColor(Tools.colorToXml(link.getColor()));
+    if (link instanceof MindMapArrowLink arrowLink) {
+      action.setEndArrow(arrowLink.getEndArrow());
+      action.setEndInclination(Tools.PointToXml(arrowLink.getEndInclination()));
+      action.setStartArrow(arrowLink.getStartArrow());
+      action.setStartInclination(Tools.PointToXml(arrowLink.getStartInclination()));
+    }
+    return action;
+  }
 }

@@ -36,117 +36,123 @@ import freemind.modes.mindmapmode.MindMapNodeModel;
 
 /** */
 public class ExportBranchAction extends MindmapAction {
-	private final MindMapController mMindMapController;
+  private final MindMapController mMindMapController;
 
-	public ExportBranchAction(MindMapController pMindMapController) {
-		super("export_branch_new", pMindMapController);
-		mMindMapController = pMindMapController;
-	}
+  public ExportBranchAction(MindMapController pMindMapController) {
+    super("export_branch_new", pMindMapController);
+    mMindMapController = pMindMapController;
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		MindMapNodeModel node = (MindMapNodeModel) mMindMapController.getSelected();
+  public void actionPerformed(ActionEvent e) {
+    MindMapNodeModel node = (MindMapNodeModel) mMindMapController.getSelected();
 
-		// if something is wrong, abort.
-		if (mMindMapController.getMap() == null || node == null || node.isRoot()) {
-			mMindMapController.getFrame().err("Could not export branch.");
-			return;
-		}
-		// If the current map is not saved yet, save it first.
-		if (mMindMapController.getMap().getFile() == null) {
-			mMindMapController.getFrame().out("You must save the current map first!");
-			if (!mMindMapController.save()) {
-				return;
-			}
-		}
+    // if something is wrong, abort.
+    if (mMindMapController.getMap() == null || node == null || node.isRoot()) {
+      mMindMapController.getFrame().err("Could not export branch.");
+      return;
+    }
+    // If the current map is not saved yet, save it first.
+    if (mMindMapController.getMap().getFile() == null) {
+      mMindMapController.getFrame().out("You must save the current map first!");
+      if (!mMindMapController.save()) {
+        return;
+      }
+    }
 
-		// Open FileChooser to choose in which file the exported
-		// branch should be stored
-		FreeMindFileDialog chooser = mMindMapController.getFileChooser();
-		chooser.setSelectedFile(new File(Tools.getFileNameProposal(node)
-				+ freemind.main.FreeMindCommon.FREEMIND_FILE_EXTENSION));
-		int returnVal = chooser.showSaveDialog(mMindMapController.getSelectedView());
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File chosenFile = chooser.getSelectedFile();
-			// Force the extension to be .mm
-			String ext = Tools.getExtension(chosenFile.getName());
-			if (!ext.equals(freemind.main.FreeMindCommon.FREEMIND_FILE_EXTENSION_WITHOUT_DOT)) {
-				chosenFile = new File(chosenFile.getParent(), chosenFile.getName()
-						+ freemind.main.FreeMindCommon.FREEMIND_FILE_EXTENSION);
-			}
-			try {
-				Tools.fileToUrl(chosenFile);
-			} catch (MalformedURLException ex) {
-				JOptionPane.showMessageDialog(mMindMapController.getView(),
-						"couldn't create valid URL!");
-				return;
-			}
-			// Confirm overwrite if file exists.
-			if (chosenFile.exists()) { // If file exists, ask before
-										// overwriting.
-				int overwriteMap = JOptionPane.showConfirmDialog(mMindMapController.getView(),
-						mMindMapController.getText("map_already_exists"), "FreeMind",
-						JOptionPane.YES_NO_OPTION);
-				if (overwriteMap != JOptionPane.YES_OPTION) {
-					return;
-				}
-			}
+    // Open FileChooser to choose in which file the exported
+    // branch should be stored
+    FreeMindFileDialog chooser = mMindMapController.getFileChooser();
+    chooser.setSelectedFile(
+        new File(
+            Tools.getFileNameProposal(node)
+                + freemind.main.FreeMindCommon.FREEMIND_FILE_EXTENSION));
+    int returnVal = chooser.showSaveDialog(mMindMapController.getSelectedView());
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+      File chosenFile = chooser.getSelectedFile();
+      // Force the extension to be .mm
+      String ext = Tools.getExtension(chosenFile.getName());
+      if (!ext.equals(freemind.main.FreeMindCommon.FREEMIND_FILE_EXTENSION_WITHOUT_DOT)) {
+        chosenFile =
+            new File(
+                chosenFile.getParent(),
+                chosenFile.getName() + freemind.main.FreeMindCommon.FREEMIND_FILE_EXTENSION);
+      }
+      try {
+        Tools.fileToUrl(chosenFile);
+      } catch (MalformedURLException ex) {
+        JOptionPane.showMessageDialog(mMindMapController.getView(), "couldn't create valid URL!");
+        return;
+      }
+      // Confirm overwrite if file exists.
+      if (chosenFile.exists()) { // If file exists, ask before
+        // overwriting.
+        int overwriteMap =
+            JOptionPane.showConfirmDialog(
+                mMindMapController.getView(),
+                mMindMapController.getText("map_already_exists"),
+                "FreeMind",
+                JOptionPane.YES_NO_OPTION);
+        if (overwriteMap != JOptionPane.YES_OPTION) {
+          return;
+        }
+      }
 
-			/*
-			 * Now make a copy from the node, remove the node from the map and create a new Map with
-			 * the node as root, store the new Map, add the copy of the node to the parent, and set
-			 * a link from the copy to the new Map.
-			 */
-			MindMapNodeModel parent = (MindMapNodeModel) node.getParentNode();
-			// set a link from the new root to the old map
-			String linkToNewMapString = Tools
-					.fileToRelativeUrlString(mMindMapController.getModel().getFile(), chosenFile);
-			mMindMapController.setLink(node, linkToNewMapString);
-			int nodePosition = parent.getChildPosition(node);
-			mMindMapController.deleteNode(node);
-			// save node:
-			node.setParent(null);
-			// unfold node
-			node.setFolded(false);
-			// construct new controller:
-			final ModeController newModeController =
-					mMindMapController.getMode().createModeController();
-			MindMapMapModel newMap = new MindMapMapModel(node, newModeController);
-			newModeController.setModel(newMap);
-			try {
-				newMap.save(chosenFile);
-			} catch (Exception e1) {
-				freemind.main.Resources.getInstance().logException(e1);
-				// roll back:
-				mMindMapController.insertNodeInto(node, parent);
+      /*
+       * Now make a copy from the node, remove the node from the map and create a new Map with
+       * the node as root, store the new Map, add the copy of the node to the parent, and set
+       * a link from the copy to the new Map.
+       */
+      MindMapNodeModel parent = (MindMapNodeModel) node.getParentNode();
+      // set a link from the new root to the old map
+      String linkToNewMapString =
+          Tools.fileToRelativeUrlString(mMindMapController.getModel().getFile(), chosenFile);
+      mMindMapController.setLink(node, linkToNewMapString);
+      int nodePosition = parent.getChildPosition(node);
+      mMindMapController.deleteNode(node);
+      // save node:
+      node.setParent(null);
+      // unfold node
+      node.setFolded(false);
+      // construct new controller:
+      final ModeController newModeController = mMindMapController.getMode().createModeController();
+      MindMapMapModel newMap = new MindMapMapModel(node, newModeController);
+      newModeController.setModel(newMap);
+      try {
+        newMap.save(chosenFile);
+      } catch (Exception e1) {
+        freemind.main.Resources.getInstance().logException(e1);
+        // roll back:
+        mMindMapController.insertNodeInto(node, parent);
 
-				String message = Tools.expandPlaceholders(mMindMapController.getText("save_failed"),
-						chosenFile.getName());
-				mMindMapController.getController().errorMessage(message);
-				return;
-			}
-			// new node instead:
-			final MindMapNode newNode =
-					mMindMapController.addNewNode(parent, nodePosition, node.isLeft());
-			// TODO: Keep formatting of node.
-			mMindMapController.setNodeText(newNode, node.getText());
+        String message =
+            Tools.expandPlaceholders(
+                mMindMapController.getText("save_failed"), chosenFile.getName());
+        mMindMapController.getController().errorMessage(message);
+        return;
+      }
+      // new node instead:
+      final MindMapNode newNode =
+          mMindMapController.addNewNode(parent, nodePosition, node.isLeft());
+      // TODO: Keep formatting of node.
+      mMindMapController.setNodeText(newNode, node.getText());
 
-			final String linkString = Tools.fileToRelativeUrlString(chosenFile,
-					mMindMapController.getModel().getFile());
-			mMindMapController.setLink(newNode, linkString);
-			mMindMapController.newMap(newMap, newModeController);
-			// old map should not be saved automatically!!
-			EventQueue.invokeLater(() -> {
-				try {
-					// save new map again to create thumbnail...
-					newModeController.setSaved(false);
-					newModeController.save();
-					// set link again to refresh thumbnail
-					mMindMapController.setLink(newNode, linkString);
-				} catch (Exception e2) {
-					freemind.main.Resources.getInstance().logException(e2);
-				}
-			});
-		}
-	}
-
+      final String linkString =
+          Tools.fileToRelativeUrlString(chosenFile, mMindMapController.getModel().getFile());
+      mMindMapController.setLink(newNode, linkString);
+      mMindMapController.newMap(newMap, newModeController);
+      // old map should not be saved automatically!!
+      EventQueue.invokeLater(
+          () -> {
+            try {
+              // save new map again to create thumbnail...
+              newModeController.setSaved(false);
+              newModeController.save();
+              // set link again to refresh thumbnail
+              mMindMapController.setLink(newNode, linkString);
+            } catch (Exception e2) {
+              freemind.main.Resources.getInstance().logException(e2);
+            }
+          });
+    }
+  }
 }

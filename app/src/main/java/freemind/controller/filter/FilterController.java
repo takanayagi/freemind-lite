@@ -46,156 +46,152 @@ import freemind.view.MapModule;
 
 /**
  * @author dimitri
- * 
  */
 public class FilterController implements MapModuleChangeObserver {
-	private Controller c;
-	private FilterToolbar filterToolbar;
-	private DefaultComboBoxModel<Condition> filterConditionModel;
-	static private ConditionRenderer conditionRenderer = null;
-	static private ConditionFactory conditionFactory;
-	private MindMap map;
-	static final String FREEMIND_FILTER_EXTENSION_WITHOUT_DOT = "mmfilter";
-	private static Filter inactiveFilter;
+  private Controller c;
+  private FilterToolbar filterToolbar;
+  private DefaultComboBoxModel<Condition> filterConditionModel;
+  private static ConditionRenderer conditionRenderer = null;
+  private static ConditionFactory conditionFactory;
+  private MindMap map;
+  static final String FREEMIND_FILTER_EXTENSION_WITHOUT_DOT = "mmfilter";
+  private static Filter inactiveFilter;
 
-	public FilterController(Controller c) {
-		this.c = c;
-		c.getMapModuleManager().addListener(this);
-	}
+  public FilterController(Controller c) {
+    this.c = c;
+    c.getMapModuleManager().addListener(this);
+  }
 
-	ConditionRenderer getConditionRenderer() {
-		if (conditionRenderer == null)
-			conditionRenderer = new ConditionRenderer();
-		return conditionRenderer;
-	}
+  ConditionRenderer getConditionRenderer() {
+    if (conditionRenderer == null) conditionRenderer = new ConditionRenderer();
+    return conditionRenderer;
+  }
 
-	/**
-	 */
-	public FilterToolbar getFilterToolbar() {
-		if (filterToolbar == null) {
-			filterToolbar = new FilterToolbar(c);
-			filterConditionModel =
-					(DefaultComboBoxModel<Condition>) filterToolbar.getFilterConditionModel();
+  /** */
+  public FilterToolbar getFilterToolbar() {
+    if (filterToolbar == null) {
+      filterToolbar = new FilterToolbar(c);
+      filterConditionModel =
+          (DefaultComboBoxModel<Condition>) filterToolbar.getFilterConditionModel();
 
-			// FIXME state icons should be created on order to make possible
-			// their use in the filter component.
-			// It should not happen here.
-			MindIcon.factory("AttributeExist", freemind.view.ImageFactory.getInstance()
-					.createIcon(Resources.getInstance().getResource("images/showAttributes.gif")));
-			MindIcon.factory(NodeNoteBase.NODE_NOTE_ICON, freemind.view.ImageFactory.getInstance()
-					.createIcon(Resources.getInstance().getResource("images/knotes.png")));
-			MindIcon.factory("encrypted");
-			MindIcon.factory("decrypted");
+      // FIXME state icons should be created on order to make possible
+      // their use in the filter component.
+      // It should not happen here.
+      MindIcon.factory(
+          "AttributeExist",
+          freemind.view.ImageFactory.getInstance()
+              .createIcon(Resources.getInstance().getResource("images/showAttributes.gif")));
+      MindIcon.factory(
+          NodeNoteBase.NODE_NOTE_ICON,
+          freemind.view.ImageFactory.getInstance()
+              .createIcon(Resources.getInstance().getResource("images/knotes.png")));
+      MindIcon.factory("encrypted");
+      MindIcon.factory("decrypted");
 
-			filterToolbar.initConditions();
-		}
-		return filterToolbar;
-	}
+      filterToolbar.initConditions();
+    }
+    return filterToolbar;
+  }
 
-	/**
-	 */
-	public void showFilterToolbar(boolean show) {
-		if (show == isVisible())
-			return;
-		getFilterToolbar().setVisible(show);
-		final Filter filter = getMap().getFilter();
-		if (show) {
-			filter.applyFilter(c);
-		} else {
-			createTransparentFilter().applyFilter(c);
-		}
-		refreshMap();
-	}
+  /** */
+  public void showFilterToolbar(boolean show) {
+    if (show == isVisible()) return;
+    getFilterToolbar().setVisible(show);
+    final Filter filter = getMap().getFilter();
+    if (show) {
+      filter.applyFilter(c);
+    } else {
+      createTransparentFilter().applyFilter(c);
+    }
+    refreshMap();
+  }
 
-	public boolean isVisible() {
-		return getFilterToolbar().isVisible();
-	}
+  public boolean isVisible() {
+    return getFilterToolbar().isVisible();
+  }
 
-	void refreshMap() {
-		c.getModeController().refreshMap();
-	}
+  void refreshMap() {
+    c.getModeController().refreshMap();
+  }
 
-	static public ConditionFactory getConditionFactory() {
-		if (conditionFactory == null)
-			conditionFactory = new ConditionFactory();
-		return conditionFactory;
-	}
+  public static ConditionFactory getConditionFactory() {
+    if (conditionFactory == null) conditionFactory = new ConditionFactory();
+    return conditionFactory;
+  }
 
-	/**
-	 */
-	public MindMap getMap() {
-		return map;
-	}
+  /** */
+  public MindMap getMap() {
+    return map;
+  }
 
-	public boolean isMapModuleChangeAllowed(MapModule oldMapModule, Mode oldMode,
-			MapModule newMapModule, Mode newMode) {
-		return true;
-	}
+  public boolean isMapModuleChangeAllowed(
+      MapModule oldMapModule, Mode oldMode, MapModule newMapModule, Mode newMode) {
+    return true;
+  }
 
-	public void beforeMapModuleChange(MapModule oldMapModule, Mode oldMode, MapModule newMapModule,
-			Mode newMode) {}
+  public void beforeMapModuleChange(
+      MapModule oldMapModule, Mode oldMode, MapModule newMapModule, Mode newMode) {}
 
-	public void afterMapClose(MapModule pOldMapModule, Mode pOldMode) {}
+  public void afterMapClose(MapModule pOldMapModule, Mode pOldMode) {}
 
-	public void afterMapModuleChange(MapModule oldMapModule, Mode oldMode, MapModule newMapModule,
-			Mode newMode) {
-		MindMap newMap = newMapModule != null ? newMapModule.getModel() : null;
-		FilterComposerDialog fd = getFilterToolbar().getFilterDialog();
-		if (fd != null) {
-			fd.mapChanged(newMap);
-		}
-		map = newMap;
-		getFilterToolbar().mapChanged(newMap);
-	}
+  public void afterMapModuleChange(
+      MapModule oldMapModule, Mode oldMode, MapModule newMapModule, Mode newMode) {
+    MindMap newMap = newMapModule != null ? newMapModule.getModel() : null;
+    FilterComposerDialog fd = getFilterToolbar().getFilterDialog();
+    if (fd != null) {
+      fd.mapChanged(newMap);
+    }
+    map = newMap;
+    getFilterToolbar().mapChanged(newMap);
+  }
 
-	public void numberOfOpenMapInformation(int number, int pIndex) {}
+  public void numberOfOpenMapInformation(int number, int pIndex) {}
 
-	private static Filter createTransparentFilter() {
-		if (inactiveFilter == null)
-			inactiveFilter = new DefaultFilter(NoFilteringCondition.createCondition(), true, false);
-		return inactiveFilter;
+  private static Filter createTransparentFilter() {
+    if (inactiveFilter == null)
+      inactiveFilter = new DefaultFilter(NoFilteringCondition.createCondition(), true, false);
+    return inactiveFilter;
+  }
 
-	}
+  public void saveConditions() {
+    if (filterToolbar != null) {
+      filterToolbar.saveConditions();
+    }
+  }
 
-	public void saveConditions() {
-		if (filterToolbar != null) {
-			filterToolbar.saveConditions();
-		}
-	}
+  public DefaultComboBoxModel<Condition> getFilterConditionModel() {
+    return filterConditionModel;
+  }
 
-	public DefaultComboBoxModel<Condition> getFilterConditionModel() {
-		return filterConditionModel;
-	}
+  public void setFilterConditionModel(DefaultComboBoxModel<Condition> filterConditionModel) {
+    this.filterConditionModel = filterConditionModel;
+    filterToolbar.setFilterConditionModel(filterConditionModel);
+  }
 
-	public void setFilterConditionModel(DefaultComboBoxModel<Condition> filterConditionModel) {
-		this.filterConditionModel = filterConditionModel;
-		filterToolbar.setFilterConditionModel(filterConditionModel);
-	}
+  void saveConditions(DefaultComboBoxModel<Condition> filterConditionModel, String pathToFilterFile)
+      throws IOException {
+    XMLElement saver = new XMLElement();
+    saver.setName("filter_conditions");
+    Writer writer = new FileWriter(pathToFilterFile);
+    for (int i = 0; i < filterConditionModel.getSize(); i++) {
+      Condition cond = filterConditionModel.getElementAt(i);
+      cond.save(saver);
+    }
+    saver.write(writer);
+    writer.close();
+  }
 
-	void saveConditions(DefaultComboBoxModel<Condition> filterConditionModel,
-			String pathToFilterFile) throws IOException {
-		XMLElement saver = new XMLElement();
-		saver.setName("filter_conditions");
-		Writer writer = new FileWriter(pathToFilterFile);
-		for (int i = 0; i < filterConditionModel.getSize(); i++) {
-			Condition cond = filterConditionModel.getElementAt(i);
-			cond.save(saver);
-		}
-		saver.write(writer);
-		writer.close();
-	}
-
-	void loadConditions(DefaultComboBoxModel<Condition> filterConditionModel,
-			String pathToFilterFile) throws IOException {
-		filterConditionModel.removeAllElements();
-		XMLElement loader = new XMLElement();
-		Reader reader = new FileReader(pathToFilterFile);
-		loader.parseFromReader(reader);
-		reader.close();
-		final Vector<XMLElement> conditions = loader.getChildren();
-		for (XMLElement condition : conditions) {
-			filterConditionModel.addElement(
-					FilterController.getConditionFactory().loadCondition(condition));
-		}
-	}
+  void loadConditions(DefaultComboBoxModel<Condition> filterConditionModel, String pathToFilterFile)
+      throws IOException {
+    filterConditionModel.removeAllElements();
+    XMLElement loader = new XMLElement();
+    Reader reader = new FileReader(pathToFilterFile);
+    loader.parseFromReader(reader);
+    reader.close();
+    final Vector<XMLElement> conditions = loader.getChildren();
+    for (XMLElement condition : conditions) {
+      filterConditionModel.addElement(
+          FilterController.getConditionFactory().loadCondition(condition));
+    }
+  }
 }

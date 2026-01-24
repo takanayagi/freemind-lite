@@ -19,51 +19,44 @@
  * Created on 01.05.2004
  */
 
-
 package freemind.modes.mindmapmode.actions.xml;
 
 import freemind.controller.actions.generated.instance.XmlAction;
 
 /**
  * @author foltin
- * 
  */
 public class DefaultActionHandler implements ActionHandler {
 
-	private ActionRegistry factory;
+  private ActionRegistry factory;
 
-	public DefaultActionHandler(ActionRegistry factory) {
-		this.factory = factory;
-	}
+  public DefaultActionHandler(ActionRegistry factory) {
+    this.factory = factory;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#executeAction(freemind.controller
-	 * .actions.ActionPair)
-	 */
-	public void executeAction(XmlAction action) {
-		ActorXml actor = factory.getActor(action);
-		// exception handling is done by the caller.
-		actor.act(action);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#executeAction(freemind.controller
+   * .actions.ActionPair)
+   */
+  public void executeAction(XmlAction action) {
+    ActorXml actor = factory.getActor(action);
+    // exception handling is done by the caller.
+    actor.act(action);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#startTransaction(java.lang. String)
-	 */
-	public void startTransaction(String name) {
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#startTransaction(java.lang. String)
+   */
+  public void startTransaction(String name) {}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#endTransaction(java.lang.String )
-	 */
-	public void endTransaction(String name) {
-
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#endTransaction(java.lang.String )
+   */
+  public void endTransaction(String name) {}
 }

@@ -26,50 +26,49 @@ import freemind.common.ComboProperty;
 
 /**
  * Adjusts string values of integers to the nearest integer as string.
- * 
+ *
  * @author foltin
  * @date 26.09.2013
  */
 public class IntegerComboProperty extends ComboProperty {
 
-	/**
-	 * @param pDescription
-	 * @param pLabel
-	 * @param pPossibles
-	 * @param pSizesVector
-	 */
-	public IntegerComboProperty(String pDescription, String pLabel,
-			String[] pPossibles, Vector<String> pSizesVector) {
-		super(pDescription, pLabel, pPossibles, pSizesVector);
-	}
+  /**
+   * @param pDescription
+   * @param pLabel
+   * @param pPossibles
+   * @param pSizesVector
+   */
+  public IntegerComboProperty(
+      String pDescription, String pLabel, String[] pPossibles, Vector<String> pSizesVector) {
+    super(pDescription, pLabel, pPossibles, pSizesVector);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.common.ComboProperty#setValue(java.lang.String)
-	 */
-	public void setValue(String pValue) {
-		String lastMatchedValue = null;
-		if (possibleValues.contains(pValue)) {
-			super.setValue(pValue);
-			return;
-		} else {
-			int givenVal;
-			try {
-				givenVal = Integer.parseInt(pValue);
-				for (String stringValue : possibleValues) {
-					int val = Integer.parseInt(stringValue);
-					if(val > givenVal && lastMatchedValue != null) {
-						super.setValue(lastMatchedValue);
-						return;
-					}
-					lastMatchedValue = stringValue;
-				}
-			} catch (NumberFormatException e) {
-				freemind.main.Resources.getInstance().logException(e);
-			}
-		}
-		super.setValue(pValue);
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.common.ComboProperty#setValue(java.lang.String)
+   */
+  public void setValue(String pValue) {
+    String lastMatchedValue = null;
+    if (possibleValues.contains(pValue)) {
+      super.setValue(pValue);
+      return;
+    } else {
+      int givenVal;
+      try {
+        givenVal = Integer.parseInt(pValue);
+        for (String stringValue : possibleValues) {
+          int val = Integer.parseInt(stringValue);
+          if (val > givenVal && lastMatchedValue != null) {
+            super.setValue(lastMatchedValue);
+            return;
+          }
+          lastMatchedValue = stringValue;
+        }
+      } catch (NumberFormatException e) {
+        freemind.main.Resources.getInstance().logException(e);
+      }
+    }
+    super.setValue(pValue);
+  }
 }

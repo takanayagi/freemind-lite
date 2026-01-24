@@ -15,7 +15,6 @@
  * 02111-1307, USA.
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import java.awt.event.ActionEvent;
@@ -25,16 +24,13 @@ import freemind.modes.mindmapmode.MindMapController;
 /** */
 public class SelectBranchAction extends MindmapAction {
 
-	/**
-	 *
-	 */
-	public SelectBranchAction(final MindMapController modeController) {
-		super("select_branch", (String) null, modeController);
-	}
+  /** */
+  public SelectBranchAction(final MindMapController modeController) {
+    super("select_branch", (String) null, modeController);
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		getMindMapController().selectBranch(getMindMapController().getSelectedView(),
-				true /* = extend */);
-	}
-
+  public void actionPerformed(ActionEvent e) {
+    getMindMapController()
+        .selectBranch(getMindMapController().getSelectedView(), true /* = extend */);
+  }
 }

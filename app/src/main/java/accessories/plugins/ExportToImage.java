@@ -43,81 +43,74 @@ import freemind.extensions.ExportHook;
  * @author foltin
  * @author kakeda
  * @author rreppel
- * 
  */
 public class ExportToImage extends ExportHook {
 
-	/**
-	 * 
-	 */
-	public ExportToImage() {
-		super();
-	}
+  /** */
+  public ExportToImage() {
+    super();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.MindMapHook#startupMapHook()
-	 */
-	public void startupMapHook() {
-		super.startupMapHook();
-		BufferedImage image = createBufferedImage();
-		if (image != null) {
-			String imageType = getResourceString("image_type");
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.MindMapHook#startupMapHook()
+   */
+  public void startupMapHook() {
+    super.startupMapHook();
+    BufferedImage image = createBufferedImage();
+    if (image != null) {
+      String imageType = getResourceString("image_type");
 
-			exportToImage(image, imageType, getResourceString("image_description"));
-		}
+      exportToImage(image, imageType, getResourceString("image_description"));
+    }
+  }
 
-	}
+  /** Export image. */
+  public boolean exportToImage(BufferedImage image, String type, String description) {
+    File chosenFile = chooseFile(type, description, null);
+    if (chosenFile == null) {
+      return false;
+    }
+    try {
+      getController().getFrame().setWaitingCursor(true);
+      FileOutputStream out = new FileOutputStream(chosenFile);
+      ImageIO.write(image, type, out);
+      // OutputStream out = new FileOutputStream(f);
+      // JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+      // encoder.encode(image);
+      out.close();
+    } catch (IOException e1) {
+      freemind.main.Resources.getInstance().logException(e1);
+    }
+    getController().getFrame().setWaitingCursor(false);
+    return true;
+  }
 
-	/**
-	 * Export image.
-	 */
-	public boolean exportToImage(BufferedImage image, String type, String description) {
-		File chosenFile = chooseFile(type, description, null);
-		if (chosenFile == null) {
-			return false;
-		}
-		try {
-			getController().getFrame().setWaitingCursor(true);
-			FileOutputStream out = new FileOutputStream(chosenFile);
-			ImageIO.write(image, type, out);
-			// OutputStream out = new FileOutputStream(f);
-			// JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-			// encoder.encode(image);
-			out.close();
-		} catch (IOException e1) {
-			freemind.main.Resources.getInstance().logException(e1);
-		}
-		getController().getFrame().setWaitingCursor(false);
-		return true;
-	}
+  public void transForm(Source xmlSource, InputStream xsltStream, File resultFile, String areaCode)
+      throws FileNotFoundException {
+    // System.out.println("set xsl");
+    Source xsltSource = new StreamSource(xsltStream);
+    // System.out.println("set result");
+    Result result = new StreamResult(new FileOutputStream(resultFile));
 
-	public void transForm(Source xmlSource, InputStream xsltStream, File resultFile,
-			String areaCode) throws FileNotFoundException {
-		// System.out.println("set xsl");
-		Source xsltSource = new StreamSource(xsltStream);
-		// System.out.println("set result");
-		Result result = new StreamResult(new FileOutputStream(resultFile));
+    // create an instance of TransformerFactory
+    try {
+      // System.out.println("make transform instance");
+      TransformerFactory transFact = TransformerFactory.newInstance();
 
-		// create an instance of TransformerFactory
-		try {
-			// System.out.println("make transform instance");
-			TransformerFactory transFact = TransformerFactory.newInstance();
-
-			Transformer trans = transFact.newTransformer(xsltSource);
-			// set parameter:
-			// relative directory <filename>_files
-			trans.setParameter("destination_dir", resultFile.getName() + "_files/");
-			trans.setParameter("area_code", areaCode);
-			trans.setParameter("folding_type",
-					getController().getFrame().getProperty("html_export_folding"));
-			trans.transform(xmlSource, result);
-		} catch (Exception e) {
-			// System.err.println("error applying the xslt file "+e);
-			freemind.main.Resources.getInstance().logException(e);
-		}
-		return;
-	}
-
+      Transformer trans = transFact.newTransformer(xsltSource);
+      // set parameter:
+      // relative directory <filename>_files
+      trans.setParameter("destination_dir", resultFile.getName() + "_files/");
+      trans.setParameter("area_code", areaCode);
+      trans.setParameter(
+          "folding_type", getController().getFrame().getProperty("html_export_folding"));
+      trans.transform(xmlSource, result);
+    } catch (Exception e) {
+      // System.err.println("error applying the xslt file "+e);
+      freemind.main.Resources.getInstance().logException(e);
+    }
+    return;
+  }
 }

@@ -24,10 +24,10 @@ package freemind.controller;
  * @date 16.04.2012
  */
 public interface ZoomListener {
-	/**
-	 * On each zoom change, this method is called, if registered.
-	 * 
-	 * @param f the effective zoom value (1.25 means 125%)
-	 */
-	void setZoom(float f);
+  /**
+   * On each zoom change, this method is called, if registered.
+   *
+   * @param f the effective zoom value (1.25 means 125%)
+   */
+  void setZoom(float f);
 }

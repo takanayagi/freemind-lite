@@ -34,98 +34,95 @@ import freemind.controller.actions.generated.instance.PluginProperty;
 /**
  * This is an information class that holds all outer properties of a hook, i.e. all contents of the
  * XML description file.
- * 
- * Don't use this class for anything except for the implementation of a HookFactory.
- * 
+ *
+ * <p>Don't use this class for anything except for the implementation of a HookFactory.
+ *
  * @author foltin
- * 
  */
 public class HookDescriptorPluginAction extends HookDescriptorBase {
-	private Properties properties;
-	public Vector<String> menuPositions;
-	private Vector<String> modes;
-	private PluginAction pluginAction;
+  private Properties properties;
+  public Vector<String> menuPositions;
+  private Vector<String> modes;
+  private PluginAction pluginAction;
 
-	public HookDescriptorPluginAction(String xmlPluginFile, Plugin pluginBase,
-			PluginAction pluginAction) {
-		super(pluginBase, xmlPluginFile);
-		this.pluginAction = pluginAction;
-		if (pluginAction.getName() == null) {
-			pluginAction.setName(pluginAction.getLabel());
-		}
-		menuPositions = new Vector<>();
-		properties = new Properties();
-		modes = new Vector<>();
-		for (Object obj : pluginAction.getListChoiceList()) {
-			if (obj instanceof PluginMenu menu) {
-				menuPositions.add(menu.getLocation());
-			}
-			if (obj instanceof PluginProperty property) {
-				properties.put(property.getName(), property.getValue());
-			}
-			if (obj instanceof PluginMode mode) {
-				modes.add(mode.getClassName());
-			}
-		}
-	}
+  public HookDescriptorPluginAction(
+      String xmlPluginFile, Plugin pluginBase, PluginAction pluginAction) {
+    super(pluginBase, xmlPluginFile);
+    this.pluginAction = pluginAction;
+    if (pluginAction.getName() == null) {
+      pluginAction.setName(pluginAction.getLabel());
+    }
+    menuPositions = new Vector<>();
+    properties = new Properties();
+    modes = new Vector<>();
+    for (Object obj : pluginAction.getListChoiceList()) {
+      if (obj instanceof PluginMenu menu) {
+        menuPositions.add(menu.getLocation());
+      }
+      if (obj instanceof PluginProperty property) {
+        properties.put(property.getName(), property.getValue());
+      }
+      if (obj instanceof PluginMode mode) {
+        modes.add(mode.getClassName());
+      }
+    }
+  }
 
-	public String toString() {
-		return "[HookDescriptor props=" + properties + ", menu positions=" + menuPositions + "]";
-	}
+  public String toString() {
+    return "[HookDescriptor props=" + properties + ", menu positions=" + menuPositions + "]";
+  }
 
-	public HookInstanciationMethod getInstanciationMethod() {
-		if (pluginAction.getInstanciation() != null) {
-			HashMap<String, HookInstanciationMethod> allInstMethods =
-					HookInstanciationMethod.getAllInstanciationMethods();
-			for (String name : allInstMethods.keySet()) {
-				if (pluginAction.getInstanciation().equalsIgnoreCase(name)) {
-					return allInstMethods.get(name);
-				}
-			}
-		}
-		// this is an error case?
-		return HookInstanciationMethod.Other;
-	}
+  public HookInstanciationMethod getInstanciationMethod() {
+    if (pluginAction.getInstanciation() != null) {
+      HashMap<String, HookInstanciationMethod> allInstMethods =
+          HookInstanciationMethod.getAllInstanciationMethods();
+      for (String name : allInstMethods.keySet()) {
+        if (pluginAction.getInstanciation().equalsIgnoreCase(name)) {
+          return allInstMethods.get(name);
+        }
+      }
+    }
+    // this is an error case?
+    return HookInstanciationMethod.Other;
+  }
 
-	public Vector<String> getModes() {
-		return modes;
-	}
+  public Vector<String> getModes() {
+    return modes;
+  }
 
-	public String getBaseClass() {
-		return pluginAction.getBase();
-	}
+  public String getBaseClass() {
+    return pluginAction.getBase();
+  }
 
-	public String getName() {
-		return getFromResourceIfNecessary(pluginAction.getName());
-	}
+  public String getName() {
+    return getFromResourceIfNecessary(pluginAction.getName());
+  }
 
-	public String getClassName() {
-		return pluginAction.getClassName();
-	}
+  public String getClassName() {
+    return pluginAction.getClassName();
+  }
 
-	public String getDocumentation() {
-		return getFromResourceIfNecessary(pluginAction.getDocumentation());
-	}
+  public String getDocumentation() {
+    return getFromResourceIfNecessary(pluginAction.getDocumentation());
+  }
 
-	public String getIconPath() {
-		return pluginAction.getIconPath();
-	}
+  public String getIconPath() {
+    return pluginAction.getIconPath();
+  }
 
-	public String getKeyStroke() {
-		return getFromPropertiesIfNecessary(pluginAction.getKeyStroke());
-	}
+  public String getKeyStroke() {
+    return getFromPropertiesIfNecessary(pluginAction.getKeyStroke());
+  }
 
-	/**
-	 */
-	public Properties getProperties() {
-		return properties;
-	}
+  /** */
+  public Properties getProperties() {
+    return properties;
+  }
 
-	/**
-	 * @return whether or not the plugin can be on/off and this should be displayed in the menus.
-	 */
-	public boolean isSelectable() {
-		return pluginAction.getIsSelectable();
-	}
-
+  /**
+   * @return whether or not the plugin can be on/off and this should be displayed in the menus.
+   */
+  public boolean isSelectable() {
+    return pluginAction.getIsSelectable();
+  }
 }

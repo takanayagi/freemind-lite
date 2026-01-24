@@ -32,53 +32,49 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class EditActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public EditActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public EditActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
+   * generated.instance.XmlAction)
+   */
+  public void act(XmlAction action) {
+    EditNodeAction editAction = (EditNodeAction) action;
+    NodeAdapter node = this.getNodeFromID(editAction.getNode());
+    if (!node.toString().equals(editAction.getText())) {
+      node.setUserObject(editAction.getText());
+      getExMapFeedback().nodeChanged(node);
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
-	 * generated.instance.XmlAction)
-	 */
-	public void act(XmlAction action) {
-		EditNodeAction editAction = (EditNodeAction) action;
-		NodeAdapter node = this.getNodeFromID(editAction.getNode());
-		if (!node.toString().equals(editAction.getText())) {
-			node.setUserObject(editAction.getText());
-			getExMapFeedback().nodeChanged(node);
-		}
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#getDoActionClass()
+   */
+  public Class<EditNodeAction> getDoActionClass() {
+    return EditNodeAction.class;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#getDoActionClass()
-	 */
-	public Class<EditNodeAction> getDoActionClass() {
-		return EditNodeAction.class;
-	}
+  public void setNodeText(MindMapNode selected, String newText) {
+    String oldText = selected.toString();
 
-	public void setNodeText(MindMapNode selected, String newText) {
-		String oldText = selected.toString();
+    EditNodeAction EditAction = new EditNodeAction();
+    String nodeID = getNodeID(selected);
+    EditAction.setNode(nodeID);
+    EditAction.setText(newText);
 
-		EditNodeAction EditAction = new EditNodeAction();
-		String nodeID = getNodeID(selected);
-		EditAction.setNode(nodeID);
-		EditAction.setText(newText);
+    EditNodeAction undoEditAction = new EditNodeAction();
+    undoEditAction.setNode(nodeID);
+    undoEditAction.setText(oldText);
 
-		EditNodeAction undoEditAction = new EditNodeAction();
-		undoEditAction.setNode(nodeID);
-		undoEditAction.setText(oldText);
-
-		execute(new ActionPair(EditAction, undoEditAction));
-	}
-
-
-
+    execute(new ActionPair(EditAction, undoEditAction));
+  }
 }

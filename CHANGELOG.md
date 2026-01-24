@@ -7,3 +7,4 @@
 - Remove pdf export feature
 - Upgrade batik 1.7 to 1.19
 - Upgrade Java version to 21
+- Re-format source files by Google Java Format

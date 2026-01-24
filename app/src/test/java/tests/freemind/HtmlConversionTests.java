@@ -47,116 +47,120 @@ import tests.freemind.findreplace.TestMindMapNode;
 
 /**
  * @author foltin
- * 
  */
 public class HtmlConversionTests extends FreeMindTestBase {
 
-	/**
-	 * @author foltin
-	 * @date 22.12.2014
-	 */
-	private static final class HtmlTransfer implements Transferable {
-		private DataFlavor mFlavor;
-		private String mHtmlData;
+  /**
+   * @author foltin
+   * @date 22.12.2014
+   */
+  private static final class HtmlTransfer implements Transferable {
+    private DataFlavor mFlavor;
+    private String mHtmlData;
 
-		/**
-		 * 
-		 */
-		public HtmlTransfer(String pHtmlData) {
-			mHtmlData = pHtmlData;
-			try {
-				mFlavor = new DataFlavor("text/html; class=java.lang.String");
-			} catch (ClassNotFoundException e) {
-				freemind.main.Resources.getInstance().logException(e);
-			}
-		}
+    /** */
+    public HtmlTransfer(String pHtmlData) {
+      mHtmlData = pHtmlData;
+      try {
+        mFlavor = new DataFlavor("text/html; class=java.lang.String");
+      } catch (ClassNotFoundException e) {
+        freemind.main.Resources.getInstance().logException(e);
+      }
+    }
 
-		@Override
-		public DataFlavor[] getTransferDataFlavors() {
-			return new DataFlavor[] {mFlavor};
-		}
+    @Override
+    public DataFlavor[] getTransferDataFlavors() {
+      return new DataFlavor[] {mFlavor};
+    }
 
-		@Override
-		public boolean isDataFlavorSupported(DataFlavor pFlavor) {
-			return pFlavor.equals(mFlavor);
-		}
+    @Override
+    public boolean isDataFlavorSupported(DataFlavor pFlavor) {
+      return pFlavor.equals(mFlavor);
+    }
 
-		@Override
-		public Object getTransferData(DataFlavor pFlavor)
-				throws UnsupportedFlavorException, IOException {
-			return mHtmlData;
-		}
-	}
+    @Override
+    public Object getTransferData(DataFlavor pFlavor)
+        throws UnsupportedFlavorException, IOException {
+      return mHtmlData;
+    }
+  }
 
-	@Test
-	public void testSetHtml() throws Exception {
-		MindMapNodeModel node = new MindMapNodeModel(new MindMapMock("</map>"));
-		node.setText("test");
-		// wiped out: <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html
-		// PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
-		// \"DTD/xhtml1-transitional.dtd\">\n
-		assertNull(node.getXmlText(), "Should no conversion as test is not html.");
-		node.setXmlText("test");
+  @Test
+  public void testSetHtml() throws Exception {
+    MindMapNodeModel node = new MindMapNodeModel(new MindMapMock("</map>"));
+    node.setText("test");
+    // wiped out: <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html
+    // PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
+    // \"DTD/xhtml1-transitional.dtd\">\n
+    assertNull(node.getXmlText(), "Should no conversion as test is not html.");
+    node.setXmlText("test");
 
-		assertEquals("test", node.getText(), "Not proper conversion");
-		node.setText("<html><br>");
-		assertEquals(
-				"<html>\n  <head>\n    \n  </head>\n  <body>\n    <br />\n  </body>\n</html>\n",
-				node.getXmlText(), "Not proper html conversion");
-		// must remove the '/' in <br/>.
-		node.setXmlText("<html><br/></html>");
-		assertEquals("<html><br></html>", node.getText(), "Not proper html conversion");
-		node.setXmlText("<html><br /></html>");
-		assertEquals("<html><br ></html>", node.getText(), "Not proper html conversion");
+    assertEquals("test", node.getText(), "Not proper conversion");
+    node.setText("<html><br>");
+    assertEquals(
+        "<html>\n  <head>\n    \n  </head>\n  <body>\n    <br />\n  </body>\n</html>\n",
+        node.getXmlText(),
+        "Not proper html conversion");
+    // must remove the '/' in <br/>.
+    node.setXmlText("<html><br/></html>");
+    assertEquals("<html><br></html>", node.getText(), "Not proper html conversion");
+    node.setXmlText("<html><br /></html>");
+    assertEquals("<html><br ></html>", node.getText(), "Not proper html conversion");
+  }
 
-	}
+  @Test
+  public void testEndContentMatcher() throws Exception {
+    matchingTest("</" + XMLElement.XML_NODE_XHTML_CONTENT_TAG + ">");
+    matchingTest("</ " + XMLElement.XML_NODE_XHTML_CONTENT_TAG + ">");
+    matchingTest("</ " + XMLElement.XML_NODE_XHTML_CONTENT_TAG + " >");
+    matchingTest("< /\n" + XMLElement.XML_NODE_XHTML_CONTENT_TAG + " >");
+  }
 
-	@Test
-	public void testEndContentMatcher() throws Exception {
-		matchingTest("</" + XMLElement.XML_NODE_XHTML_CONTENT_TAG + ">");
-		matchingTest("</ " + XMLElement.XML_NODE_XHTML_CONTENT_TAG + ">");
-		matchingTest("</ " + XMLElement.XML_NODE_XHTML_CONTENT_TAG + " >");
-		matchingTest("< /\n" + XMLElement.XML_NODE_XHTML_CONTENT_TAG + " >");
-	}
+  /** */
+  private void matchingTest(String string) {
+    assertTrue(string.matches(XMLElement.XML_NODE_XHTML_CONTENT_END_TAG_REGEXP));
+  }
 
-	/**
-	 */
-	private void matchingTest(String string) {
-		assertTrue(string.matches(XMLElement.XML_NODE_XHTML_CONTENT_END_TAG_REGEXP));
-	}
+  @Test
+  public void testNanoXmlContent() throws Exception {
+    XMLElement element = new XMLElement();
+    element.parseFromReader(
+        new StringReader(
+            "<"
+                + XMLElement.XML_NODE_XHTML_CONTENT_TAG
+                + "><body>a<b>cd</b>e</body></"
+                + XMLElement.XML_NODE_XHTML_CONTENT_TAG
+                + ">"));
+    assertEquals(
+        "<body>a<b>cd</b>e</body>",
+        element.getContent(),
+        XMLElement.XML_NODE_XHTML_CONTENT_TAG + " tag removed");
+  }
 
-	@Test
-	public void testNanoXmlContent() throws Exception {
-		XMLElement element = new XMLElement();
-		element.parseFromReader(new StringReader("<" + XMLElement.XML_NODE_XHTML_CONTENT_TAG
-				+ "><body>a<b>cd</b>e</body></" + XMLElement.XML_NODE_XHTML_CONTENT_TAG + ">"));
-		assertEquals("<body>a<b>cd</b>e</body>", element.getContent(),
-				XMLElement.XML_NODE_XHTML_CONTENT_TAG + " tag removed");
-	}
+  @Test
+  public void testXHtmlToHtmlConversion() throws Exception {
+    assertEquals("<br >", HtmlTools.getInstance().toHtml("<br />"), "br tag conversion");
+    assertEquals(
+        "<brmore/>", HtmlTools.getInstance().toHtml("<brmore/>"), "brmore tag not converted");
+  }
 
-	@Test
-	public void testXHtmlToHtmlConversion() throws Exception {
-		assertEquals("<br >", HtmlTools.getInstance().toHtml("<br />"), "br tag conversion");
-		assertEquals("<brmore/>", HtmlTools.getInstance().toHtml("<brmore/>"),
-				"brmore tag not converted");
-	}
+  @Test
+  public void testWellFormedXml() throws Exception {
+    assertTrue(HtmlTools.getInstance().isWellformedXml("<a></a>"));
+    // assertEquals(true,
+    // HtmlTools.getInstance().isWellformedXml("<?xml version=\"1.0\"
+    // encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0
+    // Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n<a></a>"));
+    assertTrue(
+        HtmlTools.getInstance()
+            .isWellformedXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<a></a>"));
+    assertFalse(HtmlTools.getInstance().isWellformedXml("<a><a></a>"));
+  }
 
-	@Test
-	public void testWellFormedXml() throws Exception {
-		assertTrue(HtmlTools.getInstance().isWellformedXml("<a></a>"));
-		// assertEquals(true,
-		// HtmlTools.getInstance().isWellformedXml("<?xml version=\"1.0\"
-		// encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0
-		// Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n<a></a>"));
-		assertTrue(HtmlTools.getInstance()
-				.isWellformedXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<a></a>"));
-		assertFalse(HtmlTools.getInstance().isWellformedXml("<a><a></a>"));
-
-	}
-
-	@Test
-	public void testBr() throws Exception {
-		String input = """
+  @Test
+  public void testBr() throws Exception {
+    String input =
+        """
 				<html>
 				  <head>
 				   \s
@@ -170,167 +174,408 @@ public class HtmlConversionTests extends FreeMindTestBase {
 				    </p>
 				  </body>
 				</html>""";
-		String result = HtmlTools.getInstance().toHtml(input);
-		assertFalse(result.matches("^.*&gt;.*$"), "Should not contain &gt; in the result.");
-	}
+    String result = HtmlTools.getInstance().toHtml(input);
+    assertFalse(result.matches("^.*&gt;.*$"), "Should not contain &gt; in the result.");
+  }
 
-	/**
-	 * I suspected, that the toXhtml method inserts some spaces into the output, but it doesn't seem
-	 * to be the case.
-	 * 
-	 * @throws Exception
-	 */
-	public void testSpaceHandling() throws Exception {
-		String input = getInputStringWithManySpaces(HtmlTools.SP);
-		assertEquals(input, HtmlTools.getInstance().toXhtml(input));
-	}
+  /**
+   * I suspected, that the toXhtml method inserts some spaces into the output, but it doesn't seem
+   * to be the case.
+   *
+   * @throws Exception
+   */
+  public void testSpaceHandling() throws Exception {
+    String input = getInputStringWithManySpaces(HtmlTools.SP);
+    assertEquals(input, HtmlTools.getInstance().toXhtml(input));
+  }
 
-	// public void testSpaceHandlingInShtml() throws Exception {
-	// String input = getInputStringWithManySpaces(" ");
-	// SHTMLPanel panel = SHTMLPanel.createSHTMLPanel();
-	// panel.setCurrentDocumentContent(input);
-	// assertEquals(input, panel.getDocumentText());
-	// panel.setVisible(false);
-	// }
-	/**
-	 * Set the panel to a text, read this text from the panel and set it again. Then, setting and
-	 * getting this text to the panel must give the same.
-	 */
-	@Test
-	public void testSpaceHandlingInShtmlIdempotency() throws Exception {
-		if (Tools.isHeadless()) {
-			return;
-		}
-		String input = getInputStringWithManySpaces(" ");
-		SHTMLPanel panel = SHTMLPanel.createSHTMLPanel();
-		panel.setCurrentDocumentContent(input);
-		// set the value of the panel itself again.
-		input = panel.getDocumentText();
-		panel.setCurrentDocumentContent(input);
-		assertEquals(input, panel.getDocumentText(),
-				"Setting the input to its output should cause the same output.");
-		panel.setVisible(false);
-	}
+  // public void testSpaceHandlingInShtml() throws Exception {
+  // String input = getInputStringWithManySpaces(" ");
+  // SHTMLPanel panel = SHTMLPanel.createSHTMLPanel();
+  // panel.setCurrentDocumentContent(input);
+  // assertEquals(input, panel.getDocumentText());
+  // panel.setVisible(false);
+  // }
+  /**
+   * Set the panel to a text, read this text from the panel and set it again. Then, setting and
+   * getting this text to the panel must give the same.
+   */
+  @Test
+  public void testSpaceHandlingInShtmlIdempotency() throws Exception {
+    if (Tools.isHeadless()) {
+      return;
+    }
+    String input = getInputStringWithManySpaces(" ");
+    SHTMLPanel panel = SHTMLPanel.createSHTMLPanel();
+    panel.setCurrentDocumentContent(input);
+    // set the value of the panel itself again.
+    input = panel.getDocumentText();
+    panel.setCurrentDocumentContent(input);
+    assertEquals(
+        input,
+        panel.getDocumentText(),
+        "Setting the input to its output should cause the same output.");
+    panel.setVisible(false);
+  }
 
-	@Test
-	public void testSpaceRemovalInShtml() throws Exception {
-		if (Tools.isHeadless()) {
-			return;
-		}
-		String input = getInputStringWithManySpaces(HtmlTools.SP);
-		SHTMLPanel panel = SHTMLPanel.createSHTMLPanel();
-		panel.setCurrentDocumentContent(input);
-		// set the value of the panel itself again (twice)
-		input = panel.getDocumentText();
-		panel.setCurrentDocumentContent(input);
-		input = panel.getDocumentText();
-		panel.setCurrentDocumentContent(input);
-		assertEquals(input, panel.getDocumentText(),
-				"Setting the input to its output should cause the same output.");
-		panel.setVisible(false);
-	}
+  @Test
+  public void testSpaceRemovalInShtml() throws Exception {
+    if (Tools.isHeadless()) {
+      return;
+    }
+    String input = getInputStringWithManySpaces(HtmlTools.SP);
+    SHTMLPanel panel = SHTMLPanel.createSHTMLPanel();
+    panel.setCurrentDocumentContent(input);
+    // set the value of the panel itself again (twice)
+    input = panel.getDocumentText();
+    panel.setCurrentDocumentContent(input);
+    input = panel.getDocumentText();
+    panel.setCurrentDocumentContent(input);
+    assertEquals(
+        input,
+        panel.getDocumentText(),
+        "Setting the input to its output should cause the same output.");
+    panel.setVisible(false);
+  }
 
-	private String getInputStringWithManySpaces(String pSpaceString) {
-		String body = getHtmlBody(pSpaceString);
-		return "<html>\n" + "  <head>\n" + "    \n" + "  </head>\n" + "  <body>" + body
-				+ "</body>\n" + "</html>\n";
-	}
+  private String getInputStringWithManySpaces(String pSpaceString) {
+    String body = getHtmlBody(pSpaceString);
+    return "<html>\n"
+        + "  <head>\n"
+        + "    \n"
+        + "  </head>\n"
+        + "  <body>"
+        + body
+        + "</body>\n"
+        + "</html>\n";
+  }
 
-	private String getHtmlBody(String pSpaceString) {
-		return "\n    <p>\n" + "      Using" + pSpaceString + "Filters" + pSpaceString
-				+ "the" + pSpaceString + "current" + pSpaceString + "mindmap" + pSpaceString + "can"
-				+ pSpaceString + "be" + pSpaceString + "reduced" + pSpaceString + "to"
-				+ pSpaceString + "nodes" + pSpaceString + "satisfying" + pSpaceString + "certain"
-				+ pSpaceString + "criteria." + pSpaceString + "For" + pSpaceString + "example,"
-				+ pSpaceString + "if" + pSpaceString + "you" + pSpaceString + "only" + pSpaceString
-				+ "want" + pSpaceString + "to" + pSpaceString + "see" + pSpaceString + "every"
-				+ pSpaceString + "node" + pSpaceString + "containing" + pSpaceString
-				+ "&quot;TODO&quot;," + pSpaceString + "then" + pSpaceString + "you" + pSpaceString
-				+ "have" + pSpaceString + "to" + pSpaceString + "press" + pSpaceString + "on"
-				+ pSpaceString + "the" + pSpaceString + "filter" + pSpaceString + "symbol"
-				+ pSpaceString + "(the" + pSpaceString + "funnel" + pSpaceString + "beside"
-				+ pSpaceString + "the" + pSpaceString + "zoom" + pSpaceString + "box),"
-				+ pSpaceString + "the" + pSpaceString + "filter" + pSpaceString + "toolbar"
-				+ pSpaceString + "appears," + pSpaceString + "choose" + pSpaceString
-				+ "&quot;edit&quot;" + pSpaceString + "and" + pSpaceString + "add" + pSpaceString
-				+ "the" + pSpaceString + "condition" + pSpaceString + "that" + pSpaceString + "the"
-				+ pSpaceString + "node" + pSpaceString + "content" + pSpaceString + "contains"
-				+ pSpaceString + "&quot;TODO&quot;." + pSpaceString + "Then" + pSpaceString
-				+ "select" + pSpaceString + "the" + pSpaceString + "filter" + pSpaceString + "in"
-				+ pSpaceString + "the" + pSpaceString + "filter" + pSpaceString + "toolbar."
-				+ pSpaceString + "Now," + pSpaceString + "only" + pSpaceString + "the"
-				+ pSpaceString + "filtered" + pSpaceString + "nodes" + pSpaceString + "and"
-				+ pSpaceString + "its" + pSpaceString + "ancestors" + pSpaceString + "are"
-				+ pSpaceString + "displayed" + pSpaceString + "unless" + pSpaceString + "you"
-				+ pSpaceString + "choose" + pSpaceString + "&quot;No" + pSpaceString
-				+ "filtering&quot;" + pSpaceString + "in" + pSpaceString + "the" + pSpaceString
-				+ "toolbar." + pSpaceString + "\n" + "    </p>\n" + "    <p>\n" + "      Using"
-				+ pSpaceString + "the" + pSpaceString + "settings" + pSpaceString + "&quot;Show"
-				+ pSpaceString + "ancestors&quot;" + pSpaceString + "and" + pSpaceString
-				+ "&quot;Show" + pSpaceString + "descendants&quot;" + pSpaceString + "you"
-				+ pSpaceString + "can" + pSpaceString + "influence" + pSpaceString + "the"
-				+ pSpaceString + "apperance" + pSpaceString + "of" + pSpaceString + "the"
-				+ pSpaceString + "parent" + pSpaceString + "and" + pSpaceString + "child"
-				+ pSpaceString + "nodes" + pSpaceString + "that" + pSpaceString + "are"
-				+ pSpaceString + "connected" + pSpaceString + "with" + pSpaceString + "the"
-				+ pSpaceString + "nodes" + pSpaceString + "being" + pSpaceString + "filtered.\n"
-				+ "    </p>\n" + "    <p>\n" + "      There" + pSpaceString + "are" + pSpaceString
-				+ "many" + pSpaceString + "different" + pSpaceString + "criteria" + pSpaceString
-				+ "filters" + pSpaceString + "can" + pSpaceString + "be" + pSpaceString + "based"
-				+ pSpaceString + "on" + pSpaceString + "such" + pSpaceString + "as" + pSpaceString
-				+ "a" + pSpaceString + "set" + pSpaceString + "of" + pSpaceString + "selected"
-				+ pSpaceString + "nodes," + pSpaceString + "a" + pSpaceString + "specific"
-				+ pSpaceString + "icon" + pSpaceString + "and" + pSpaceString + "some"
-				+ pSpaceString + "attributes.\n" + "    </p>\n" + "    <p>\n" + "      "
-				+ pSpaceString + "\n" + "    </p>\n  ";
-	}
+  private String getHtmlBody(String pSpaceString) {
+    return "\n    <p>\n"
+        + "      Using"
+        + pSpaceString
+        + "Filters"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "current"
+        + pSpaceString
+        + "mindmap"
+        + pSpaceString
+        + "can"
+        + pSpaceString
+        + "be"
+        + pSpaceString
+        + "reduced"
+        + pSpaceString
+        + "to"
+        + pSpaceString
+        + "nodes"
+        + pSpaceString
+        + "satisfying"
+        + pSpaceString
+        + "certain"
+        + pSpaceString
+        + "criteria."
+        + pSpaceString
+        + "For"
+        + pSpaceString
+        + "example,"
+        + pSpaceString
+        + "if"
+        + pSpaceString
+        + "you"
+        + pSpaceString
+        + "only"
+        + pSpaceString
+        + "want"
+        + pSpaceString
+        + "to"
+        + pSpaceString
+        + "see"
+        + pSpaceString
+        + "every"
+        + pSpaceString
+        + "node"
+        + pSpaceString
+        + "containing"
+        + pSpaceString
+        + "&quot;TODO&quot;,"
+        + pSpaceString
+        + "then"
+        + pSpaceString
+        + "you"
+        + pSpaceString
+        + "have"
+        + pSpaceString
+        + "to"
+        + pSpaceString
+        + "press"
+        + pSpaceString
+        + "on"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "filter"
+        + pSpaceString
+        + "symbol"
+        + pSpaceString
+        + "(the"
+        + pSpaceString
+        + "funnel"
+        + pSpaceString
+        + "beside"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "zoom"
+        + pSpaceString
+        + "box),"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "filter"
+        + pSpaceString
+        + "toolbar"
+        + pSpaceString
+        + "appears,"
+        + pSpaceString
+        + "choose"
+        + pSpaceString
+        + "&quot;edit&quot;"
+        + pSpaceString
+        + "and"
+        + pSpaceString
+        + "add"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "condition"
+        + pSpaceString
+        + "that"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "node"
+        + pSpaceString
+        + "content"
+        + pSpaceString
+        + "contains"
+        + pSpaceString
+        + "&quot;TODO&quot;."
+        + pSpaceString
+        + "Then"
+        + pSpaceString
+        + "select"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "filter"
+        + pSpaceString
+        + "in"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "filter"
+        + pSpaceString
+        + "toolbar."
+        + pSpaceString
+        + "Now,"
+        + pSpaceString
+        + "only"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "filtered"
+        + pSpaceString
+        + "nodes"
+        + pSpaceString
+        + "and"
+        + pSpaceString
+        + "its"
+        + pSpaceString
+        + "ancestors"
+        + pSpaceString
+        + "are"
+        + pSpaceString
+        + "displayed"
+        + pSpaceString
+        + "unless"
+        + pSpaceString
+        + "you"
+        + pSpaceString
+        + "choose"
+        + pSpaceString
+        + "&quot;No"
+        + pSpaceString
+        + "filtering&quot;"
+        + pSpaceString
+        + "in"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "toolbar."
+        + pSpaceString
+        + "\n"
+        + "    </p>\n"
+        + "    <p>\n"
+        + "      Using"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "settings"
+        + pSpaceString
+        + "&quot;Show"
+        + pSpaceString
+        + "ancestors&quot;"
+        + pSpaceString
+        + "and"
+        + pSpaceString
+        + "&quot;Show"
+        + pSpaceString
+        + "descendants&quot;"
+        + pSpaceString
+        + "you"
+        + pSpaceString
+        + "can"
+        + pSpaceString
+        + "influence"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "apperance"
+        + pSpaceString
+        + "of"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "parent"
+        + pSpaceString
+        + "and"
+        + pSpaceString
+        + "child"
+        + pSpaceString
+        + "nodes"
+        + pSpaceString
+        + "that"
+        + pSpaceString
+        + "are"
+        + pSpaceString
+        + "connected"
+        + pSpaceString
+        + "with"
+        + pSpaceString
+        + "the"
+        + pSpaceString
+        + "nodes"
+        + pSpaceString
+        + "being"
+        + pSpaceString
+        + "filtered.\n"
+        + "    </p>\n"
+        + "    <p>\n"
+        + "      There"
+        + pSpaceString
+        + "are"
+        + pSpaceString
+        + "many"
+        + pSpaceString
+        + "different"
+        + pSpaceString
+        + "criteria"
+        + pSpaceString
+        + "filters"
+        + pSpaceString
+        + "can"
+        + pSpaceString
+        + "be"
+        + pSpaceString
+        + "based"
+        + pSpaceString
+        + "on"
+        + pSpaceString
+        + "such"
+        + pSpaceString
+        + "as"
+        + pSpaceString
+        + "a"
+        + pSpaceString
+        + "set"
+        + pSpaceString
+        + "of"
+        + pSpaceString
+        + "selected"
+        + pSpaceString
+        + "nodes,"
+        + pSpaceString
+        + "a"
+        + pSpaceString
+        + "specific"
+        + pSpaceString
+        + "icon"
+        + pSpaceString
+        + "and"
+        + pSpaceString
+        + "some"
+        + pSpaceString
+        + "attributes.\n"
+        + "    </p>\n"
+        + "    <p>\n"
+        + "      "
+        + pSpaceString
+        + "\n"
+        + "    </p>\n  ";
+  }
 
-	@Test
-	public void testUnicodeHandling() {
-		String input =
-				"if (myOldValue != null && myText.startsWith(myOldValue) == true) { \nmyText = myText.substring(myOldValue.length() + terminator.length());\n};\n";
-		String escapedText = HtmlTools.toXMLEscapedText(input);
-		String unicodeToHTMLUnicodeEntity =
-				HtmlTools.unicodeToHTMLUnicodeEntity(escapedText, false);
-		System.out.println(unicodeToHTMLUnicodeEntity);
-		String unescapeHTMLUnicodeEntity =
-				HtmlTools.unescapeHTMLUnicodeEntity(unicodeToHTMLUnicodeEntity);
-		String back = HtmlTools.toXMLUnescapedText(unescapeHTMLUnicodeEntity);
-		System.out.println(back);
-		assertEquals(input, back, "Unicode handling failed.");
-	}
+  @Test
+  public void testUnicodeHandling() {
+    String input =
+        "if (myOldValue != null && myText.startsWith(myOldValue) == true) { \nmyText = myText.substring(myOldValue.length() + terminator.length());\n};\n";
+    String escapedText = HtmlTools.toXMLEscapedText(input);
+    String unicodeToHTMLUnicodeEntity = HtmlTools.unicodeToHTMLUnicodeEntity(escapedText, false);
+    System.out.println(unicodeToHTMLUnicodeEntity);
+    String unescapeHTMLUnicodeEntity =
+        HtmlTools.unescapeHTMLUnicodeEntity(unicodeToHTMLUnicodeEntity);
+    String back = HtmlTools.toXMLUnescapedText(unescapeHTMLUnicodeEntity);
+    System.out.println(back);
+    assertEquals(input, back, "Unicode handling failed.");
+  }
 
-	@Test
-	public void testHtmlBodyExtraction() {
-		String input = getInputStringWithManySpaces(" ");
-		String expectedOutput = getHtmlBody(" ");
-		assertTrue(HtmlTools.isHtmlNode(input));
-		assertEquals(expectedOutput, HtmlTools.extractHtmlBody(input));
-	}
+  @Test
+  public void testHtmlBodyExtraction() {
+    String input = getInputStringWithManySpaces(" ");
+    String expectedOutput = getHtmlBody(" ");
+    assertTrue(HtmlTools.isHtmlNode(input));
+    assertEquals(expectedOutput, HtmlTools.extractHtmlBody(input));
+  }
 
-	@Test
-	public void testIllegalXmlChars() throws Exception {
-		assertEquals("AB&#32;&#x20;",
-				Tools.replaceUtf8AndIllegalXmlChars(
-						"&#x1f;A&#0;&#31;&#x0001B;B&#x1;&#32;&#1;&#x20;"),
-				"Wrong chars remaining after replacement.");
-	}
+  @Test
+  public void testIllegalXmlChars() throws Exception {
+    assertEquals(
+        "AB&#32;&#x20;",
+        Tools.replaceUtf8AndIllegalXmlChars("&#x1f;A&#0;&#31;&#x0001B;B&#x1;&#32;&#1;&#x20;"),
+        "Wrong chars remaining after replacement.");
+  }
 
-	@Test
-	public void testSpaceReplacements() throws Exception {
-		assertEquals(" " + HtmlTools.NBSP, HtmlTools.replaceSpacesToNonbreakableSpaces("  "),
-				"Space conversion failed");
-		assertEquals(" " + HtmlTools.NBSP + HtmlTools.NBSP + HtmlTools.NBSP,
-				HtmlTools.replaceSpacesToNonbreakableSpaces("    "),
-				"Multiple space conversion failed");
-		assertEquals(" " + HtmlTools.NBSP + "xy " + HtmlTools.NBSP + HtmlTools.NBSP,
-				HtmlTools.replaceSpacesToNonbreakableSpaces("  xy   "),
-				"Double space conversion failed");
-	}
+  @Test
+  public void testSpaceReplacements() throws Exception {
+    assertEquals(
+        " " + HtmlTools.NBSP,
+        HtmlTools.replaceSpacesToNonbreakableSpaces("  "),
+        "Space conversion failed");
+    assertEquals(
+        " " + HtmlTools.NBSP + HtmlTools.NBSP + HtmlTools.NBSP,
+        HtmlTools.replaceSpacesToNonbreakableSpaces("    "),
+        "Multiple space conversion failed");
+    assertEquals(
+        " " + HtmlTools.NBSP + "xy " + HtmlTools.NBSP + HtmlTools.NBSP,
+        HtmlTools.replaceSpacesToNonbreakableSpaces("  xy   "),
+        "Double space conversion failed");
+  }
 
-	static final String testHtml1 = "<ul><li>bla</li></ul>";
-	final static String testHtml2 =
-			"""
+  static final String testHtml1 = "<ul><li>bla</li></ul>";
+  static final String testHtml2 =
+      """
 					<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 					<html>
 					<head>
@@ -366,7 +611,8 @@ public class HtmlConversionTests extends FreeMindTestBase {
 					</ul>
 					</body>
 					</html>""";
-	static final String testHtml3 = """
+  static final String testHtml3 =
+      """
 			<html>
 			<head>
 			<title>FreeMind Import</title>
@@ -533,84 +779,83 @@ public class HtmlConversionTests extends FreeMindTestBase {
 			</div>
 			</body>
 			</html>
-			
+
 			</body>
 			</html>
 			""";
 
-	@Test
-	public void testListDetection() throws Exception {
-		HtmlTools instance = HtmlTools.getInstance();
-		final IntHolder created = new IntHolder();
+  @Test
+  public void testListDetection() throws Exception {
+    HtmlTools instance = HtmlTools.getInstance();
+    final IntHolder created = new IntHolder();
 
-		// new NodeTraversor(new NodeVisitor() {
-		//
-		// @Override
-		// public void head(Node pNode, int pDepth) {
-		// System.out.println("Node: " + pNode.getClass() + ", " + pNode);
-		// }
-		//
-		// @Override
-		// public void tail(Node pNode, int pDepth) {
-		// System.out.println("/Node: " + pNode.getClass() + ", " + pNode);
-		//
-		// }}).traverse(Jsoup.parse(testHtml2));
+    // new NodeTraversor(new NodeVisitor() {
+    //
+    // @Override
+    // public void head(Node pNode, int pDepth) {
+    // System.out.println("Node: " + pNode.getClass() + ", " + pNode);
+    // }
+    //
+    // @Override
+    // public void tail(Node pNode, int pDepth) {
+    // System.out.println("/Node: " + pNode.getClass() + ", " + pNode);
+    //
+    // }}).traverse(Jsoup.parse(testHtml2));
 
-		MindMapNode rootNode = new TestMindMapNode();
-		rootNode.setText("myRoot");
-		NodeCreator creator = new NodeCreator() {
+    MindMapNode rootNode = new TestMindMapNode();
+    rootNode.setText("myRoot");
+    NodeCreator creator =
+        new NodeCreator() {
 
-			@Override
-			public MindMapNode createChild(MindMapNode pParent) {
-				created.increase();
-				System.out.println("Create new node as child of: " + pParent.getText());
-				TestMindMapNode newNode = new TestMindMapNode();
-				pParent.insert(newNode, pParent.getChildCount());
-				newNode.setParent(pParent);
-				return newNode;
-			}
+          @Override
+          public MindMapNode createChild(MindMapNode pParent) {
+            created.increase();
+            System.out.println("Create new node as child of: " + pParent.getText());
+            TestMindMapNode newNode = new TestMindMapNode();
+            pParent.insert(newNode, pParent.getChildCount());
+            newNode.setParent(pParent);
+            return newNode;
+          }
 
-			@Override
-			public void setText(String pText, MindMapNode pNode) {
-				System.out.println("Text: " + pText);
-				pNode.setText(pText);
-			}
+          @Override
+          public void setText(String pText, MindMapNode pNode) {
+            System.out.println("Text: " + pText);
+            pNode.setText(pText);
+          }
 
-			@Override
-			public void setLink(String pLink, MindMapNode pNode) {}
+          @Override
+          public void setLink(String pLink, MindMapNode pNode) {}
+        };
+    instance.insertHtmlIntoNodes(testHtml1, rootNode, creator);
 
-		};
-		instance.insertHtmlIntoNodes(testHtml1, rootNode, creator);
+    assertEquals(1, created.getValue());
+    assertEquals(1, rootNode.getChildCount(), "Only one in the first level is expected");
+    created.setValue(0);
+    rootNode = new TestMindMapNode();
+    rootNode.setText("myRoot2");
+    instance.insertHtmlIntoNodes(testHtml2, rootNode, creator);
 
-		assertEquals(1, created.getValue());
-		assertEquals(1, rootNode.getChildCount(), "Only one in the first level is expected");
-		created.setValue(0);
-		rootNode = new TestMindMapNode();
-		rootNode.setText("myRoot2");
-		instance.insertHtmlIntoNodes(testHtml2, rootNode, creator);
+    assertEquals(5, created.getValue());
+    assertEquals(2, rootNode.getChildCount(), "Only two in the first level are expected");
 
-		assertEquals(5, created.getValue());
-		assertEquals(2, rootNode.getChildCount(), "Only two in the first level are expected");
+    created.setValue(0);
+    rootNode = new TestMindMapNode();
+    rootNode.setText("myRoot3");
+    instance.insertHtmlIntoNodes(testHtml3, rootNode, creator);
+    assertEquals(13, created.getValue());
+    assertEquals(10, rootNode.getChildCount(), "first level nodes");
+  }
 
-		created.setValue(0);
-		rootNode = new TestMindMapNode();
-		rootNode.setText("myRoot3");
-		instance.insertHtmlIntoNodes(testHtml3, rootNode, creator);
-		assertEquals(13, created.getValue());
-		assertEquals(10, rootNode.getChildCount(), "first level nodes");
-	}
-
-	@Test
-	public void testDetermineNodeAmount() throws Exception {
-		ExtendedMapFeedbackImpl mapFeedback = new ExtendedMapFeedbackImpl();
-		final MindMapMapModel mMap = new MindMapMapModel(mapFeedback);
-		mapFeedback.setMap(mMap);
-		PasteActor actor = new PasteActor(mapFeedback);
-		assertEquals(1, actor.determineAmountOfNewNodes(new HtmlTransfer(testHtml1)));
-		assertEquals(2, actor.determineAmountOfNewNodes(new HtmlTransfer(testHtml2)));
-		// this is one less, as the determine... strips the html header and uses its
-		// own.
-		assertEquals(9, actor.determineAmountOfNewNodes(new HtmlTransfer(testHtml3)));
-	}
-
+  @Test
+  public void testDetermineNodeAmount() throws Exception {
+    ExtendedMapFeedbackImpl mapFeedback = new ExtendedMapFeedbackImpl();
+    final MindMapMapModel mMap = new MindMapMapModel(mapFeedback);
+    mapFeedback.setMap(mMap);
+    PasteActor actor = new PasteActor(mapFeedback);
+    assertEquals(1, actor.determineAmountOfNewNodes(new HtmlTransfer(testHtml1)));
+    assertEquals(2, actor.determineAmountOfNewNodes(new HtmlTransfer(testHtml2)));
+    // this is one less, as the determine... strips the html header and uses its
+    // own.
+    assertEquals(9, actor.determineAmountOfNewNodes(new HtmlTransfer(testHtml3)));
+  }
 }

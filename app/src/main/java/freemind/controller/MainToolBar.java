@@ -22,22 +22,21 @@ import java.awt.Insets;
 import java.util.logging.Logger;
 
 public class MainToolBar extends FreeMindToolBar {
-	Controller controller;
-	private static Logger logger = null;
+  Controller controller;
+  private static Logger logger = null;
 
-	public MainToolBar(final Controller controller) {
-		super();
-		this.controller = controller;
-		if (logger == null) {
-			logger = controller.getFrame().getLogger(this.getClass().getName());
-		}
-		setRollover(true);
-		setBorderPainted(false);
-		setMargin(new Insets(0, 0, 0, 0));
-	}
+  public MainToolBar(final Controller controller) {
+    super();
+    this.controller = controller;
+    if (logger == null) {
+      logger = controller.getFrame().getLogger(this.getClass().getName());
+    }
+    setRollover(true);
+    setBorderPainted(false);
+    setMargin(new Insets(0, 0, 0, 0));
+  }
 
-	public void activate(boolean visible) {}
+  public void activate(boolean visible) {}
 
-	public void setAllActions(boolean enabled) {}
-
+  public void setAllActions(boolean enabled) {}
 }

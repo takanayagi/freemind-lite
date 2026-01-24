@@ -35,77 +35,75 @@ import freemind.modes.MindIcon;
 import freemind.modes.MindMapNode;
 
 public class IconNotContainedCondition implements Condition {
-	static final String ICON = "icon";
-	static final String NAME = "icon_not_contained_condition";
-	private final String iconName;
+  static final String ICON = "icon";
+  static final String NAME = "icon_not_contained_condition";
+  private final String iconName;
 
-	public IconNotContainedCondition(String iconName) {
-		this.iconName = iconName;
-	}
+  public IconNotContainedCondition(String iconName) {
+    this.iconName = iconName;
+  }
 
-	public boolean checkNode(Controller c, MindMapNode node) {
-		return iconFirstIndex(node, iconName) == -1 && !isStateIconContained(node, iconName);
-	}
+  public boolean checkNode(Controller c, MindMapNode node) {
+    return iconFirstIndex(node, iconName) == -1 && !isStateIconContained(node, iconName);
+  }
 
-	static public int iconFirstIndex(MindMapNode node, String iconName) {
-		List<MindIcon> icons = node.getIcons();
-		for (ListIterator<MindIcon> i = icons.listIterator(); i.hasNext();) {
-			MindIcon nextIcon = i.next();
-			if (iconName.equals(nextIcon.getName()))
-				return i.previousIndex();
-		}
-		return -1;
+  public static int iconFirstIndex(MindMapNode node, String iconName) {
+    List<MindIcon> icons = node.getIcons();
+    for (ListIterator<MindIcon> i = icons.listIterator(); i.hasNext(); ) {
+      MindIcon nextIcon = i.next();
+      if (iconName.equals(nextIcon.getName())) return i.previousIndex();
+    }
+    return -1;
+  }
 
-	}
+  public static int iconLastIndex(MindMapNode node, String iconName) {
+    List<MindIcon> icons = node.getIcons();
+    ListIterator<MindIcon> i = icons.listIterator(icons.size());
+    while (i.hasPrevious()) {
+      MindIcon nextIcon = i.previous();
+      if (iconName.equals(nextIcon.getName())) return i.nextIndex();
+    }
+    return -1;
+  }
 
-	static public int iconLastIndex(MindMapNode node, String iconName) {
-		List<MindIcon> icons = node.getIcons();
-		ListIterator<MindIcon> i = icons.listIterator(icons.size());
-		while (i.hasPrevious()) {
-			MindIcon nextIcon = i.previous();
-			if (iconName.equals(nextIcon.getName()))
-				return i.nextIndex();
-		}
-		return -1;
+  private static boolean isStateIconContained(MindMapNode node, String iconName) {
+    Set<String> stateIcons = node.getStateIcons().keySet();
+    for (String nextIcon : stateIcons) {
+      if (iconName.equals(nextIcon)) return true;
+    }
+    return false;
+  }
 
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList,
+   * java.lang.Object, int, boolean, boolean)
+   */
+  public JComponent getListCellRendererComponent() {
+    JCondition component = new JCondition();
+    String text =
+        Resources.getInstance().getResourceString("filter_icon")
+            + ' '
+            + Resources.getInstance().getResourceString("filter_not_contains")
+            + ' ';
+    component.add(new JLabel(text));
+    component.add(MindIcon.factory(getIconName()).getRendererComponent());
+    return component;
+  }
 
-	private static boolean isStateIconContained(MindMapNode node, String iconName) {
-		Set<String> stateIcons = node.getStateIcons().keySet();
-		for (String nextIcon : stateIcons) {
-			if (iconName.equals(nextIcon))
-				return true;
-		}
-		return false;
-	}
+  private String getIconName() {
+    return iconName;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList,
-	 * java.lang.Object, int, boolean, boolean)
-	 */
-	public JComponent getListCellRendererComponent() {
-		JCondition component = new JCondition();
-		String text = Resources.getInstance().getResourceString("filter_icon") + ' '
-				+ Resources.getInstance().getResourceString("filter_not_contains") + ' ';
-		component.add(new JLabel(text));
-		component.add(MindIcon.factory(getIconName()).getRendererComponent());
-		return component;
-	}
+  public void save(XMLElement element) {
+    XMLElement child = new XMLElement();
+    child.setName(NAME);
+    child.setAttribute(ICON, iconName);
+    element.addChild(child);
+  }
 
-	private String getIconName() {
-		return iconName;
-	}
-
-	public void save(XMLElement element) {
-		XMLElement child = new XMLElement();
-		child.setName(NAME);
-		child.setAttribute(ICON, iconName);
-		element.addChild(child);
-	}
-
-	static Condition load(XMLElement element) {
-		return new IconNotContainedCondition(element.getStringAttribute(ICON));
-	}
+  static Condition load(XMLElement element) {
+    return new IconNotContainedCondition(element.getStringAttribute(ICON));
+  }
 }

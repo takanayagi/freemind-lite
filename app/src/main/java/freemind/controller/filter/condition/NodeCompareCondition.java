@@ -29,45 +29,46 @@ import freemind.modes.MindMapNode;
 
 class NodeCompareCondition extends CompareConditionAdapter {
 
-	static final String COMPARATION_RESULT = "comparation_result";
-	static final String VALUE = "value";
-	static final String NAME = "node_compare_condition";
-	static final String SUCCEED = "succeed";
-	private int comparationResult;
-	private boolean succeed;
+  static final String COMPARATION_RESULT = "comparation_result";
+  static final String VALUE = "value";
+  static final String NAME = "node_compare_condition";
+  static final String SUCCEED = "succeed";
+  private int comparationResult;
+  private boolean succeed;
 
-	NodeCompareCondition(String value, boolean ignoreCase, int comparationResult, boolean succeed) {
-		super(value, ignoreCase);
-		this.comparationResult = comparationResult;
-		this.succeed = succeed;
-	}
+  NodeCompareCondition(String value, boolean ignoreCase, int comparationResult, boolean succeed) {
+    super(value, ignoreCase);
+    this.comparationResult = comparationResult;
+    this.succeed = succeed;
+  }
 
-	public boolean checkNode(Controller c, MindMapNode node) {
-		try {
-			return succeed == (compareTo(node.getText()) == comparationResult);
-		} catch (NumberFormatException fne) {
-			return false;
-		}
-	}
+  public boolean checkNode(Controller c, MindMapNode node) {
+    try {
+      return succeed == (compareTo(node.getText()) == comparationResult);
+    } catch (NumberFormatException fne) {
+      return false;
+    }
+  }
 
-	public void save(XMLElement element) {
-		XMLElement child = new XMLElement();
-		child.setName(NAME);
-		super.saveAttributes(child);
-		child.setIntAttribute(COMPARATION_RESULT, comparationResult);
-		child.setAttribute(SUCCEED, Tools.BooleanToXml(succeed));
-		element.addChild(child);
-	}
+  public void save(XMLElement element) {
+    XMLElement child = new XMLElement();
+    child.setName(NAME);
+    super.saveAttributes(child);
+    child.setIntAttribute(COMPARATION_RESULT, comparationResult);
+    child.setAttribute(SUCCEED, Tools.BooleanToXml(succeed));
+    element.addChild(child);
+  }
 
-	static Condition load(XMLElement element) {
-		return new NodeCompareCondition(element.getStringAttribute(VALUE),
-				Tools.xmlToBoolean(element.getStringAttribute(NodeCompareCondition.IGNORE_CASE)),
-				element.getIntAttribute(COMPARATION_RESULT),
-				Tools.xmlToBoolean(element.getStringAttribute(SUCCEED)));
-	}
+  static Condition load(XMLElement element) {
+    return new NodeCompareCondition(
+        element.getStringAttribute(VALUE),
+        Tools.xmlToBoolean(element.getStringAttribute(NodeCompareCondition.IGNORE_CASE)),
+        element.getIntAttribute(COMPARATION_RESULT),
+        Tools.xmlToBoolean(element.getStringAttribute(SUCCEED)));
+  }
 
-	protected String createDesctiption() {
-		final String nodeCondition = ConditionFactory.FILTER_NODE.getName();
-		return super.createDescription(nodeCondition, comparationResult, succeed);
-	}
+  protected String createDesctiption() {
+    final String nodeCondition = ConditionFactory.FILTER_NODE.getName();
+    return super.createDescription(nodeCondition, comparationResult, succeed);
+  }
 }

@@ -26,53 +26,51 @@ import freemind.view.mindmapview.MapView;
 /**
  * Stores targets of arrow links. It is used to enable cut/copy+paste for every parts of links (ie.
  * source, destination or both).
- * 
+ *
  * @author foltin
  * @date 27.10.2012
  */
 public class ArrowLinkTarget extends ArrowLinkAdapter {
-	private String mSourceLabel;
+  private String mSourceLabel;
 
-	/**
-	 * @param pSource
-	 * @param pTarget I am the target!
-	 * @param pMapFeedback
-	 */
-	public ArrowLinkTarget(MindMapNode pSource, MindMapNode pTarget, MapFeedback pMapFeedback) {
-		super(pSource, pTarget, pMapFeedback);
-	}
+  /**
+   * @param pSource
+   * @param pTarget I am the target!
+   * @param pMapFeedback
+   */
+  public ArrowLinkTarget(MindMapNode pSource, MindMapNode pTarget, MapFeedback pMapFeedback) {
+    super(pSource, pTarget, pMapFeedback);
+  }
 
-	public String getSourceLabel() {
-		return mSourceLabel;
-	}
+  public String getSourceLabel() {
+    return mSourceLabel;
+  }
 
-	public void setSourceLabel(String sourceLabel) {
-		mSourceLabel = sourceLabel;
-	}
+  public void setSourceLabel(String sourceLabel) {
+    mSourceLabel = sourceLabel;
+  }
 
-	public XMLElement save() {
-		XMLElement arrowLink = super.save();
-		arrowLink.setName("linktarget");
-		if (getSourceLabel() != null) {
-			arrowLink.setAttribute("SOURCE", getSourceLabel());
-		}
-		return arrowLink;
-	}
+  public XMLElement save() {
+    XMLElement arrowLink = super.save();
+    arrowLink.setName("linktarget");
+    if (getSourceLabel() != null) {
+      arrowLink.setAttribute("SOURCE", getSourceLabel());
+    }
+    return arrowLink;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMapArrowLink#changeInclination(freemind.view.mindmapview.MapView,
-	 * int, int, int, int)
-	 */
-	public void changeInclination(MapView pMap, int pOriginX, int pOriginY, int pDeltaX,
-			int pDeltaY) {}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMapArrowLink#changeInclination(freemind.view.mindmapview.MapView,
+   * int, int, int, int)
+   */
+  public void changeInclination(
+      MapView pMap, int pOriginX, int pOriginY, int pDeltaX, int pDeltaY) {}
 
-	public ArrowLinkAdapter createArrowLinkAdapter(MindMapLinkRegistry pRegistry) {
-		ArrowLinkAdapter linkAdapter = new MindMapArrowLinkModel(source, target, mMapFeedback);
-		copy(linkAdapter);
-		return linkAdapter;
-	}
-
-
+  public ArrowLinkAdapter createArrowLinkAdapter(MindMapLinkRegistry pRegistry) {
+    ArrowLinkAdapter linkAdapter = new MindMapArrowLinkModel(source, target, mMapFeedback);
+    copy(linkAdapter);
+    return linkAdapter;
+  }
 }

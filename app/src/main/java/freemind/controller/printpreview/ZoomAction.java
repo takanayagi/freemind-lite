@@ -23,17 +23,17 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 class ZoomAction extends AbstractAction {
-	public ZoomAction(Preview preview, double zoomStep) {
-		super();
-		this.preview = preview;
-		this.zoomStep = zoomStep;
-	}
+  public ZoomAction(Preview preview, double zoomStep) {
+    super();
+    this.preview = preview;
+    this.zoomStep = zoomStep;
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		preview.changeZoom(zoomStep);
-		preview.repaint();
-	}
+  public void actionPerformed(ActionEvent e) {
+    preview.changeZoom(zoomStep);
+    preview.repaint();
+  }
 
-	protected Preview preview;
-	protected double zoomStep;
+  protected Preview preview;
+  protected double zoomStep;
 }

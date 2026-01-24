@@ -32,58 +32,50 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class FontSizeActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public FontSizeActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public FontSizeActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public Class<FontSizeNodeAction> getDoActionClass() {
-		return FontSizeNodeAction.class;
-	}
+  public Class<FontSizeNodeAction> getDoActionClass() {
+    return FontSizeNodeAction.class;
+  }
 
-	/**
-	 */
-	public void setFontSize(MindMapNode node, String fontSizeValue) {
-		if (Tools.safeEquals(fontSizeValue, node.getFontSize())) {
-			return;
-		}
-		execute(getActionPair(node, fontSizeValue));
+  /** */
+  public void setFontSize(MindMapNode node, String fontSizeValue) {
+    if (Tools.safeEquals(fontSizeValue, node.getFontSize())) {
+      return;
+    }
+    execute(getActionPair(node, fontSizeValue));
+  }
 
-	}
+  public ActionPair getActionPair(MindMapNode node, String fontSizeValue) {
+    FontSizeNodeAction fontSizeAction = createFontSizeNodeAction(node, fontSizeValue);
+    FontSizeNodeAction undoFontSizeAction = createFontSizeNodeAction(node, node.getFontSize());
+    return new ActionPair(fontSizeAction, undoFontSizeAction);
+  }
 
-	public ActionPair getActionPair(MindMapNode node, String fontSizeValue) {
-		FontSizeNodeAction fontSizeAction = createFontSizeNodeAction(node, fontSizeValue);
-		FontSizeNodeAction undoFontSizeAction = createFontSizeNodeAction(node, node.getFontSize());
-		return new ActionPair(fontSizeAction, undoFontSizeAction);
-	}
+  private FontSizeNodeAction createFontSizeNodeAction(MindMapNode node, String fontSizeValue) {
+    FontSizeNodeAction fontSizeAction = new FontSizeNodeAction();
+    fontSizeAction.setNode(getNodeID(node));
+    fontSizeAction.setSize(fontSizeValue);
+    return fontSizeAction;
+  }
 
-	private FontSizeNodeAction createFontSizeNodeAction(MindMapNode node, String fontSizeValue) {
-		FontSizeNodeAction fontSizeAction = new FontSizeNodeAction();
-		fontSizeAction.setNode(getNodeID(node));
-		fontSizeAction.setSize(fontSizeValue);
-		return fontSizeAction;
-
-	}
-
-	/**
-	 *
-	 */
-
-	public void act(XmlAction action) {
-		if (action instanceof FontSizeNodeAction fontSizeAction) {
-			MindMapNode node = getNodeFromID(fontSizeAction.getNode());
-			try {
-				int size = Integer.parseInt(fontSizeAction.getSize());
-				if (!node.getFontSize().equals(fontSizeAction.getSize())) {
-					node.setFontSize(size);
-					getExMapFeedback().nodeChanged(node);
-				}
-			} catch (NumberFormatException ignore) {
-			}
-		}
-	}
-
-
+  /** */
+  public void act(XmlAction action) {
+    if (action instanceof FontSizeNodeAction fontSizeAction) {
+      MindMapNode node = getNodeFromID(fontSizeAction.getNode());
+      try {
+        int size = Integer.parseInt(fontSizeAction.getSize());
+        if (!node.getFontSize().equals(fontSizeAction.getSize())) {
+          node.setFontSize(size);
+          getExMapFeedback().nodeChanged(node);
+        }
+      } catch (NumberFormatException ignore) {
+      }
+    }
+  }
 }

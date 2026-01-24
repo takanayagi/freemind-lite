@@ -29,8 +29,8 @@ import freemind.main.Resources;
  * @date 18.06.2015
  */
 public class ScalableJTable extends JTable {
-	public ScalableJTable() {
-		int scale = Resources.getInstance().getIntProperty(FreeMind.SCALING_FACTOR_PROPERTY, 100);
-		setRowHeight(getRowHeight() * scale / 100);
-	}
+  public ScalableJTable() {
+    int scale = Resources.getInstance().getIntProperty(FreeMind.SCALING_FACTOR_PROPERTY, 100);
+    setRowHeight(getRowHeight() * scale / 100);
+  }
 }

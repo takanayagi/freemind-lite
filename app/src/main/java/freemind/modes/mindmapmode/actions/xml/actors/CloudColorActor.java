@@ -35,49 +35,49 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class CloudColorActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public CloudColorActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public CloudColorActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void setCloudColor(MindMapNode node, Color color) {
-		CloudColorXmlAction doAction = createCloudColorXmlAction(node, color);
-		CloudColorXmlAction undoAction = createCloudColorXmlAction(node,
-				(node.getCloud() == null) ? null : node.getCloud().getColor());
-		execute(new ActionPair(doAction, undoAction));
-	}
+  public void setCloudColor(MindMapNode node, Color color) {
+    CloudColorXmlAction doAction = createCloudColorXmlAction(node, color);
+    CloudColorXmlAction undoAction =
+        createCloudColorXmlAction(
+            node, (node.getCloud() == null) ? null : node.getCloud().getColor());
+    execute(new ActionPair(doAction, undoAction));
+  }
 
-	public CloudColorXmlAction createCloudColorXmlAction(MindMapNode node, Color color) {
-		CloudColorXmlAction nodeAction = new CloudColorXmlAction();
-		nodeAction.setNode(getNodeID(node));
-		nodeAction.setColor(Tools.colorToXml(color));
-		return nodeAction;
-	}
+  public CloudColorXmlAction createCloudColorXmlAction(MindMapNode node, Color color) {
+    CloudColorXmlAction nodeAction = new CloudColorXmlAction();
+    nodeAction.setNode(getNodeID(node));
+    nodeAction.setColor(Tools.colorToXml(color));
+    return nodeAction;
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof CloudColorXmlAction nodeColorAction) {
-			Color color = Tools.xmlToColor(nodeColorAction.getColor());
-			MindMapNode node = getNodeFromID(nodeColorAction.getNode());
-			// this is not necessary, as this action is not enabled if there is
-			// no cloud.
-			if (node.getCloud() == null) {
-				getExMapFeedback().getActorFactory().getCloudActor().setCloud(node, true);
-			}
-			Color selectedColor = null;
-			if (node.getCloud() != null) {
-				selectedColor = node.getCloud().getColor();
-			}
-			if (!Tools.safeEquals(color, selectedColor)) {
-				((LineAdapter) node.getCloud()).setColor(color); // null
-				getExMapFeedback().nodeChanged(node);
-			}
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof CloudColorXmlAction nodeColorAction) {
+      Color color = Tools.xmlToColor(nodeColorAction.getColor());
+      MindMapNode node = getNodeFromID(nodeColorAction.getNode());
+      // this is not necessary, as this action is not enabled if there is
+      // no cloud.
+      if (node.getCloud() == null) {
+        getExMapFeedback().getActorFactory().getCloudActor().setCloud(node, true);
+      }
+      Color selectedColor = null;
+      if (node.getCloud() != null) {
+        selectedColor = node.getCloud().getColor();
+      }
+      if (!Tools.safeEquals(color, selectedColor)) {
+        ((LineAdapter) node.getCloud()).setColor(color); // null
+        getExMapFeedback().nodeChanged(node);
+      }
+    }
+  }
 
-	public Class<CloudColorXmlAction> getDoActionClass() {
-		return CloudColorXmlAction.class;
-	}
-
+  public Class<CloudColorXmlAction> getDoActionClass() {
+    return CloudColorXmlAction.class;
+  }
 }

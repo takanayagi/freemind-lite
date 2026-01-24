@@ -15,7 +15,6 @@
  * 02111-1307, USA.
  */
 
-
 package freemind.modes;
 
 import java.io.File;
@@ -33,215 +32,212 @@ import freemind.main.Resources;
 import freemind.main.Tools;
 import freemind.view.ScalableImageIcon;
 
-/**
- * This class represents a MindIcon than can be applied to a node or a whole branch.
- */
+/** This class represents a MindIcon than can be applied to a node or a whole branch. */
 public class MindIcon implements Comparable<MindIcon>, IconInformation {
-	public static final String PROPERTY_STRING_ICONS_LIST = "icons.list";
-	private String name;
-	private int number = UNKNOWN;
-	/**
-	 * Stores the once created ImageIcon.
-	 */
-	private ImageIcon associatedIcon;
-	private static ImageIcon iconNotFound;
-	/**
-	 * Set of all created icons. Name -> MindIcon
-	 */
-	private static HashMap<String, MindIcon> createdIcons = new HashMap<>();
-	private static final int UNKNOWN = -1;
-	public static final int LAST = UNKNOWN;
-	static int nextNumber = UNKNOWN - 1;
-	private JComponent component = null;
+  public static final String PROPERTY_STRING_ICONS_LIST = "icons.list";
+  private String name;
+  private int number = UNKNOWN;
 
-	private MindIcon(String name) {
-		setName(name);
-		associatedIcon = null;
-	}
+  /** Stores the once created ImageIcon. */
+  private ImageIcon associatedIcon;
 
-	/**
-	 */
-	private MindIcon(String name, ImageIcon icon) {
-		setName(name);
-		associatedIcon = icon;
-	}
+  private static ImageIcon iconNotFound;
 
-	public String toString() {
-		return "Icon_name: " + name;
-	}
+  /** Set of all created icons. Name -> MindIcon */
+  private static HashMap<String, MindIcon> createdIcons = new HashMap<>();
 
-	/**
-	 * Get the value of name.
-	 * 
-	 * @return Value of name.
-	 */
-	public String getName() {
-		// DanPolansky: it's essential that we do not return null
-		// for saving of the map.
-		return name == null ? "notfound" : name;
-	}
+  private static final int UNKNOWN = -1;
+  public static final int LAST = UNKNOWN;
+  static int nextNumber = UNKNOWN - 1;
+  private JComponent component = null;
 
-	/**
-	 * Set the value of name.
-	 * 
-	 * @param name Value to assign to name.
-	 */
-	public void setName(String name) {
+  private MindIcon(String name) {
+    setName(name);
+    associatedIcon = null;
+  }
 
-		this.name = name;
+  /** */
+  private MindIcon(String name, ImageIcon icon) {
+    setName(name);
+    associatedIcon = icon;
+  }
 
-		/* here, we must check, whether the name is allowed. */
+  public String toString() {
+    return "Icon_name: " + name;
+  }
 
-		// DanPolansky: I suggest to avoid any checking. If the icon with the
-		// name
-		// does not exist, let's keep the name and save it again anyway. Let us
-		// imagine the set of icons expanding and changing in the future.
+  /**
+   * Get the value of name.
+   *
+   * @return Value of name.
+   */
+  public String getName() {
+    // DanPolansky: it's essential that we do not return null
+    // for saving of the map.
+    return name == null ? "notfound" : name;
+  }
 
-		// Vector allIconNames = getAllIconNames();
-		// for(int i = 0; i < allIconNames.size(); ++i) {
-		// if(((String) allIconNames.get(i)).equals(v)) {
-		// //System.out.println("Icon name: " + v);
-		// this.name = v;
-		// return;
-		// }
-		// }
-		// throw new IllegalArgumentException("'"+v+"' is not a known icon.");
-		// DanPolansky: we want to parse the file though. Not existent icon is
-		// not
-		// that a big tragedy.
-	}
+  /**
+   * Set the value of name.
+   *
+   * @param name Value to assign to name.
+   */
+  public void setName(String name) {
 
-	public String getDescription() {
-		String resource = "icon_" + getName();
-		return Resources.getInstance().getResourceString(resource, resource);
-	}
+    this.name = name;
 
-	public String getIconFileName() {
-		return getIconsPath() + getIconBaseFileName();
-	}
+    /* here, we must check, whether the name is allowed. */
 
-	public String getIconBaseFileName() {
-		return getName() + ".png";
-	}
+    // DanPolansky: I suggest to avoid any checking. If the icon with the
+    // name
+    // does not exist, let's keep the name and save it again anyway. Let us
+    // imagine the set of icons expanding and changing in the future.
 
-	public static String getIconsPath() {
-		return "images/icons/";
-	}
+    // Vector allIconNames = getAllIconNames();
+    // for(int i = 0; i < allIconNames.size(); ++i) {
+    // if(((String) allIconNames.get(i)).equals(v)) {
+    // //System.out.println("Icon name: " + v);
+    // this.name = v;
+    // return;
+    // }
+    // }
+    // throw new IllegalArgumentException("'"+v+"' is not a known icon.");
+    // DanPolansky: we want to parse the file though. Not existent icon is
+    // not
+    // that a big tragedy.
+  }
 
-	public ImageIcon getIcon() {
-		// We need the frame to be able to obtain the resource URL of the icon.
-		if (iconNotFound == null) {
-			iconNotFound = freemind.view.ImageFactory.getInstance()
-					.createIcon(Resources.getInstance().getResource("images/IconNotFound.png"));
-		}
+  public String getDescription() {
+    String resource = "icon_" + getName();
+    return Resources.getInstance().getResourceString(resource, resource);
+  }
 
-		if (associatedIcon != null)
-			return associatedIcon;
-		if (name != null) {
-			URL imageURL = Resources.getInstance().getResource(getIconFileName());
-			if (imageURL == null) { // As standard icon not found, try user's
-				try {
-					final File file = new File(Resources.getInstance().getFreemindDirectory(),
-							"icons/" + getName() + ".png");
-					if (file.canRead()) {
-						imageURL = Tools.fileToUrl(file);
-					}
-				} catch (Exception ignore) {
-				}
-			}
-			ImageIcon icon = imageURL == null ? iconNotFound
-					: freemind.view.ImageFactory.getInstance().createIcon(imageURL);
-			setIcon(icon);
-			return icon;
-		} else {
-			setIcon(iconNotFound);
-			return iconNotFound;
-		}
-	}
+  public String getIconFileName() {
+    return getIconsPath() + getIconBaseFileName();
+  }
 
-	/**
-	 * Set the value of icon.
-	 * 
-	 * @param _associatedIcon Value to assign to icon.
-	 */
-	protected void setIcon(ImageIcon _associatedIcon) {
-		this.associatedIcon = _associatedIcon;
-	}
+  public String getIconBaseFileName() {
+    return getName() + ".png";
+  }
 
-	public ImageIcon getUnscaledIcon() {
-		if (associatedIcon instanceof ScalableImageIcon scalableIcon) {
-			return scalableIcon.getUnscaledIcon();
-		}
-		return associatedIcon;
-	}
+  public static String getIconsPath() {
+    return "images/icons/";
+  }
 
-	public static Vector<String> getAllIconNames() {
-		Vector<String> mAllIconNames = new Vector<>();
-		String icons = Resources.getInstance().getProperty(PROPERTY_STRING_ICONS_LIST);
-		StringTokenizer tokenizer = new StringTokenizer(icons, ";");
-		while (tokenizer.hasMoreTokens()) {
-			mAllIconNames.add(tokenizer.nextToken());
-		}
-		return mAllIconNames;
-	}
+  public ImageIcon getIcon() {
+    // We need the frame to be able to obtain the resource URL of the icon.
+    if (iconNotFound == null) {
+      iconNotFound =
+          freemind.view.ImageFactory.getInstance()
+              .createIcon(Resources.getInstance().getResource("images/IconNotFound.png"));
+    }
 
-	public static MindIcon factory(String iconName) {
-		if (createdIcons.containsKey(iconName)) {
-			return createdIcons.get(iconName);
-		}
-		MindIcon icon = new MindIcon(iconName);
-		createdIcons.put(iconName, icon);
-		return icon;
-	}
+    if (associatedIcon != null) return associatedIcon;
+    if (name != null) {
+      URL imageURL = Resources.getInstance().getResource(getIconFileName());
+      if (imageURL == null) { // As standard icon not found, try user's
+        try {
+          final File file =
+              new File(
+                  Resources.getInstance().getFreemindDirectory(), "icons/" + getName() + ".png");
+          if (file.canRead()) {
+            imageURL = Tools.fileToUrl(file);
+          }
+        } catch (Exception ignore) {
+        }
+      }
+      ImageIcon icon =
+          imageURL == null
+              ? iconNotFound
+              : freemind.view.ImageFactory.getInstance().createIcon(imageURL);
+      setIcon(icon);
+      return icon;
+    } else {
+      setIcon(iconNotFound);
+      return iconNotFound;
+    }
+  }
 
-	/**
-	 */
-	public static MindIcon factory(String iconName, ImageIcon icon) {
-		if (createdIcons.containsKey(iconName)) {
-			return createdIcons.get(iconName);
-		}
-		MindIcon mindIcon = new MindIcon(iconName, icon);
-		getAllIconNames().add(iconName);
-		createdIcons.put(iconName, mindIcon);
-		return mindIcon;
-	}
+  /**
+   * Set the value of icon.
+   *
+   * @param _associatedIcon Value to assign to icon.
+   */
+  protected void setIcon(ImageIcon _associatedIcon) {
+    this.associatedIcon = _associatedIcon;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(MindIcon icon) {
-		int i1 = getNumber();
-		int i2 = icon.getNumber();
-		return Integer.compare(i1, i2);
-	}
+  public ImageIcon getUnscaledIcon() {
+    if (associatedIcon instanceof ScalableImageIcon scalableIcon) {
+      return scalableIcon.getUnscaledIcon();
+    }
+    return associatedIcon;
+  }
 
-	private int getNumber() {
-		if (number == UNKNOWN) {
-			number = getAllIconNames().indexOf(name);
-		}
-		if (number == UNKNOWN) {
-			number = nextNumber--;
-		}
-		return number;
-	}
+  public static Vector<String> getAllIconNames() {
+    Vector<String> mAllIconNames = new Vector<>();
+    String icons = Resources.getInstance().getProperty(PROPERTY_STRING_ICONS_LIST);
+    StringTokenizer tokenizer = new StringTokenizer(icons, ";");
+    while (tokenizer.hasMoreTokens()) {
+      mAllIconNames.add(tokenizer.nextToken());
+    }
+    return mAllIconNames;
+  }
 
-	/**
-	 */
-	public JComponent getRendererComponent() {
-		if (component == null) {
-			component = new JLabel(getIcon());
-		}
-		return component;
-	}
+  public static MindIcon factory(String iconName) {
+    if (createdIcons.containsKey(iconName)) {
+      return createdIcons.get(iconName);
+    }
+    MindIcon icon = new MindIcon(iconName);
+    createdIcons.put(iconName, icon);
+    return icon;
+  }
 
-	public String getKeystrokeResourceName() {
-		return "keystroke_icon_" + name;
-	}
+  /** */
+  public static MindIcon factory(String iconName, ImageIcon icon) {
+    if (createdIcons.containsKey(iconName)) {
+      return createdIcons.get(iconName);
+    }
+    MindIcon mindIcon = new MindIcon(iconName, icon);
+    getAllIconNames().add(iconName);
+    createdIcons.put(iconName, mindIcon);
+    return mindIcon;
+  }
 
-	public KeyStroke getKeyStroke() {
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(MindIcon icon) {
+    int i1 = getNumber();
+    int i2 = icon.getNumber();
+    return Integer.compare(i1, i2);
+  }
 
+  private int getNumber() {
+    if (number == UNKNOWN) {
+      number = getAllIconNames().indexOf(name);
+    }
+    if (number == UNKNOWN) {
+      number = nextNumber--;
+    }
+    return number;
+  }
+
+  /** */
+  public JComponent getRendererComponent() {
+    if (component == null) {
+      component = new JLabel(getIcon());
+    }
+    return component;
+  }
+
+  public String getKeystrokeResourceName() {
+    return "keystroke_icon_" + name;
+  }
+
+  public KeyStroke getKeyStroke() {
+    return null;
+  }
 }

@@ -26,28 +26,25 @@ import freemind.view.mindmapview.MapView;
 
 public class BrowseArrowLinkModel extends ArrowLinkAdapter {
 
-	public BrowseArrowLinkModel(MindMapNode source, MindMapNode target, MapFeedback pMapFeedback) {
-		super(source, target, pMapFeedback);
-	}
+  public BrowseArrowLinkModel(MindMapNode source, MindMapNode target, MapFeedback pMapFeedback) {
+    super(source, target, pMapFeedback);
+  }
 
-	/* maybe this method is wrong here, but ... */
-	public Object clone() {
-		return super.clone();
-	}
+  /* maybe this method is wrong here, but ... */
+  public Object clone() {
+    return super.clone();
+  }
 
-	public XMLElement save() {
-		return null;
-	}
+  public XMLElement save() {
+    return null;
+  }
 
-	public String toString() {
-		return "Source=" + getSource() + ", target=" + getTarget();
-	}
+  public String toString() {
+    return "Source=" + getSource() + ", target=" + getTarget();
+  }
 
-	/**
-	 * @see freemind.modes.MindMapArrowLink#changeInclination(MapView, int, int, int, int)
-	 */
-	public void changeInclination(MapView map, int oldX, int oldY, int deltaX, int deltaY) {
-
-	}
-
+  /**
+   * @see freemind.modes.MindMapArrowLink#changeInclination(MapView, int, int, int, int)
+   */
+  public void changeInclination(MapView map, int oldX, int oldY, int deltaX, int deltaY) {}
 }

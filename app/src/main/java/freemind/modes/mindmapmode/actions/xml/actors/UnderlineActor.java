@@ -33,49 +33,46 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class UnderlineActor extends NodeXmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public UnderlineActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public UnderlineActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void act(XmlAction action) {
-		UnderlinedNodeAction underlinedact = (UnderlinedNodeAction) action;
-		NodeAdapter node = getNodeFromID(underlinedact.getNode());
-		if (node.isUnderlined() != underlinedact.getUnderlined()) {
-			node.setUnderlined(underlinedact.getUnderlined());
-			getExMapFeedback().nodeChanged(node);
-		}
-	}
+  public void act(XmlAction action) {
+    UnderlinedNodeAction underlinedact = (UnderlinedNodeAction) action;
+    NodeAdapter node = getNodeFromID(underlinedact.getNode());
+    if (node.isUnderlined() != underlinedact.getUnderlined()) {
+      node.setUnderlined(underlinedact.getUnderlined());
+      getExMapFeedback().nodeChanged(node);
+    }
+  }
 
-	public Class<UnderlinedNodeAction> getDoActionClass() {
-		return UnderlinedNodeAction.class;
-	}
+  public Class<UnderlinedNodeAction> getDoActionClass() {
+    return UnderlinedNodeAction.class;
+  }
 
-	public ActionPair apply(MindMap model, MindMapNode selected) {
-		// every node is set to the inverse of the focussed node.
-		boolean underlined = getExMapFeedback().getSelected().isUnderlined();
-		return getActionPair(selected, !underlined);
-	}
+  public ActionPair apply(MindMap model, MindMapNode selected) {
+    // every node is set to the inverse of the focussed node.
+    boolean underlined = getExMapFeedback().getSelected().isUnderlined();
+    return getActionPair(selected, !underlined);
+  }
 
-	private ActionPair getActionPair(MindMapNode selected, boolean underlined) {
-		UnderlinedNodeAction underlinedAction = toggleUnderlined(selected, underlined);
-		UnderlinedNodeAction undoUnderlinedAction = toggleUnderlined(selected, !underlined);
-		return new ActionPair(underlinedAction, undoUnderlinedAction);
-	}
+  private ActionPair getActionPair(MindMapNode selected, boolean underlined) {
+    UnderlinedNodeAction underlinedAction = toggleUnderlined(selected, underlined);
+    UnderlinedNodeAction undoUnderlinedAction = toggleUnderlined(selected, !underlined);
+    return new ActionPair(underlinedAction, undoUnderlinedAction);
+  }
 
-	private UnderlinedNodeAction toggleUnderlined(MindMapNode selected, boolean underlined) {
-		UnderlinedNodeAction underlinedAction = new UnderlinedNodeAction();
-		underlinedAction.setNode(getNodeID(selected));
-		underlinedAction.setUnderlined(underlined);
-		return underlinedAction;
-	}
+  private UnderlinedNodeAction toggleUnderlined(MindMapNode selected, boolean underlined) {
+    UnderlinedNodeAction underlinedAction = new UnderlinedNodeAction();
+    underlinedAction.setNode(getNodeID(selected));
+    underlinedAction.setUnderlined(underlined);
+    return underlinedAction;
+  }
 
-	public void setUnderlined(MindMapNode node, boolean underlined) {
-		execute(getActionPair(node, underlined));
-	}
-
-
-
+  public void setUnderlined(MindMapNode node, boolean underlined) {
+    execute(getActionPair(node, underlined));
+  }
 }

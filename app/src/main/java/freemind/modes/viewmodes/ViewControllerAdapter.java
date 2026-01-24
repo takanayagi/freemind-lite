@@ -39,138 +39,134 @@ import freemind.view.mindmapview.NodeView;
 
 /**
  * @author foltin
- * 
  */
 public abstract class ViewControllerAdapter extends ControllerAdapter {
 
-	public CommonToggleFoldedAction toggleFolded = null;
+  public CommonToggleFoldedAction toggleFolded = null;
 
-	public CommonToggleChildrenFoldedAction toggleChildrenFolded = null;
+  public CommonToggleChildrenFoldedAction toggleChildrenFolded = null;
 
-	public FindAction find = null;
+  public FindAction find = null;
 
-	public FindNextAction findNext = null;
+  public FindNextAction findNext = null;
 
-	/**
-	 */
-	public ViewControllerAdapter(Mode mode) {
-		super(mode);
-		toggleFolded = new CommonToggleFoldedAction(this);
-		toggleChildrenFolded = new CommonToggleChildrenFoldedAction(this);
-		find = new FindAction(this);
-		findNext = new FindNextAction(this, find);
-	}
+  /** */
+  public ViewControllerAdapter(Mode mode) {
+    super(mode);
+    toggleFolded = new CommonToggleFoldedAction(this);
+    toggleChildrenFolded = new CommonToggleChildrenFoldedAction(this);
+    find = new FindAction(this);
+    findNext = new FindNextAction(this, find);
+  }
 
-	public void doubleClick(MouseEvent e) {}
+  public void doubleClick(MouseEvent e) {}
 
-	public void plainClick(MouseEvent e) {}
+  public void plainClick(MouseEvent e) {}
 
-	public boolean extendSelection(MouseEvent e) {
-		// FIXME: Remove double code
-		NodeView newlySelectedNodeView = ((MainView) e.getComponent()).getNodeView();
-		// MindMapNode newlySelectedNode = newlySelectedNodeView.getModel();
-		boolean extend = e.isControlDown();
-		boolean range = e.isShiftDown();
-		boolean branch = e.isAltGraphDown() || e.isAltDown(); /*
+  public boolean extendSelection(MouseEvent e) {
+    // FIXME: Remove double code
+    NodeView newlySelectedNodeView = ((MainView) e.getComponent()).getNodeView();
+    // MindMapNode newlySelectedNode = newlySelectedNodeView.getModel();
+    boolean extend = e.isControlDown();
+    boolean range = e.isShiftDown();
+    boolean branch = e.isAltGraphDown() || e.isAltDown(); /*
 																 * windows alt, linux altgraph ....
 																 */
-		boolean retValue = false;
+    boolean retValue = false;
 
-		if (extend || range || branch || !getView().isSelected(newlySelectedNodeView)) {
-			if (!range) {
-				if (extend)
-					getView().toggleSelected(newlySelectedNodeView);
-				else
-					select(newlySelectedNodeView);
-				retValue = true;
-			} else {
-				retValue = getView().selectContinuous(newlySelectedNodeView);
-				// /* fc, 25.1.2004: replace getView by controller methods.*/
-				// if (newlySelectedNodeView != getView().getSelected() &&
-				// newlySelectedNodeView.isSiblingOf(getView().getSelected())) {
-				// getView().selectContinuous(newlySelectedNodeView);
-				// retValue = true;
-				// } else {
-				// /* if shift was down, but no range can be selected, then the
-				// new node is simply selected: */
-				// if(!getView().isSelected(newlySelectedNodeView)) {
-				// getView().toggleSelected(newlySelectedNodeView);
-				// retValue = true;
-				// }
-			}
-			if (branch) {
-				getView().selectBranch(newlySelectedNodeView, extend);
-				retValue = true;
-			}
-		}
+    if (extend || range || branch || !getView().isSelected(newlySelectedNodeView)) {
+      if (!range) {
+        if (extend) getView().toggleSelected(newlySelectedNodeView);
+        else select(newlySelectedNodeView);
+        retValue = true;
+      } else {
+        retValue = getView().selectContinuous(newlySelectedNodeView);
+        // /* fc, 25.1.2004: replace getView by controller methods.*/
+        // if (newlySelectedNodeView != getView().getSelected() &&
+        // newlySelectedNodeView.isSiblingOf(getView().getSelected())) {
+        // getView().selectContinuous(newlySelectedNodeView);
+        // retValue = true;
+        // } else {
+        // /* if shift was down, but no range can be selected, then the
+        // new node is simply selected: */
+        // if(!getView().isSelected(newlySelectedNodeView)) {
+        // getView().toggleSelected(newlySelectedNodeView);
+        // retValue = true;
+        // }
+      }
+      if (branch) {
+        getView().selectBranch(newlySelectedNodeView, extend);
+        retValue = true;
+      }
+    }
 
-		if (retValue) {
-			e.consume();
+    if (retValue) {
+      e.consume();
 
-			// Display link in status line
-			String link = newlySelectedNodeView.getModel().getLink();
-			link = (link != null ? link : " ");
-			getController().getFrame().out(link);
-		}
-		return retValue;
-	}
+      // Display link in status line
+      String link = newlySelectedNodeView.getModel().getLink();
+      link = (link != null ? link : " ");
+      getController().getFrame().out(link);
+    }
+    return retValue;
+  }
 
-	public void setFolded(MindMapNode node, boolean folded) {
-		if (node == null)
-			throw new IllegalArgumentException("setFolded was called with a null node.");
-		// no root folding, fc, 16.5.2004
-		if (node.isRoot() && folded) {
-			return;
-		}
-		if (node.isFolded() != folded) {
-			node.setFolded(folded);
-			nodeStructureChanged(node);
-		}
-	}
+  public void setFolded(MindMapNode node, boolean folded) {
+    if (node == null) throw new IllegalArgumentException("setFolded was called with a null node.");
+    // no root folding, fc, 16.5.2004
+    if (node.isRoot() && folded) {
+      return;
+    }
+    if (node.isFolded() != folded) {
+      node.setFolded(folded);
+      nodeStructureChanged(node);
+    }
+  }
 
-	public void startupController() {
-		super.startupController();
-		getNodeMouseMotionListener().register(new CommonNodeMouseMotionListener(this));
-		getMapMouseMotionListener().register(new CommonMouseMotionManager(this));
-		getNodeKeyListener().register(new CommonNodeKeyListener(this, (e, addNew, editLong) -> {
-			// no edit.
-		}));
+  public void startupController() {
+    super.startupController();
+    getNodeMouseMotionListener().register(new CommonNodeMouseMotionListener(this));
+    getMapMouseMotionListener().register(new CommonMouseMotionManager(this));
+    getNodeKeyListener()
+        .register(
+            new CommonNodeKeyListener(
+                this,
+                (e, addNew, editLong) -> {
+                  // no edit.
+                }));
+  }
 
-	}
+  public void shutdownController() {
+    super.shutdownController();
+    getNodeMouseMotionListener().deregister();
+    getMapMouseMotionListener().deregister();
+    getNodeKeyListener().deregister();
+  }
 
-	public void shutdownController() {
-		super.shutdownController();
-		getNodeMouseMotionListener().deregister();
-		getMapMouseMotionListener().deregister();
-		getNodeKeyListener().deregister();
-	}
+  protected void setAllActions(boolean enabled) {
+    super.setAllActions(enabled);
+    find.setEnabled(enabled);
+    findNext.setEnabled(enabled);
+    toggleFolded.setEnabled(enabled);
+    toggleChildrenFolded.setEnabled(enabled);
+  }
 
-	protected void setAllActions(boolean enabled) {
-		super.setAllActions(enabled);
-		find.setEnabled(enabled);
-		findNext.setEnabled(enabled);
-		toggleFolded.setEnabled(enabled);
-		toggleChildrenFolded.setEnabled(enabled);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap.MapFeedback#paste(freemind.modes.MindMapNode,
+   * freemind.modes.MindMapNode)
+   */
+  @Override
+  public void paste(MindMapNode pNode, MindMapNode pParent) {}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap.MapFeedback#paste(freemind.modes.MindMapNode,
-	 * freemind.modes.MindMapNode)
-	 */
-	@Override
-	public void paste(MindMapNode pNode, MindMapNode pParent) {}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MapFeedback#createNodeHook(java.lang.String, freemind.modes.MindMapNode)
-	 */
-	@Override
-	public NodeHook createNodeHook(String pLoadName, MindMapNode pNode) {
-		return new PermanentNodeHookSubstituteUnknown(pLoadName);
-	}
-
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MapFeedback#createNodeHook(java.lang.String, freemind.modes.MindMapNode)
+   */
+  @Override
+  public NodeHook createNodeHook(String pLoadName, MindMapNode pNode) {
+    return new PermanentNodeHookSubstituteUnknown(pLoadName);
+  }
 }

@@ -34,35 +34,36 @@ import freemind.modes.mindmapmode.hooks.MindMapNodeHookAdapter;
  */
 public class ShowCloneNodes extends MindMapNodeHookAdapter {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.NodeHookAdapter#invoke(freemind.modes.MindMapNode)
-	 */
-	public void invoke(MindMapNode pNode) {
-		super.invoke(pNode);
-		final Vector<MindMapNode> newSelecteds = new Vector<>();
-		final MindMapController mindMapController = getMindMapController();
-		List<MindMapNode> selecteds = mindMapController.getSelecteds();
-		for (MindMapNode node : selecteds) {
-			addClonesToList(newSelecteds, node);
-			newSelecteds.remove(node);
-		}
-		if (!newSelecteds.isEmpty()) {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					mindMapController.select(newSelecteds.get(0), newSelecteds);
-				}
-			});
-		}
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.NodeHookAdapter#invoke(freemind.modes.MindMapNode)
+   */
+  public void invoke(MindMapNode pNode) {
+    super.invoke(pNode);
+    final Vector<MindMapNode> newSelecteds = new Vector<>();
+    final MindMapController mindMapController = getMindMapController();
+    List<MindMapNode> selecteds = mindMapController.getSelecteds();
+    for (MindMapNode node : selecteds) {
+      addClonesToList(newSelecteds, node);
+      newSelecteds.remove(node);
+    }
+    if (!newSelecteds.isEmpty()) {
+      EventQueue.invokeLater(
+          new Runnable() {
+            public void run() {
+              mindMapController.select(newSelecteds.get(0), newSelecteds);
+            }
+          });
+    }
+  }
 
-	protected void addClonesToList(Vector<MindMapNode> newSelecteds, MindMapNode node) {
-		ClonePlugin hook = ClonePlugin.getHook(node);
-		if (hook != null) {
-			// original found.
-			HashSet<MindMapNode> clones = hook.getCloneNodes();
-			newSelecteds.addAll(clones);
-		}
-	}
+  protected void addClonesToList(Vector<MindMapNode> newSelecteds, MindMapNode node) {
+    ClonePlugin hook = ClonePlugin.getHook(node);
+    if (hook != null) {
+      // original found.
+      HashSet<MindMapNode> clones = hook.getCloneNodes();
+      newSelecteds.addAll(clones);
+    }
+  }
 }

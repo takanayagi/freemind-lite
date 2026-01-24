@@ -19,7 +19,6 @@
  * Created on 27.08.2004
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import freemind.modes.mindmapmode.MindMapController;
@@ -28,35 +27,35 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
 
 /**
  * @author foltin
- * 
  */
 public class FontFamilyAction extends NodeGeneralAction {
-	/** This action is used for all fonts, which have to be set first. */
-	private String actionFont;
+  /** This action is used for all fonts, which have to be set first. */
+  private String actionFont;
 
-	/**
-	 */
-	public FontFamilyAction(MindMapController modeController) {
-		super(modeController, "font_family", null, (NodeActorXml) null);
-		// default value:
-		actionFont = modeController.getFrame().getProperty("defaultfont");
-	}
+  /** */
+  public FontFamilyAction(MindMapController modeController) {
+    super(modeController, "font_family", null, (NodeActorXml) null);
+    // default value:
+    actionFont = modeController.getFrame().getProperty("defaultfont");
+  }
 
-	public void actionPerformed(String font) {
-		this.actionFont = font;
-		super.actionPerformed(null);
-	}
+  public void actionPerformed(String font) {
+    this.actionFont = font;
+    super.actionPerformed(null);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * freemind.modes.mindmapmode.actions.NodeGeneralAction#getActionPair(freemind.modes.mindmapmode
-	 * .MindMapNodeModel)
-	 */
-	@Override
-	protected ActionPair getActionPair(MindMapNodeModel pSelected) {
-		return getMindMapController().getActorFactory().getFontFamilyActor()
-				.getActionPair(pSelected, actionFont);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * freemind.modes.mindmapmode.actions.NodeGeneralAction#getActionPair(freemind.modes.mindmapmode
+   * .MindMapNodeModel)
+   */
+  @Override
+  protected ActionPair getActionPair(MindMapNodeModel pSelected) {
+    return getMindMapController()
+        .getActorFactory()
+        .getFontFamilyActor()
+        .getActionPair(pSelected, actionFont);
+  }
 }

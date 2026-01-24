@@ -40,114 +40,110 @@ import freemind.view.mindmapview.NodeView;
  */
 public class DeleteChildActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public DeleteChildActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public DeleteChildActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
-	 * generated.instance.XmlAction)
-	 */
-	public void act(XmlAction action) {
-		DeleteNodeAction deleteNodeAction = (DeleteNodeAction) action;
-		MindMapNode selectedNode = getNodeFromID(deleteNodeAction.getNode());
-		deleteWithoutUndo(selectedNode);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
+   * generated.instance.XmlAction)
+   */
+  public void act(XmlAction action) {
+    DeleteNodeAction deleteNodeAction = (DeleteNodeAction) action;
+    MindMapNode selectedNode = getNodeFromID(deleteNodeAction.getNode());
+    deleteWithoutUndo(selectedNode);
+  }
 
-	/**
-	 */
-	public void deleteWithoutUndo(MindMapNode selectedNode) {
-		if (selectedNode.isRoot()) {
-			throw new IllegalArgumentException("Root node can't be deleted");
-		}
-		// remove hooks:
-		removeHooks(selectedNode);
-		MindMapNode parent = selectedNode.getParentNode();
-		getExMapFeedback().fireNodePreDeleteEvent(selectedNode);
-		// deregister node:
-		MindMap map = getExMapFeedback().getMap();
-		map.getLinkRegistry().deregisterLinkTarget(selectedNode);
-		// deselect
-		ViewAbstraction view = getExMapFeedback().getViewAbstraction();
-		if (view != null) {
-			NodeView nodeView = view.getNodeView(selectedNode);
-			view.deselect(nodeView);
-			if (view.getSelecteds().isEmpty()) {
-				NodeView newSelectedView;
-				int childIndex = parent.getChildPosition(selectedNode);
-				if (parent.getChildCount() > childIndex + 1) {
-					// the next node
-					newSelectedView =
-							view.getNodeView((MindMapNode) parent.getChildAt(childIndex + 1));
-				} else if (childIndex > 0) {
-					// the node before:
-					newSelectedView =
-							view.getNodeView((MindMapNode) parent.getChildAt(childIndex - 1));
-				} else {
-					// no other node on same level. take the parent.
-					newSelectedView = view.getNodeView(parent);
-				}
-				view.select(newSelectedView);
-			}
-		}
-		getExMapFeedback().removeNodeFromParent(selectedNode);
-		// post event
-		getExMapFeedback().fireNodePostDeleteEvent(selectedNode, parent);
-	}
+  /** */
+  public void deleteWithoutUndo(MindMapNode selectedNode) {
+    if (selectedNode.isRoot()) {
+      throw new IllegalArgumentException("Root node can't be deleted");
+    }
+    // remove hooks:
+    removeHooks(selectedNode);
+    MindMapNode parent = selectedNode.getParentNode();
+    getExMapFeedback().fireNodePreDeleteEvent(selectedNode);
+    // deregister node:
+    MindMap map = getExMapFeedback().getMap();
+    map.getLinkRegistry().deregisterLinkTarget(selectedNode);
+    // deselect
+    ViewAbstraction view = getExMapFeedback().getViewAbstraction();
+    if (view != null) {
+      NodeView nodeView = view.getNodeView(selectedNode);
+      view.deselect(nodeView);
+      if (view.getSelecteds().isEmpty()) {
+        NodeView newSelectedView;
+        int childIndex = parent.getChildPosition(selectedNode);
+        if (parent.getChildCount() > childIndex + 1) {
+          // the next node
+          newSelectedView = view.getNodeView((MindMapNode) parent.getChildAt(childIndex + 1));
+        } else if (childIndex > 0) {
+          // the node before:
+          newSelectedView = view.getNodeView((MindMapNode) parent.getChildAt(childIndex - 1));
+        } else {
+          // no other node on same level. take the parent.
+          newSelectedView = view.getNodeView(parent);
+        }
+        view.select(newSelectedView);
+      }
+    }
+    getExMapFeedback().removeNodeFromParent(selectedNode);
+    // post event
+    getExMapFeedback().fireNodePostDeleteEvent(selectedNode, parent);
+  }
 
-	private void removeHooks(MindMapNode selectedNode) {
-		for (Iterator<? extends MindMapNode> it = selectedNode.childrenUnfolded(); it.hasNext();) {
-			MindMapNode child = it.next();
-			removeHooks(child);
-		}
-		long currentRun = 0;
-		// determine timeout:
-		long timeout = selectedNode.getActivatedHooks().size() * 2L + 2L;
-		while (!selectedNode.getActivatedHooks().isEmpty()) {
-			PermanentNodeHook hook = selectedNode.getActivatedHooks().iterator().next();
-			selectedNode.removeHook(hook);
-			if (currentRun++ > timeout) {
-				throw new IllegalStateException("Timeout reached shutting down the hooks.");
-			}
-		}
-	}
+  private void removeHooks(MindMapNode selectedNode) {
+    for (Iterator<? extends MindMapNode> it = selectedNode.childrenUnfolded(); it.hasNext(); ) {
+      MindMapNode child = it.next();
+      removeHooks(child);
+    }
+    long currentRun = 0;
+    // determine timeout:
+    long timeout = selectedNode.getActivatedHooks().size() * 2L + 2L;
+    while (!selectedNode.getActivatedHooks().isEmpty()) {
+      PermanentNodeHook hook = selectedNode.getActivatedHooks().iterator().next();
+      selectedNode.removeHook(hook);
+      if (currentRun++ > timeout) {
+        throw new IllegalStateException("Timeout reached shutting down the hooks.");
+      }
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#getDoActionClass()
-	 */
-	public Class<DeleteNodeAction> getDoActionClass() {
-		return DeleteNodeAction.class;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#getDoActionClass()
+   */
+  public Class<DeleteNodeAction> getDoActionClass() {
+    return DeleteNodeAction.class;
+  }
 
-	public void deleteNode(MindMapNode selectedNode) {
-		if (selectedNode.isRoot()) {
-			throw new IllegalArgumentException("Root node can't be deleted");
-		}
-		String newId = getNodeID(selectedNode);
+  public void deleteNode(MindMapNode selectedNode) {
+    if (selectedNode.isRoot()) {
+      throw new IllegalArgumentException("Root node can't be deleted");
+    }
+    String newId = getNodeID(selectedNode);
 
-		Transferable copy = getExMapFeedback().copy(selectedNode, true);
-		NodeCoordinate coord = new NodeCoordinate(selectedNode, selectedNode.isLeft());
-		// Undo-action
-		PasteNodeAction pasteNodeAction = null;
-		pasteNodeAction = getExMapFeedback().getActorFactory().getPasteActor()
-				.getPasteNodeAction(copy, coord, null);
+    Transferable copy = getExMapFeedback().copy(selectedNode, true);
+    NodeCoordinate coord = new NodeCoordinate(selectedNode, selectedNode.isLeft());
+    // Undo-action
+    PasteNodeAction pasteNodeAction = null;
+    pasteNodeAction =
+        getExMapFeedback().getActorFactory().getPasteActor().getPasteNodeAction(copy, coord, null);
 
-		DeleteNodeAction deleteAction = getDeleteNodeAction(newId);
-		getExMapFeedback().doTransaction(getDoActionClass().getName(),
-				new ActionPair(deleteAction, pasteNodeAction));
-	}
+    DeleteNodeAction deleteAction = getDeleteNodeAction(newId);
+    getExMapFeedback()
+        .doTransaction(getDoActionClass().getName(), new ActionPair(deleteAction, pasteNodeAction));
+  }
 
-	public DeleteNodeAction getDeleteNodeAction(String newId) {
-		DeleteNodeAction deleteAction = new DeleteNodeAction();
-		deleteAction.setNode(newId);
-		return deleteAction;
-	}
-
+  public DeleteNodeAction getDeleteNodeAction(String newId) {
+    DeleteNodeAction deleteAction = new DeleteNodeAction();
+    deleteAction.setNode(newId);
+    return deleteAction;
+  }
 }

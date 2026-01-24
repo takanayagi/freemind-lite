@@ -15,7 +15,6 @@
  * 02111-1307, USA.
  */
 
-
 package freemind.modes.filemode;
 
 import java.io.File;
@@ -36,168 +35,164 @@ import freemind.modes.NodeAdapter;
 
 public class FileMapModel extends MapAdapter {
 
-	private MindMapLinkRegistry linkRegistry;
+  private MindMapLinkRegistry linkRegistry;
 
-	//
-	// Constructors
-	//
+  //
+  // Constructors
+  //
 
-	public FileMapModel(FreeMindMain frame, ModeController modeController) {
-		this(new File(File.separator), frame, modeController);
-	}
+  public FileMapModel(FreeMindMain frame, ModeController modeController) {
+    this(new File(File.separator), frame, modeController);
+  }
 
-	public FileMapModel(File root, FreeMindMain frame, ModeController modeController) {
-		super(modeController);
-		setRoot(new FileNodeModel(root, this));
-		getRootNode().setFolded(false);
-		linkRegistry = new MindMapLinkRegistry();
-	}
+  public FileMapModel(File root, FreeMindMain frame, ModeController modeController) {
+    super(modeController);
+    setRoot(new FileNodeModel(root, this));
+    getRootNode().setFolded(false);
+    linkRegistry = new MindMapLinkRegistry();
+  }
 
-	//
-	// Other methods
-	//
-	public MindMapLinkRegistry getLinkRegistry() {
-		return linkRegistry;
-	}
+  //
+  // Other methods
+  //
+  public MindMapLinkRegistry getLinkRegistry() {
+    return linkRegistry;
+  }
 
-	//
-	// Other methods
-	//
-	public boolean save(File file) {
-		return true;
-	}
+  //
+  // Other methods
+  //
+  public boolean save(File file) {
+    return true;
+  }
 
-	/**
-	 *
-	 */
+  /** */
+  public void destroy() {
+    /*
+     * fc, 8.8.2004: don't call super.destroy as this method tries to remove the hooks
+     * recursively. This must fail.
+     */
+    // super.destroy();
+    cancelFileChangeObservationTimer();
+  }
 
-	public void destroy() {
-		/*
-		 * fc, 8.8.2004: don't call super.destroy as this method tries to remove the hooks
-		 * recursively. This must fail.
-		 */
-		// super.destroy();
-		cancelFileChangeObservationTimer();
-	}
+  public boolean isSaved() {
+    return true;
+  }
 
-	public boolean isSaved() {
-		return true;
-	}
+  public String toString() {
+    return "File: " + getRoot().toString();
+  }
 
-	public String toString() {
-		return "File: " + getRoot().toString();
-	}
+  public void changeNode(MindMapNode node, String newText) {
+    // File file = ((FileNodeModel)node).getFile();
+    // File newFile = new File(file.getParentFile(), newText);
+    // file.renameTo(newFile);
+    // System.out.println(file);
+    // FileNodeModel parent = (FileNodeModel)node.getParent();
+    // // removeNodeFromParent(node);
 
-	public void changeNode(MindMapNode node, String newText) {
-		// File file = ((FileNodeModel)node).getFile();
-		// File newFile = new File(file.getParentFile(), newText);
-		// file.renameTo(newFile);
-		// System.out.println(file);
-		// FileNodeModel parent = (FileNodeModel)node.getParent();
-		// // removeNodeFromParent(node);
+    // insertNodeInto(new FileNodeModel(newFile),parent,0);
 
-		// insertNodeInto(new FileNodeModel(newFile),parent,0);
+    // nodeChanged(node);
+  }
 
-		// nodeChanged(node);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#setLinkInclinationChanged()
+   */
+  public void setLinkInclinationChanged() {}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#setLinkInclinationChanged()
-	 */
-	public void setLinkInclinationChanged() {}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#getXml(java.io.Writer)
+   */
+  public void getXml(Writer fileout) throws IOException {
+    // nothing.
+    // FIXME: Implement me if you need me.
+    throw new RuntimeException("Unimplemented method called.");
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#getXml(java.io.Writer)
-	 */
-	public void getXml(Writer fileout) throws IOException {
-		// nothing.
-		// FIXME: Implement me if you need me.
-		throw new RuntimeException("Unimplemented method called.");
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#getFilteredXml(java.io.Writer)
+   */
+  public void getFilteredXml(Writer fileout) {
+    // nothing.
+    // FIXME: Implement me if you need me.
+    throw new RuntimeException("Unimplemented method called.");
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#getFilteredXml(java.io.Writer)
-	 */
-	public void getFilteredXml(Writer fileout) {
-		// nothing.
-		// FIXME: Implement me if you need me.
-		throw new RuntimeException("Unimplemented method called.");
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#createNodeAdapter(freemind.modes.MindMap, java.lang.String)
+   */
+  @Override
+  public NodeAdapter createNodeAdapter(MindMap pMap, String pNodeClass) {
+    // FIXME: Implement me if you need me.
+    throw new RuntimeException("Unimplemented method called.");
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#createNodeAdapter(freemind.modes.MindMap, java.lang.String)
-	 */
-	@Override
-	public NodeAdapter createNodeAdapter(MindMap pMap, String pNodeClass) {
-		// FIXME: Implement me if you need me.
-		throw new RuntimeException("Unimplemented method called.");
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#createEdgeAdapter(freemind.modes.NodeAdapter)
+   */
+  @Override
+  public EdgeAdapter createEdgeAdapter(NodeAdapter pNode) {
+    // FIXME: Implement me if you need me.
+    throw new RuntimeException("Unimplemented method called.");
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#createEdgeAdapter(freemind.modes.NodeAdapter)
-	 */
-	@Override
-	public EdgeAdapter createEdgeAdapter(NodeAdapter pNode) {
-		// FIXME: Implement me if you need me.
-		throw new RuntimeException("Unimplemented method called.");
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#createCloudAdapter(freemind.modes.NodeAdapter)
+   */
+  @Override
+  public CloudAdapter createCloudAdapter(NodeAdapter pNode) {
+    // FIXME: Implement me if you need me.
+    throw new RuntimeException("Unimplemented method called.");
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#createCloudAdapter(freemind.modes.NodeAdapter)
-	 */
-	@Override
-	public CloudAdapter createCloudAdapter(NodeAdapter pNode) {
-		// FIXME: Implement me if you need me.
-		throw new RuntimeException("Unimplemented method called.");
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#createArrowLinkAdapter(freemind.modes.NodeAdapter,
+   * freemind.modes.NodeAdapter)
+   */
+  @Override
+  public ArrowLinkAdapter createArrowLinkAdapter(NodeAdapter pSource, NodeAdapter pTarget) {
+    // FIXME: Implement me if you need me.
+    throw new RuntimeException("Unimplemented method called.");
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#createArrowLinkAdapter(freemind.modes.NodeAdapter,
-	 * freemind.modes.NodeAdapter)
-	 */
-	@Override
-	public ArrowLinkAdapter createArrowLinkAdapter(NodeAdapter pSource, NodeAdapter pTarget) {
-		// FIXME: Implement me if you need me.
-		throw new RuntimeException("Unimplemented method called.");
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#createArrowLinkTarget(freemind.modes.NodeAdapter,
+   * freemind.modes.NodeAdapter)
+   */
+  @Override
+  public ArrowLinkTarget createArrowLinkTarget(NodeAdapter pSource, NodeAdapter pTarget) {
+    // FIXME: Implement me if you need me.
+    throw new RuntimeException("Unimplemented method called.");
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#createArrowLinkTarget(freemind.modes.NodeAdapter,
-	 * freemind.modes.NodeAdapter)
-	 */
-	@Override
-	public ArrowLinkTarget createArrowLinkTarget(NodeAdapter pSource, NodeAdapter pTarget) {
-		// FIXME: Implement me if you need me.
-		throw new RuntimeException("Unimplemented method called.");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#createEncryptedNode(java.lang.String)
-	 */
-	@Override
-	public NodeAdapter createEncryptedNode(String pAdditionalInfo) {
-		// FIXME: Implement me if you need me.
-		throw new RuntimeException("Unimplemented method called.");
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#createEncryptedNode(java.lang.String)
+   */
+  @Override
+  public NodeAdapter createEncryptedNode(String pAdditionalInfo) {
+    // FIXME: Implement me if you need me.
+    throw new RuntimeException("Unimplemented method called.");
+  }
 }
 
 // public class FileSystemModel extends AbstractTreeTableModel

@@ -28,9 +28,9 @@ import freemind.main.XMLElement;
 import freemind.modes.MindMapNode;
 
 public interface Condition {
-	boolean checkNode(Controller c, MindMapNode node);
+  boolean checkNode(Controller c, MindMapNode node);
 
-	JComponent getListCellRendererComponent();
+  JComponent getListCellRendererComponent();
 
-	void save(XMLElement element);
+  void save(XMLElement element);
 }

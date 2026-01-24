@@ -19,7 +19,6 @@
  * Created on 05.05.2004
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import java.awt.event.ActionEvent;
@@ -32,80 +31,80 @@ import freemind.modes.mindmapmode.MindMapController;
 import freemind.view.mindmapview.NodeView;
 
 public class NewChildAction extends MindmapAction {
-	private final MindMapController c;
-	private static Logger logger = null;
+  private final MindMapController c;
+  private static Logger logger = null;
 
-	public NewChildAction(MindMapController modeController) {
-		super("new_child", "images/idea.png", modeController);
-		this.c = modeController;
-		if (logger == null) {
-			logger = c.getFrame().getLogger(NewChildAction.class.getName());
-		}
-	}
+  public NewChildAction(MindMapController modeController) {
+    super("new_child", "images/idea.png", modeController);
+    this.c = modeController;
+    if (logger == null) {
+      logger = c.getFrame().getLogger(NewChildAction.class.getName());
+    }
+  }
 
-	MindMapController getModeController() {
-		return c;
-	}
+  MindMapController getModeController() {
+    return c;
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		this.c.addNew(c.getSelected(), MindMapController.NEW_CHILD, null);
-	}
+  public void actionPerformed(ActionEvent e) {
+    this.c.addNew(c.getSelected(), MindMapController.NEW_CHILD, null);
+  }
 
-	public MindMapNode addNew(final MindMapNode target, int newNodeMode, final KeyEvent e) {
-		MindMapNode newNode = null;
+  public MindMapNode addNew(final MindMapNode target, int newNodeMode, final KeyEvent e) {
+    MindMapNode newNode = null;
 
-		switch (newNodeMode) {
-			case MindMapController.NEW_SIBLING_BEFORE:
-			case MindMapController.NEW_SIBLING_BEHIND: {
-				if (!target.isRoot()) {
-					MindMapNode parent = target.getParentNode();
-					int childPosition = parent.getChildPosition(target);
-					if (newNodeMode == MindMapController.NEW_SIBLING_BEHIND) {
-						childPosition++;
-					}
-					newNode = getModeController().addNewNode(parent, childPosition,
-							target.isLeft());
-					final NodeView nodeView = getModeController().getNodeView(newNode);
-					getModeController().select(nodeView);
-					getModeController().edit.edit(nodeView, getModeController().getNodeView(target),
-							e, true, false, false);
-					break;
-				} else {
-					// fc, 21.8.07: we don't do anything here and get a new child
-					// instead.
-					newNodeMode = MindMapController.NEW_CHILD;
-					// @fallthrough
-				}
-			}
+    switch (newNodeMode) {
+      case MindMapController.NEW_SIBLING_BEFORE:
+      case MindMapController.NEW_SIBLING_BEHIND:
+        {
+          if (!target.isRoot()) {
+            MindMapNode parent = target.getParentNode();
+            int childPosition = parent.getChildPosition(target);
+            if (newNodeMode == MindMapController.NEW_SIBLING_BEHIND) {
+              childPosition++;
+            }
+            newNode = getModeController().addNewNode(parent, childPosition, target.isLeft());
+            final NodeView nodeView = getModeController().getNodeView(newNode);
+            getModeController().select(nodeView);
+            getModeController()
+                .edit
+                .edit(nodeView, getModeController().getNodeView(target), e, true, false, false);
+            break;
+          } else {
+            // fc, 21.8.07: we don't do anything here and get a new child
+            // instead.
+            newNodeMode = MindMapController.NEW_CHILD;
+            // @fallthrough
+          }
+        }
 
-			case MindMapController.NEW_CHILD:
-			case MindMapController.NEW_CHILD_WITHOUT_FOCUS: {
-				if (target instanceof EncryptedMindMapNode
-						&& !((EncryptedMindMapNode) target).isAccessible())
-					break;
-				final boolean parentFolded = target.isFolded();
-				if (parentFolded) {
-					getModeController().setFolded(target, false);
-				}
-				int position = c.getProperty("placenewbranches").equals("last")
-						? target.getChildCount()
-						: 0;
-				newNode = addNewNode(target, position);
-				final NodeView nodeView = getModeController().getNodeView(newNode);
-				if (newNodeMode == MindMapController.NEW_CHILD) {
-					getModeController().select(nodeView);
-				}
-				getModeController().edit.edit(nodeView, getModeController().getNodeView(target), e,
-						true, parentFolded, false);
-				break;
-			}
-		}
-		return newNode;
-	}
+      case MindMapController.NEW_CHILD:
+      case MindMapController.NEW_CHILD_WITHOUT_FOCUS:
+        {
+          if (target instanceof EncryptedMindMapNode
+              && !((EncryptedMindMapNode) target).isAccessible()) break;
+          final boolean parentFolded = target.isFolded();
+          if (parentFolded) {
+            getModeController().setFolded(target, false);
+          }
+          int position =
+              c.getProperty("placenewbranches").equals("last") ? target.getChildCount() : 0;
+          newNode = addNewNode(target, position);
+          final NodeView nodeView = getModeController().getNodeView(newNode);
+          if (newNodeMode == MindMapController.NEW_CHILD) {
+            getModeController().select(nodeView);
+          }
+          getModeController()
+              .edit
+              .edit(
+                  nodeView, getModeController().getNodeView(target), e, true, parentFolded, false);
+          break;
+        }
+    }
+    return newNode;
+  }
 
-	protected MindMapNode addNewNode(MindMapNode parent, int index) {
-		return getModeController().addNewNode(parent, index, parent.isNewChildLeft());
-	}
-
-
+  protected MindMapNode addNewNode(MindMapNode parent, int index) {
+    return getModeController().addNewNode(parent, index, parent.isNewChildLeft());
+  }
 }

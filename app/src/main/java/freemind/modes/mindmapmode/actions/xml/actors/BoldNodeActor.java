@@ -33,47 +33,47 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class BoldNodeActor extends NodeXmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public BoldNodeActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public BoldNodeActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof BoldNodeAction boldact) {
-			NodeAdapter node = getNodeFromID(boldact.getNode());
-			if (node.isBold() != boldact.getBold()) {
-				node.setBold(boldact.getBold());
-				mMapFeedback.nodeChanged(node);
-			}
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof BoldNodeAction boldact) {
+      NodeAdapter node = getNodeFromID(boldact.getNode());
+      if (node.isBold() != boldact.getBold()) {
+        node.setBold(boldact.getBold());
+        mMapFeedback.nodeChanged(node);
+      }
+    }
+  }
 
-	public Class<BoldNodeAction> getDoActionClass() {
-		return BoldNodeAction.class;
-	}
+  public Class<BoldNodeAction> getDoActionClass() {
+    return BoldNodeAction.class;
+  }
 
-	public ActionPair apply(MindMap model, MindMapNode selected) {
-		// every node is set to the inverse of the focussed node.
-		boolean bold = getSelected().isBold();
-		return getActionPair(selected, !bold);
-	}
+  public ActionPair apply(MindMap model, MindMapNode selected) {
+    // every node is set to the inverse of the focussed node.
+    boolean bold = getSelected().isBold();
+    return getActionPair(selected, !bold);
+  }
 
-	private ActionPair getActionPair(MindMapNode selected, boolean bold) {
-		BoldNodeAction boldAction = toggleBold(selected, bold);
-		BoldNodeAction undoBoldAction = toggleBold(selected, selected.isBold());
-		return new ActionPair(boldAction, undoBoldAction);
-	}
+  private ActionPair getActionPair(MindMapNode selected, boolean bold) {
+    BoldNodeAction boldAction = toggleBold(selected, bold);
+    BoldNodeAction undoBoldAction = toggleBold(selected, selected.isBold());
+    return new ActionPair(boldAction, undoBoldAction);
+  }
 
-	private BoldNodeAction toggleBold(MindMapNode selected, boolean bold) {
-		BoldNodeAction boldAction = new BoldNodeAction();
-		boldAction.setNode(getNodeID(selected));
-		boldAction.setBold(bold);
-		return boldAction;
-	}
+  private BoldNodeAction toggleBold(MindMapNode selected, boolean bold) {
+    BoldNodeAction boldAction = new BoldNodeAction();
+    boldAction.setNode(getNodeID(selected));
+    boldAction.setBold(bold);
+    return boldAction;
+  }
 
-	public void setBold(MindMapNode node, boolean bold) {
-		execute(getActionPair(node, bold));
-	}
+  public void setBold(MindMapNode node, boolean bold) {
+    execute(getActionPair(node, bold));
+  }
 }

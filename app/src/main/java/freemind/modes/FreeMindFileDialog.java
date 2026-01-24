@@ -31,62 +31,60 @@ import javax.swing.filechooser.FileFilter;
  */
 public interface FreeMindFileDialog {
 
-	public interface DirectoryResultListener {
-		void setChosenDirectory(File pDir);
-	}
+  public interface DirectoryResultListener {
+    void setChosenDirectory(File pDir);
+  }
 
-	public int showOpenDialog(Component pParent) throws HeadlessException;
+  public int showOpenDialog(Component pParent) throws HeadlessException;
 
-	public int showSaveDialog(Component pParent) throws HeadlessException;
+  public int showSaveDialog(Component pParent) throws HeadlessException;
 
-	public void setDialogTitle(String pDialogTitle);
+  public void setDialogTitle(String pDialogTitle);
 
-	/**
-	 * Sets the default file filter (that one that is activated at showup).
-	 * 
-	 * @see #addChoosableFileFilter(FileFilter)
-	 */
-	public void addChoosableFileFilterAsDefault(FileFilter pFilter);
+  /**
+   * Sets the default file filter (that one that is activated at showup).
+   *
+   * @see #addChoosableFileFilter(FileFilter)
+   */
+  public void addChoosableFileFilterAsDefault(FileFilter pFilter);
 
-	/**
-	 * Adds a further file filter for optional use. It is not selected by default, but this is UI
-	 * dependent.
-	 * 
-	 * @see #addChoosableFileFilterAsDefault(FileFilter)
-	 */
-	public void addChoosableFileFilter(FileFilter pFilter);
+  /**
+   * Adds a further file filter for optional use. It is not selected by default, but this is UI
+   * dependent.
+   *
+   * @see #addChoosableFileFilterAsDefault(FileFilter)
+   */
+  public void addChoosableFileFilter(FileFilter pFilter);
 
-	/**
-	 * @param pMode JFileChooser.DIRECTORIES_ONLY, JFileChooser.FILES_ONLY,
-	 *        JFileChooser.FILES_AND_DIRECTORIES
-	 */
-	public void setFileSelectionMode(int pMode);
+  /**
+   * @param pMode JFileChooser.DIRECTORIES_ONLY, JFileChooser.FILES_ONLY,
+   *     JFileChooser.FILES_AND_DIRECTORIES
+   */
+  public void setFileSelectionMode(int pMode);
 
-	public void setMultiSelectionEnabled(boolean pB);
+  public void setMultiSelectionEnabled(boolean pB);
 
-	public boolean isMultiSelectionEnabled();
+  public boolean isMultiSelectionEnabled();
 
-	/**
-	 * @return
-	 */
-	public File[] getSelectedFiles();
+  /**
+   * @return
+   */
+  public File[] getSelectedFiles();
 
-	/**
-	 * @return
-	 */
-	public File getSelectedFile();
+  /**
+   * @return
+   */
+  public File getSelectedFile();
 
-	/**
-	 * @param pLastCurrentDir
-	 */
-	public void setCurrentDirectory(File pLastCurrentDir);
+  /**
+   * @param pLastCurrentDir
+   */
+  public void setCurrentDirectory(File pLastCurrentDir);
 
-	/**
-	 * @param pFile
-	 */
-	public void setSelectedFile(File pFile);
+  /**
+   * @param pFile
+   */
+  public void setSelectedFile(File pFile);
 
-	public void registerDirectoryResultListener(DirectoryResultListener pDirectoryResultListener);
-
-
+  public void registerDirectoryResultListener(DirectoryResultListener pDirectoryResultListener);
 }

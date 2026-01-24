@@ -31,118 +31,117 @@ import javax.swing.JLabel;
 import freemind.swing.FreeMindFormBuilder;
 
 public class ComboProperty extends PropertyBean implements PropertyControl {
-	String description;
+  String description;
 
-	String label;
+  String label;
 
-	protected JComboBox<String> mComboBox = new JComboBox<>();
+  protected JComboBox<String> mComboBox = new JComboBox<>();
 
-	protected Vector<String> possibleValues;
+  protected Vector<String> possibleValues;
 
-	/**
-	 * @param pTranslator TODO
-	 */
-	public ComboProperty(String description, String label, String[] possibles,
-			TextTranslator pTranslator) {
-		super();
-		this.description = description;
-		this.label = label;
-		fillPossibleValues(possibles);
-		Vector<String> possibleTranslations = new Vector<>();
-		for (String key : possibleValues) {
-			possibleTranslations.add(pTranslator.getText(key));
-		}
-		mComboBox.setModel(new DefaultComboBoxModel<>(possibleTranslations));
-		addActionListener();
-	}
+  /**
+   * @param pTranslator TODO
+   */
+  public ComboProperty(
+      String description, String label, String[] possibles, TextTranslator pTranslator) {
+    super();
+    this.description = description;
+    this.label = label;
+    fillPossibleValues(possibles);
+    Vector<String> possibleTranslations = new Vector<>();
+    for (String key : possibleValues) {
+      possibleTranslations.add(pTranslator.getText(key));
+    }
+    mComboBox.setModel(new DefaultComboBoxModel<>(possibleTranslations));
+    addActionListener();
+  }
 
-	protected void addActionListener() {
-		mComboBox.addActionListener(pE -> firePropertyChangeEvent());
-	}
+  protected void addActionListener() {
+    mComboBox.addActionListener(pE -> firePropertyChangeEvent());
+  }
 
-	public ComboProperty(String description, String label, String[] possibles,
-			List<String> possibleTranslations) {
-		this.description = description;
-		this.label = label;
-		fillPossibleValues(possibles);
-		mComboBox.setModel(
-				new DefaultComboBoxModel<String>(new Vector<String>(possibleTranslations)));
-		addActionListener();
-	}
+  public ComboProperty(
+      String description, String label, String[] possibles, List<String> possibleTranslations) {
+    this.description = description;
+    this.label = label;
+    fillPossibleValues(possibles);
+    mComboBox.setModel(new DefaultComboBoxModel<String>(new Vector<String>(possibleTranslations)));
+    addActionListener();
+  }
 
-	public ComboProperty(String description, String label, List<String> possibles,
-			List<String> possibleTranslations) {
-		this.description = description;
-		this.label = label;
-		fillPossibleValues(possibles);
-		mComboBox.setModel(
-				new DefaultComboBoxModel<String>(new Vector<String>(possibleTranslations)));
-	}
+  public ComboProperty(
+      String description, String label, List<String> possibles, List<String> possibleTranslations) {
+    this.description = description;
+    this.label = label;
+    fillPossibleValues(possibles);
+    mComboBox.setModel(new DefaultComboBoxModel<String>(new Vector<String>(possibleTranslations)));
+  }
 
-	/**
-	 */
-	private void fillPossibleValues(String[] possibles) {
-		fillPossibleValues(Arrays.asList(possibles));
-	}
+  /** */
+  private void fillPossibleValues(String[] possibles) {
+    fillPossibleValues(Arrays.asList(possibles));
+  }
 
-	/**
-	 */
-	private void fillPossibleValues(List<String> possibles) {
-		this.possibleValues = new Vector<>();
-		possibleValues.addAll(possibles);
-	}
+  /** */
+  private void fillPossibleValues(List<String> possibles) {
+    this.possibleValues = new Vector<>();
+    possibleValues.addAll(possibles);
+  }
 
-	/**
-	 * If your combo base changes, call this method to update the values. The old selected value is
-	 * not selected, but the first in the list. Thus, you should call this method only shortly
-	 * before setting the value with setValue.
-	 */
-	public void updateComboBoxEntries(List<String> possibles, List<String> possibleTranslations) {
-		mComboBox.setModel(
-				new DefaultComboBoxModel<String>(new Vector<String>(possibleTranslations)));
-		fillPossibleValues(possibles);
-		if (!possibles.isEmpty()) {
-			mComboBox.setSelectedIndex(0);
-		}
-	}
+  /**
+   * If your combo base changes, call this method to update the values. The old selected value is
+   * not selected, but the first in the list. Thus, you should call this method only shortly before
+   * setting the value with setValue.
+   */
+  public void updateComboBoxEntries(List<String> possibles, List<String> possibleTranslations) {
+    mComboBox.setModel(new DefaultComboBoxModel<String>(new Vector<String>(possibleTranslations)));
+    fillPossibleValues(possibles);
+    if (!possibles.isEmpty()) {
+      mComboBox.setSelectedIndex(0);
+    }
+  }
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+  @Override
+  public String getDescription() {
+    return description;
+  }
 
-	@Override
-	public String getLabel() {
-		return label;
-	}
+  @Override
+  public String getLabel() {
+    return label;
+  }
 
-	@Override
-	public void setValue(String value) {
-		if (possibleValues.contains(value)) {
-			mComboBox.setSelectedIndex(possibleValues.indexOf(value));
-		} else {
-			System.err.println("Can't set the value:" + value + " into the combo box " + getLabel()
-					+ "/" + getDescription());
-			if (mComboBox.getModel().getSize() > 0) {
-				mComboBox.setSelectedIndex(0);
-			}
-		}
-	}
+  @Override
+  public void setValue(String value) {
+    if (possibleValues.contains(value)) {
+      mComboBox.setSelectedIndex(possibleValues.indexOf(value));
+    } else {
+      System.err.println(
+          "Can't set the value:"
+              + value
+              + " into the combo box "
+              + getLabel()
+              + "/"
+              + getDescription());
+      if (mComboBox.getModel().getSize() > 0) {
+        mComboBox.setSelectedIndex(0);
+      }
+    }
+  }
 
-	@Override
-	public String getValue() {
-		return possibleValues.get(mComboBox.getSelectedIndex());
-	}
+  @Override
+  public String getValue() {
+    return possibleValues.get(mComboBox.getSelectedIndex());
+  }
 
-	@Override
-	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
-		JLabel label = builder.append(pTranslator.getText(getLabel()), mComboBox);
-		label.setToolTipText(pTranslator.getText(getDescription()));
-	}
+  @Override
+  public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
+    JLabel label = builder.append(pTranslator.getText(getLabel()), mComboBox);
+    label.setToolTipText(pTranslator.getText(getDescription()));
+  }
 
-	@Override
-	public void setEnabled(boolean pEnabled) {
-		mComboBox.setEnabled(pEnabled);
-	}
-
+  @Override
+  public void setEnabled(boolean pEnabled) {
+    mComboBox.setEnabled(pEnabled);
+  }
 }

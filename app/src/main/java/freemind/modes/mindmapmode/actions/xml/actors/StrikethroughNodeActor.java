@@ -32,49 +32,48 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class StrikethroughNodeActor extends NodeXmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public StrikethroughNodeActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public StrikethroughNodeActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof StrikethroughNodeAction strikethroughact) {
-			NodeAdapter node = getNodeFromID(strikethroughact.getNode());
-			if (node.isStrikethrough() != strikethroughact.getStrikethrough()) {
-				node.setStrikethrough(strikethroughact.getStrikethrough());
-				mMapFeedback.nodeChanged(node);
-			}
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof StrikethroughNodeAction strikethroughact) {
+      NodeAdapter node = getNodeFromID(strikethroughact.getNode());
+      if (node.isStrikethrough() != strikethroughact.getStrikethrough()) {
+        node.setStrikethrough(strikethroughact.getStrikethrough());
+        mMapFeedback.nodeChanged(node);
+      }
+    }
+  }
 
-	public Class<StrikethroughNodeAction> getDoActionClass() {
-		return StrikethroughNodeAction.class;
-	}
+  public Class<StrikethroughNodeAction> getDoActionClass() {
+    return StrikethroughNodeAction.class;
+  }
 
-	public ActionPair apply(MindMap model, MindMapNode selected) {
-		// every node is set to the inverse of the focussed node.
-		boolean Strikethrough = getSelected().isStrikethrough();
-		return getActionPair(selected, !Strikethrough);
-	}
+  public ActionPair apply(MindMap model, MindMapNode selected) {
+    // every node is set to the inverse of the focussed node.
+    boolean Strikethrough = getSelected().isStrikethrough();
+    return getActionPair(selected, !Strikethrough);
+  }
 
-	private ActionPair getActionPair(MindMapNode selected, boolean Strikethrough) {
-		StrikethroughNodeAction StrikethroughAction = toggleStrikethrough(selected, Strikethrough);
-		StrikethroughNodeAction undoStrikethroughAction =
-				toggleStrikethrough(selected, selected.isStrikethrough());
-		return new ActionPair(StrikethroughAction, undoStrikethroughAction);
-	}
+  private ActionPair getActionPair(MindMapNode selected, boolean Strikethrough) {
+    StrikethroughNodeAction StrikethroughAction = toggleStrikethrough(selected, Strikethrough);
+    StrikethroughNodeAction undoStrikethroughAction =
+        toggleStrikethrough(selected, selected.isStrikethrough());
+    return new ActionPair(StrikethroughAction, undoStrikethroughAction);
+  }
 
-	private StrikethroughNodeAction toggleStrikethrough(MindMapNode selected,
-			boolean strikethrough) {
-		StrikethroughNodeAction StrikethroughAction = new StrikethroughNodeAction();
-		StrikethroughAction.setNode(getNodeID(selected));
-		StrikethroughAction.setStrikethrough(strikethrough);
-		return StrikethroughAction;
-	}
+  private StrikethroughNodeAction toggleStrikethrough(MindMapNode selected, boolean strikethrough) {
+    StrikethroughNodeAction StrikethroughAction = new StrikethroughNodeAction();
+    StrikethroughAction.setNode(getNodeID(selected));
+    StrikethroughAction.setStrikethrough(strikethrough);
+    return StrikethroughAction;
+  }
 
-	public void setStrikethrough(MindMapNode node, boolean Strikethrough) {
-		execute(getActionPair(node, Strikethrough));
-	}
+  public void setStrikethrough(MindMapNode node, boolean Strikethrough) {
+    execute(getActionPair(node, Strikethrough));
+  }
 }

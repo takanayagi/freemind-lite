@@ -33,51 +33,47 @@ import freemind.modes.mindmapmode.MindMapController;
 /**
  * Reverts the map to the saved version. In Xml, the old map is stored as xml and as an undo action,
  * the new map is stored, too.
- * 
- * Moreover, the filename of the doAction is set to the appropriate map file's name. The undo action
- * has no file name associated.
- * 
- * The action goes like this: close the actual map and open the given Xml/File. If only a Xml string
- * is given, a temporary file name is created, the xml stored into and this map is opened instead of
- * the actual.
- * 
+ *
+ * <p>Moreover, the filename of the doAction is set to the appropriate map file's name. The undo
+ * action has no file name associated.
+ *
+ * <p>The action goes like this: close the actual map and open the given Xml/File. If only a Xml
+ * string is given, a temporary file name is created, the xml stored into and this map is opened
+ * instead of the actual.
+ *
  * @author foltin
- * 
  */
 public class RevertAction extends MindmapAction {
 
-	private final MindMapController mindMapController;
+  private final MindMapController mindMapController;
 
-	/**
-	 */
-	public RevertAction(MindMapController modeController) {
-		super("RevertAction", (String) null, modeController);
-		mindMapController = modeController;
+  /** */
+  public RevertAction(MindMapController modeController) {
+    super("RevertAction", (String) null, modeController);
+    mindMapController = modeController;
+  }
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	public void actionPerformed(ActionEvent arg0) {
-		try {
-			MindMap map = mindMapController.getMap();
-			File file = map.getFile();
-			if (file == null) {
-				JOptionPane.showMessageDialog(mindMapController.getView(),
-						mindMapController.getText("map_not_saved"), "FreeMind",
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			// FIXME: Make action from MindMapActions out of it.
-			mindMapController.getActorFactory().getRevertActor().revertMap(map, file);
-		} catch (IOException e) {
-			freemind.main.Resources.getInstance().logException(e);
-		}
-
-	}
-
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  public void actionPerformed(ActionEvent arg0) {
+    try {
+      MindMap map = mindMapController.getMap();
+      File file = map.getFile();
+      if (file == null) {
+        JOptionPane.showMessageDialog(
+            mindMapController.getView(),
+            mindMapController.getText("map_not_saved"),
+            "FreeMind",
+            JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      // FIXME: Make action from MindMapActions out of it.
+      mindMapController.getActorFactory().getRevertActor().revertMap(map, file);
+    } catch (IOException e) {
+      freemind.main.Resources.getInstance().logException(e);
+    }
+  }
 }

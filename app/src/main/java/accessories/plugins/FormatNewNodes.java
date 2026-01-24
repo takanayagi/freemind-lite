@@ -39,72 +39,67 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
 
 /**
  * This plugin formats new nodes using the formats given to former nodes.
- * 
+ *
  * @author foltin
  */
 public class FormatNewNodes implements ActionHandler, ActionFilter, HookRegistration {
 
-	private MindMapController controller;
+  private MindMapController controller;
 
-	private HashMap<String, XmlAction> formatActions;
+  private HashMap<String, XmlAction> formatActions;
 
-	public FormatNewNodes(ModeController controller, MindMap map) {
-		this.controller = (MindMapController) controller;
-		this.formatActions = new HashMap<>();
-	}
+  public FormatNewNodes(ModeController controller, MindMap map) {
+    this.controller = (MindMapController) controller;
+    this.formatActions = new HashMap<>();
+  }
 
-	public void register() {
-		controller.getActionRegistry().registerHandler(this);
-		controller.getActionRegistry().registerFilter(this);
+  public void register() {
+    controller.getActionRegistry().registerHandler(this);
+    controller.getActionRegistry().registerFilter(this);
+  }
 
-	}
+  public void deRegister() {
+    controller.getActionRegistry().deregisterHandler(this);
+    controller.getActionRegistry().deregisterFilter(this);
+  }
 
-	public void deRegister() {
-		controller.getActionRegistry().deregisterHandler(this);
-		controller.getActionRegistry().deregisterFilter(this);
-	}
+  public void executeAction(XmlAction action) {
+    // detect format changes:
+    detectFormatChanges(action);
+  }
 
-	public void executeAction(XmlAction action) {
-		// detect format changes:
-		detectFormatChanges(action);
-	}
+  /** */
+  private void detectFormatChanges(XmlAction doAction) {
+    if (doAction instanceof CompoundAction compAction) {
+      for (Iterator<XmlAction> i = compAction.getListChoiceList().iterator(); i.hasNext(); ) {
+        XmlAction childAction = i.next();
+        detectFormatChanges(childAction);
+      }
+    } else if (doAction instanceof FormatNodeAction) {
+      formatActions.put(doAction.getClass().getName(), doAction);
+    }
+  }
 
-	/**
-	 */
-	private void detectFormatChanges(XmlAction doAction) {
-		if (doAction instanceof CompoundAction compAction) {
-			for (Iterator<XmlAction> i = compAction.getListChoiceList().iterator(); i.hasNext();) {
-				XmlAction childAction = i.next();
-				detectFormatChanges(childAction);
-			}
-		} else if (doAction instanceof FormatNodeAction) {
-			formatActions.put(doAction.getClass().getName(), doAction);
-		}
+  public void startTransaction(String name) {}
 
-	}
+  public void endTransaction(String name) {}
 
-	public void startTransaction(String name) {}
-
-	public void endTransaction(String name) {}
-
-	public ActionPair filterAction(ActionPair pair) {
-		if (pair.getDoAction() instanceof NewNodeAction) {
-			NewNodeAction newNodeAction = (NewNodeAction) pair.getDoAction();
-			// add to a compound the newNodeAction and the other formats we
-			// have:
-			CompoundAction compound = new CompoundAction();
-			compound.addChoice(newNodeAction);
-			for (XmlAction formatAction : formatActions.values()) {
-				// deep copy:
-				FormatNodeAction copiedFormatAction =
-						(FormatNodeAction) Tools.deepCopy(formatAction);
-				copiedFormatAction.setNode(newNodeAction.getNewId());
-				compound.addChoice(copiedFormatAction);
-			}
-			ActionPair newPair = new ActionPair(compound, pair.getUndoAction());
-			return newPair;
-		}
-		return pair;
-	}
-
+  public ActionPair filterAction(ActionPair pair) {
+    if (pair.getDoAction() instanceof NewNodeAction) {
+      NewNodeAction newNodeAction = (NewNodeAction) pair.getDoAction();
+      // add to a compound the newNodeAction and the other formats we
+      // have:
+      CompoundAction compound = new CompoundAction();
+      compound.addChoice(newNodeAction);
+      for (XmlAction formatAction : formatActions.values()) {
+        // deep copy:
+        FormatNodeAction copiedFormatAction = (FormatNodeAction) Tools.deepCopy(formatAction);
+        copiedFormatAction.setNode(newNodeAction.getNewId());
+        compound.addChoice(copiedFormatAction);
+      }
+      ActionPair newPair = new ActionPair(compound, pair.getUndoAction());
+      return newPair;
+    }
+    return pair;
+  }
 }

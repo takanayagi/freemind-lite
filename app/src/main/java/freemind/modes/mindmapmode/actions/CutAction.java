@@ -19,7 +19,6 @@
  * Created on 09.05.2004
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import java.awt.datatransfer.Transferable;
@@ -34,40 +33,46 @@ import freemind.main.FreeMind;
 import freemind.modes.mindmapmode.MindMapController;
 
 public class CutAction extends AbstractAction {
-	private final MindMapController mMindMapController;
-	private static Logger logger = null;
+  private final MindMapController mMindMapController;
+  private static Logger logger = null;
 
-	public CutAction(MindMapController c) {
-		super(c.getText("cut"), freemind.view.ImageFactory.getInstance()
-				.createIcon(c.getResource("images/editcut.png")));
-		if (logger == null) {
-			logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
-		}
-		this.mMindMapController = c;
-		setEnabled(false);
-	}
+  public CutAction(MindMapController c) {
+    super(
+        c.getText("cut"),
+        freemind.view.ImageFactory.getInstance().createIcon(c.getResource("images/editcut.png")));
+    if (logger == null) {
+      logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
+    }
+    this.mMindMapController = c;
+    setEnabled(false);
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		if (mMindMapController.getView().getRoot().isSelected()) {
-			mMindMapController.getController().errorMessage(
-					mMindMapController.getFrame().getResourceString("cannot_delete_root"));
-			return;
-		}
-		int showResult = new OptionalDontShowMeAgainDialog(
-				mMindMapController.getFrame().getJFrame(), mMindMapController.getSelectedView(),
-				"really_cut_node", "confirmation", mMindMapController,
-				new OptionalDontShowMeAgainDialog.StandardPropertyHandler(
-						mMindMapController.getController(),
-						FreeMind.RESOURCES_CUT_NODES_WITHOUT_QUESTION),
-				OptionalDontShowMeAgainDialog.ONLY_OK_SELECTION_IS_STORED).show().getResult();
-		if (showResult != JOptionPane.OK_OPTION) {
-			return;
-		}
-		Transferable copy = mMindMapController.cut();
-		// and set it.
-		mMindMapController.setClipboardContents(copy);
-		mMindMapController.getController().obtainFocusForSelected();
-	}
-
-
+  public void actionPerformed(ActionEvent e) {
+    if (mMindMapController.getView().getRoot().isSelected()) {
+      mMindMapController
+          .getController()
+          .errorMessage(mMindMapController.getFrame().getResourceString("cannot_delete_root"));
+      return;
+    }
+    int showResult =
+        new OptionalDontShowMeAgainDialog(
+                mMindMapController.getFrame().getJFrame(),
+                mMindMapController.getSelectedView(),
+                "really_cut_node",
+                "confirmation",
+                mMindMapController,
+                new OptionalDontShowMeAgainDialog.StandardPropertyHandler(
+                    mMindMapController.getController(),
+                    FreeMind.RESOURCES_CUT_NODES_WITHOUT_QUESTION),
+                OptionalDontShowMeAgainDialog.ONLY_OK_SELECTION_IS_STORED)
+            .show()
+            .getResult();
+    if (showResult != JOptionPane.OK_OPTION) {
+      return;
+    }
+    Transferable copy = mMindMapController.cut();
+    // and set it.
+    mMindMapController.setClipboardContents(copy);
+    mMindMapController.getController().obtainFocusForSelected();
+  }
 }

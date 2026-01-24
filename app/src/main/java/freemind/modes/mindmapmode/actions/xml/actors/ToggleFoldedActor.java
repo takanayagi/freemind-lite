@@ -38,92 +38,90 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class ToggleFoldedActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public ToggleFoldedActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public ToggleFoldedActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void toggleFolded(ListIterator<? extends MindMapNode> listIterator) {
+  public void toggleFolded(ListIterator<? extends MindMapNode> listIterator) {
 
-		boolean fold = CommonToggleFoldedAction
-				.getFoldingState(CommonToggleFoldedAction.reset(listIterator));
-		CompoundAction doAction =
-				createFoldAction(CommonToggleFoldedAction.reset(listIterator), fold, false);
-		CompoundAction undoAction =
-				createFoldAction(CommonToggleFoldedAction.reset(listIterator), !fold, true);
-		execute(new ActionPair(doAction, undoAction));
-	}
+    boolean fold =
+        CommonToggleFoldedAction.getFoldingState(CommonToggleFoldedAction.reset(listIterator));
+    CompoundAction doAction =
+        createFoldAction(CommonToggleFoldedAction.reset(listIterator), fold, false);
+    CompoundAction undoAction =
+        createFoldAction(CommonToggleFoldedAction.reset(listIterator), !fold, true);
+    execute(new ActionPair(doAction, undoAction));
+  }
 
-	private CompoundAction createFoldAction(ListIterator<? extends MindMapNode> iterator,
-			boolean fold, boolean undo) {
-		CompoundAction comp = new CompoundAction();
-		// sort selectedNodes list by depth, in order to guarantee that sons
-		// are deleted first:
-		while (iterator.hasNext()) {
-			MindMapNode node = iterator.next();
-			FoldAction foldAction = createSingleFoldAction(fold, node, undo);
-			if (foldAction != null) {
-				if (!undo) {
-					comp.addChoice(foldAction);
-				} else {
-					// reverse the order:
-					comp.addAtChoice(0, foldAction);
-				}
-			}
-		}
-		logger.finest("Compound contains " + comp.sizeChoiceList() + " elements.");
-		return comp;
-	}
+  private CompoundAction createFoldAction(
+      ListIterator<? extends MindMapNode> iterator, boolean fold, boolean undo) {
+    CompoundAction comp = new CompoundAction();
+    // sort selectedNodes list by depth, in order to guarantee that sons
+    // are deleted first:
+    while (iterator.hasNext()) {
+      MindMapNode node = iterator.next();
+      FoldAction foldAction = createSingleFoldAction(fold, node, undo);
+      if (foldAction != null) {
+        if (!undo) {
+          comp.addChoice(foldAction);
+        } else {
+          // reverse the order:
+          comp.addAtChoice(0, foldAction);
+        }
+      }
+    }
+    logger.finest("Compound contains " + comp.sizeChoiceList() + " elements.");
+    return comp;
+  }
 
-	/**
-	 * @return null if node cannot be folded.
-	 */
-	private FoldAction createSingleFoldAction(boolean fold, MindMapNode node, boolean undo) {
-		FoldAction foldAction = null;
-		if ((undo && (node.isFolded() == fold)) || (!undo && (node.isFolded() != fold))) {
-			if (node.hasChildren() || Tools
-					.safeEquals(getExMapFeedback().getProperty("enable_leaves_folding"), "true")) {
-				foldAction = new FoldAction();
-				foldAction.setFolded(fold);
-				foldAction.setNode(getNodeID(node));
-			}
-		}
-		return foldAction;
-	}
+  /**
+   * @return null if node cannot be folded.
+   */
+  private FoldAction createSingleFoldAction(boolean fold, MindMapNode node, boolean undo) {
+    FoldAction foldAction = null;
+    if ((undo && (node.isFolded() == fold)) || (!undo && (node.isFolded() != fold))) {
+      if (node.hasChildren()
+          || Tools.safeEquals(getExMapFeedback().getProperty("enable_leaves_folding"), "true")) {
+        foldAction = new FoldAction();
+        foldAction.setFolded(fold);
+        foldAction.setNode(getNodeID(node));
+      }
+    }
+    return foldAction;
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof FoldAction foldAction) {
-			MindMapNode node = getNodeFromID(foldAction.getNode());
-			boolean folded = foldAction.getFolded();
-			// no root folding, fc, 16.5.2004
-			if (node.isRoot() && folded) {
-				return;
-			}
-			if (node.isFolded() != folded) {
-				node.setFolded(folded);
-				getExMapFeedback().getMap().nodeStructureChanged(node);
-			}
-			if (Resources.getInstance().getBoolProperty(FreeMind.RESOURCES_SAVE_FOLDING_STATE)) {
-				getExMapFeedback().nodeChanged(node);
-			}
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof FoldAction foldAction) {
+      MindMapNode node = getNodeFromID(foldAction.getNode());
+      boolean folded = foldAction.getFolded();
+      // no root folding, fc, 16.5.2004
+      if (node.isRoot() && folded) {
+        return;
+      }
+      if (node.isFolded() != folded) {
+        node.setFolded(folded);
+        getExMapFeedback().getMap().nodeStructureChanged(node);
+      }
+      if (Resources.getInstance().getBoolProperty(FreeMind.RESOURCES_SAVE_FOLDING_STATE)) {
+        getExMapFeedback().nodeChanged(node);
+      }
+    }
+  }
 
-	public Class<FoldAction> getDoActionClass() {
-		return FoldAction.class;
-	}
+  public Class<FoldAction> getDoActionClass() {
+    return FoldAction.class;
+  }
 
-	/**
-	 */
-	public void setFolded(MindMapNode node, boolean folded) {
-		FoldAction doAction = createSingleFoldAction(folded, node, false);
-		FoldAction undoAction = createSingleFoldAction(!folded, node, true);
-		if (doAction == null || undoAction == null) {
-			return;
-		}
-		execute(new ActionPair(doAction, undoAction));
-	}
-
+  /** */
+  public void setFolded(MindMapNode node, boolean folded) {
+    FoldAction doAction = createSingleFoldAction(folded, node, false);
+    FoldAction undoAction = createSingleFoldAction(!folded, node, true);
+    if (doAction == null || undoAction == null) {
+      return;
+    }
+    execute(new ActionPair(doAction, undoAction));
+  }
 }

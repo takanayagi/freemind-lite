@@ -30,77 +30,67 @@ import freemind.view.mindmapview.NodeView;
 
 public class MindMapArrowLinkModel extends ArrowLinkAdapter {
 
-	public MindMapArrowLinkModel(MindMapNode source, MindMapNode target,
-			MapFeedback pMapFeedback) {
-		super(source, target, pMapFeedback);
-	}
+  public MindMapArrowLinkModel(MindMapNode source, MindMapNode target, MapFeedback pMapFeedback) {
+    super(source, target, pMapFeedback);
+  }
 
-	/* maybe this method is wrong here, but ... */
-	public Object clone() {
-		return super.clone();
-	}
+  /* maybe this method is wrong here, but ... */
+  public Object clone() {
+    return super.clone();
+  }
 
-	public String toString() {
-		return "Source=" + getSource() + ", target=" + getTarget() + ", "
-				+ save().toString();
-	}
+  public String toString() {
+    return "Source=" + getSource() + ", target=" + getTarget() + ", " + save().toString();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMapArrowLink#changeInclination(int, int, int,
-	 * int)
-	 */
-	public void changeInclination(MapView map, int originX, int originY,
-			int deltaX, int deltaY) {
-		double distSqToTarget = 0;
-		double distSqToSource = 0;
-		NodeView targetView = map.getNodeView(getTarget());
-		NodeView sourceView = map.getNodeView(getSource());
-		if (targetView != null && sourceView != null) {
-			Point targetLinkPoint = targetView
-					.getLinkPoint(getEndInclination());
-			Point sourceLinkPoint = sourceView
-					.getLinkPoint(getStartInclination());
-			distSqToTarget = targetLinkPoint.distanceSq(originX, originY);
-			distSqToSource = sourceLinkPoint.distanceSq(originX, originY);
-		}
-		if ((targetView == null || sourceView != null)
-				&& distSqToSource < distSqToTarget * 2.25) {
-			Point changedInclination = getStartInclination();
-			changeInclination(deltaX, deltaY, sourceView, changedInclination);
-			setStartInclination(changedInclination);
-		}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMapArrowLink#changeInclination(int, int, int,
+   * int)
+   */
+  public void changeInclination(MapView map, int originX, int originY, int deltaX, int deltaY) {
+    double distSqToTarget = 0;
+    double distSqToSource = 0;
+    NodeView targetView = map.getNodeView(getTarget());
+    NodeView sourceView = map.getNodeView(getSource());
+    if (targetView != null && sourceView != null) {
+      Point targetLinkPoint = targetView.getLinkPoint(getEndInclination());
+      Point sourceLinkPoint = sourceView.getLinkPoint(getStartInclination());
+      distSqToTarget = targetLinkPoint.distanceSq(originX, originY);
+      distSqToSource = sourceLinkPoint.distanceSq(originX, originY);
+    }
+    if ((targetView == null || sourceView != null) && distSqToSource < distSqToTarget * 2.25) {
+      Point changedInclination = getStartInclination();
+      changeInclination(deltaX, deltaY, sourceView, changedInclination);
+      setStartInclination(changedInclination);
+    }
 
-		if ((sourceView == null || targetView != null)
-				&& distSqToTarget < distSqToSource * 2.25) {
-			Point changedInclination = getEndInclination();
-			changeInclination(deltaX, deltaY, targetView, changedInclination);
-			setEndInclination(changedInclination);
-		}
+    if ((sourceView == null || targetView != null) && distSqToTarget < distSqToSource * 2.25) {
+      Point changedInclination = getEndInclination();
+      changeInclination(deltaX, deltaY, targetView, changedInclination);
+      setEndInclination(changedInclination);
+    }
+  }
 
-	}
-
-	private void changeInclination(int deltaX, int deltaY,
-			NodeView linkedNodeView, Point changedInclination) {
-		if (linkedNodeView.isLeft()) {
-			deltaX = -deltaX;
-		}
-		changedInclination.translate(deltaX, deltaY);
-		if (changedInclination.x != 0
-				&& Math.abs((double) changedInclination.y
-						/ changedInclination.x) < 0.015) {
-			changedInclination.y = 0;
-		}
-		double k = changedInclination.distance(0, 0);
-		if (k < 10) {
-			if (k > 0) {
-				changedInclination.x = (int) (changedInclination.x * 10 / k);
-				changedInclination.y = (int) (changedInclination.y * 10 / k);
-			} else {
-				changedInclination.x = 10;
-			}
-		}
-	}
-
+  private void changeInclination(
+      int deltaX, int deltaY, NodeView linkedNodeView, Point changedInclination) {
+    if (linkedNodeView.isLeft()) {
+      deltaX = -deltaX;
+    }
+    changedInclination.translate(deltaX, deltaY);
+    if (changedInclination.x != 0
+        && Math.abs((double) changedInclination.y / changedInclination.x) < 0.015) {
+      changedInclination.y = 0;
+    }
+    double k = changedInclination.distance(0, 0);
+    if (k < 10) {
+      if (k > 0) {
+        changedInclination.x = (int) (changedInclination.x * 10 / k);
+        changedInclination.y = (int) (changedInclination.y * 10 / k);
+      } else {
+        changedInclination.x = 10;
+      }
+    }
+  }
 }

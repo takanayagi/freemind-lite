@@ -59,391 +59,396 @@ import freemind.view.mindmapview.MainView;
 
 public class BrowseController extends ViewControllerAdapter {
 
-	private JPopupMenu popupmenu;
-	private JToolBar toolbar;
+  private JPopupMenu popupmenu;
+  private JToolBar toolbar;
 
-	Action followLink;
+  Action followLink;
 
-	private HookFactory mBrowseHookFactory;
-	private ImageIcon noteIcon;
-	public FollowMapLink followMapLink;
+  private HookFactory mBrowseHookFactory;
+  private ImageIcon noteIcon;
+  public FollowMapLink followMapLink;
 
-	public static class FollowMapLink extends AbstractAction implements MenuItemEnabledListener {
+  public static class FollowMapLink extends AbstractAction implements MenuItemEnabledListener {
 
-		private ViewControllerAdapter modeController;
+    private ViewControllerAdapter modeController;
 
-		private Logger logger;
+    private Logger logger;
 
-		public FollowMapLink(ViewControllerAdapter controller) {
-			super(controller.getText("follow_map_link"),
-					MapNodePositionHolderBase.getMapLocationIcon());
-			this.modeController = controller;
-			logger = modeController.getFrame().getLogger(this.getClass().getName());
-		}
+    public FollowMapLink(ViewControllerAdapter controller) {
+      super(controller.getText("follow_map_link"), MapNodePositionHolderBase.getMapLocationIcon());
+      this.modeController = controller;
+      logger = modeController.getFrame().getLogger(this.getClass().getName());
+    }
 
-		public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
 
-			MapNodePositionHolderBase hook = getHook();
-			if (hook != null) {
-				String[] barePositions = hook.getBarePosition();
-				try {
-					// GRR, this is doubled code :-(
-					HashMap<String, String> tileSources = new HashMap<>();
-					tileSources.put(MapNodePositionHolderBase.TILE_SOURCE_MAPNIK,
-							MapNodePositionHolderBase.SHORT_MAPNIK);
-					tileSources.put(MapNodePositionHolderBase.TILE_SOURCE_TRANSPORT_MAP,
-							MapNodePositionHolderBase.SHORT_TRANSPORT_MAP);
-					tileSources.put(MapNodePositionHolderBase.TILE_SOURCE_MAP_QUEST_OPEN_MAP,
-							MapNodePositionHolderBase.SHORT_MAP_QUEST_OPEN_MAP);
-					String link = "http://www.openstreetmap.org/?" + "mlat=" + barePositions[0]
-							+ "&mlon=" + barePositions[1] + "&lat=" + barePositions[2] + "&lon="
-							+ barePositions[3] + "&zoom=" + barePositions[4] + "&layers="
-							+ tileSources.get(barePositions[5]);
-					logger.fine("Try to open link " + link);
-					modeController.getFrame().openDocument(new URI(link).toURL());
-				} catch (Exception e1) {
-					freemind.main.Resources.getInstance().logException(e1);
-				}
-			}
-		}
+      MapNodePositionHolderBase hook = getHook();
+      if (hook != null) {
+        String[] barePositions = hook.getBarePosition();
+        try {
+          // GRR, this is doubled code :-(
+          HashMap<String, String> tileSources = new HashMap<>();
+          tileSources.put(
+              MapNodePositionHolderBase.TILE_SOURCE_MAPNIK, MapNodePositionHolderBase.SHORT_MAPNIK);
+          tileSources.put(
+              MapNodePositionHolderBase.TILE_SOURCE_TRANSPORT_MAP,
+              MapNodePositionHolderBase.SHORT_TRANSPORT_MAP);
+          tileSources.put(
+              MapNodePositionHolderBase.TILE_SOURCE_MAP_QUEST_OPEN_MAP,
+              MapNodePositionHolderBase.SHORT_MAP_QUEST_OPEN_MAP);
+          String link =
+              "http://www.openstreetmap.org/?"
+                  + "mlat="
+                  + barePositions[0]
+                  + "&mlon="
+                  + barePositions[1]
+                  + "&lat="
+                  + barePositions[2]
+                  + "&lon="
+                  + barePositions[3]
+                  + "&zoom="
+                  + barePositions[4]
+                  + "&layers="
+                  + tileSources.get(barePositions[5]);
+          logger.fine("Try to open link " + link);
+          modeController.getFrame().openDocument(new URI(link).toURL());
+        } catch (Exception e1) {
+          freemind.main.Resources.getInstance().logException(e1);
+        }
+      }
+    }
 
-		protected MapNodePositionHolderBase getHook() {
-			MindMapNode selected = modeController.getSelected();
-			return MapNodePositionHolderBase.getBaseHook(selected);
-		}
+    protected MapNodePositionHolderBase getHook() {
+      MindMapNode selected = modeController.getSelected();
+      return MapNodePositionHolderBase.getBaseHook(selected);
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.controller.MenuItemEnabledListener#isEnabled(javax.swing.JMenuItem,
-		 * javax.swing.Action)
-		 */
-		public boolean isEnabled(JMenuItem pItem, Action pAction) {
-			return getHook() != null;
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.controller.MenuItemEnabledListener#isEnabled(javax.swing.JMenuItem,
+     * javax.swing.Action)
+     */
+    public boolean isEnabled(JMenuItem pItem, Action pAction) {
+      return getHook() != null;
+    }
+  }
 
-	}
+  public BrowseController(Mode mode) {
+    super(mode);
+    mBrowseHookFactory = new BrowseHookFactory();
+    // Daniel: Actions are initialized here and not above because of
+    // some error it would produce. Not studied in more detail.
+    followLink = new FollowLinkAction();
 
-	public BrowseController(Mode mode) {
-		super(mode);
-		mBrowseHookFactory = new BrowseHookFactory();
-		// Daniel: Actions are initialized here and not above because of
-		// some error it would produce. Not studied in more detail.
-		followLink = new FollowLinkAction();
+    followMapLink = new FollowMapLink(this);
+    popupmenu = new BrowsePopupMenu(this);
+    toolbar = new BrowseToolBar(this);
+    setAllActions(false);
+    // for displaying notes.
+    registerNodeSelectionListener(new NodeNoteViewer(this), false);
+  }
 
-		followMapLink = new FollowMapLink(this);
-		popupmenu = new BrowsePopupMenu(this);
-		toolbar = new BrowseToolBar(this);
-		setAllActions(false);
-		// for displaying notes.
-		registerNodeSelectionListener(new NodeNoteViewer(this), false);
-	}
+  public void startupController() {
+    super.startupController();
+    invokeHooksRecursively(getRootNode(), getMap());
+  }
 
-	public void startupController() {
-		super.startupController();
-		invokeHooksRecursively(getRootNode(), getMap());
-	}
+  protected void restoreMapsLastState(ModeController pNewModeController, MapAdapter pModel) {
+    // intentionally do nothing.
+  }
 
-	protected void restoreMapsLastState(ModeController pNewModeController, MapAdapter pModel) {
-		// intentionally do nothing.
-	}
+  public MapAdapter newModel(ModeController newModeController) {
+    BrowseMapModel model = new BrowseMapModel(null, newModeController);
+    newModeController.setModel(model);
+    return model;
+  }
 
-	public MapAdapter newModel(ModeController newModeController) {
-		BrowseMapModel model = new BrowseMapModel(null, newModeController);
-		newModeController.setModel(model);
-		return model;
-	}
+  public void plainClick(MouseEvent e) {
+    /* perform action only if one selected node. */
+    if (getSelecteds().size() != 1) return;
+    final MainView component = (MainView) e.getComponent();
+    if (component.isInFollowLinkRegion(e.getX())) {
+      loadURL();
+    } else {
+      MindMapNode node = (component).getNodeView().getModel();
+      if (!node.hasChildren()) {
+        // the emulate the plain click.
+        doubleClick(e);
+        return;
+      }
+      toggleFolded.toggleFolded(getSelecteds().listIterator());
+    }
+  }
 
-	public void plainClick(MouseEvent e) {
-		/* perform action only if one selected node. */
-		if (getSelecteds().size() != 1)
-			return;
-		final MainView component = (MainView) e.getComponent();
-		if (component.isInFollowLinkRegion(e.getX())) {
-			loadURL();
-		} else {
-			MindMapNode node = (component).getNodeView().getModel();
-			if (!node.hasChildren()) {
-				// the emulate the plain click.
-				doubleClick(e);
-				return;
-			}
-			toggleFolded.toggleFolded(getSelecteds().listIterator());
-		}
+  public void doubleClick() {
+    /* If the link exists, follow the link; toggle folded otherwise */
+    if (getSelected().getLink() == null) {
+      toggleFolded.toggleFolded();
+    } else {
+      loadURL();
+    }
+  }
 
-	}
+  // public void anotherNodeSelected(MindMapNode n) {
+  // super.anotherNodeSelected(n);
+  // if(n.isRoot()){
+  // return;
+  // }
+  // //Presentation:
+  // setFolded(n, false);
+  // foldOthers(n);
+  // }
+  //
+  //
+  // private void foldOthers(MindMapNode n) {
+  // if(n.isRoot()){
+  // return;
+  // }
+  // MindMapNode parent = n.getParentNode();
+  // for (Iterator iter = parent.childrenUnfolded(); iter.hasNext();) {
+  // MindMapNode element = (MindMapNode) iter.next();
+  // if(element != n){
+  // setFolded(element, true);
+  // }
+  // }
+  // foldOthers(parent);
+  // }
 
-	public void doubleClick() {
-		/* If the link exists, follow the link; toggle folded otherwise */
-		if (getSelected().getLink() == null) {
-			toggleFolded.toggleFolded();
-		} else {
-			loadURL();
-		}
-	}
+  public MindMapNode newNode(Object userObject, MindMap map) {
+    return new BrowseNodeModel(userObject, map);
+  }
 
-	// public void anotherNodeSelected(MindMapNode n) {
-	// super.anotherNodeSelected(n);
-	// if(n.isRoot()){
-	// return;
-	// }
-	// //Presentation:
-	// setFolded(n, false);
-	// foldOthers(n);
-	// }
-	//
-	//
-	// private void foldOthers(MindMapNode n) {
-	// if(n.isRoot()){
-	// return;
-	// }
-	// MindMapNode parent = n.getParentNode();
-	// for (Iterator iter = parent.childrenUnfolded(); iter.hasNext();) {
-	// MindMapNode element = (MindMapNode) iter.next();
-	// if(element != n){
-	// setFolded(element, true);
-	// }
-	// }
-	// foldOthers(parent);
-	// }
+  public JPopupMenu getPopupMenu() {
+    return popupmenu;
+  }
 
-	public MindMapNode newNode(Object userObject, MindMap map) {
-		return new BrowseNodeModel(userObject, map);
-	}
+  /**
+   * Link implementation: If this is a link, we want to make a popup with at least removelink
+   * available.
+   */
+  public JPopupMenu getPopupForModel(java.lang.Object obj) {
+    if (obj instanceof BrowseArrowLinkModel link) {
+      // yes, this is a link.
+      JPopupMenu arrowLinkPopup = new JPopupMenu();
 
-	public JPopupMenu getPopupMenu() {
-		return popupmenu;
-	}
+      arrowLinkPopup.add(getGotoLinkNodeAction(link.getSource()));
+      arrowLinkPopup.add(getGotoLinkNodeAction(link.getTarget()));
 
-	/**
-	 * Link implementation: If this is a link, we want to make a popup with at least removelink
-	 * available.
-	 */
-	public JPopupMenu getPopupForModel(java.lang.Object obj) {
-		if (obj instanceof BrowseArrowLinkModel link) {
-			// yes, this is a link.
-			JPopupMenu arrowLinkPopup = new JPopupMenu();
+      arrowLinkPopup.addSeparator();
+      // add all links from target and from source:
+      HashSet<MindMapNode> nodeAlreadyVisited = new HashSet<>();
+      nodeAlreadyVisited.add(link.getSource());
+      nodeAlreadyVisited.add(link.getTarget());
+      Vector<MindMapLink> links = getModel().getLinkRegistry().getAllLinks(link.getSource());
+      links.addAll(getModel().getLinkRegistry().getAllLinks(link.getTarget()));
+      for (MindMapLink mindMapLink : links) {
+        BrowseArrowLinkModel foreign_link = (BrowseArrowLinkModel) mindMapLink;
+        if (nodeAlreadyVisited.add(foreign_link.getTarget())) {
+          arrowLinkPopup.add(getGotoLinkNodeAction(foreign_link.getTarget()));
+        }
+        if (nodeAlreadyVisited.add(foreign_link.getSource())) {
+          arrowLinkPopup.add(getGotoLinkNodeAction(foreign_link.getSource()));
+        }
+      }
+      return arrowLinkPopup;
+    }
+    return null;
+  }
 
-			arrowLinkPopup.add(getGotoLinkNodeAction(link.getSource()));
-			arrowLinkPopup.add(getGotoLinkNodeAction(link.getTarget()));
+  /** */
+  private GotoLinkNodeAction getGotoLinkNodeAction(MindMapNode destination) {
+    return new GotoLinkNodeAction(this, destination);
+  }
 
-			arrowLinkPopup.addSeparator();
-			// add all links from target and from source:
-			HashSet<MindMapNode> nodeAlreadyVisited = new HashSet<>();
-			nodeAlreadyVisited.add(link.getSource());
-			nodeAlreadyVisited.add(link.getTarget());
-			Vector<MindMapLink> links = getModel().getLinkRegistry().getAllLinks(link.getSource());
-			links.addAll(getModel().getLinkRegistry().getAllLinks(link.getTarget()));
-			for (MindMapLink mindMapLink : links) {
-				BrowseArrowLinkModel foreign_link = (BrowseArrowLinkModel) mindMapLink;
-				if (nodeAlreadyVisited.add(foreign_link.getTarget())) {
-					arrowLinkPopup.add(getGotoLinkNodeAction(foreign_link.getTarget()));
-				}
-				if (nodeAlreadyVisited.add(foreign_link.getSource())) {
-					arrowLinkPopup.add(getGotoLinkNodeAction(foreign_link.getSource()));
-				}
-			}
-			return arrowLinkPopup;
-		}
-		return null;
-	}
+  public JToolBar getModeToolBar() {
+    return getToolBar();
+  }
 
-	/**
-	 */
-	private GotoLinkNodeAction getGotoLinkNodeAction(MindMapNode destination) {
-		return new GotoLinkNodeAction(this, destination);
-	}
+  BrowseToolBar getToolBar() {
+    return (BrowseToolBar) toolbar;
+  }
 
-	public JToolBar getModeToolBar() {
-		return getToolBar();
-	}
+  // public void loadURL(String relative) {
+  // // copy from mind map controller:
+  // if (relative.startsWith("#")) {
+  // // inner map link, fc, 12.10.2004
+  // String target = relative.substring(1);
+  // try {
+  // MindMapNode node = getNodeFromID(target);
+  // centerNode(node);
+  // return;
+  // } catch (Exception e) {
+  // // bad luck.
+  // getFrame().out(Tools.expandPlaceholders(getText("link_not_found"),
+  // target));
+  // return;
+  // }
+  // }
+  //
+  // URL absolute = null;
+  // try {
+  // absolute = new URL(getMap().getURL(), relative);
+  // getFrame().out(absolute.toString());
+  // } catch (MalformedURLException ex) {
+  // freemind.main.Resources.getInstance().logExecption(ex);
+  // getController().errorMessage(
+  // getText("url_error") + " " + ex.getMessage());
+  // // getFrame().err(getText("url_error"));
+  // return;
+  // }
+  //
+  // String type = Tools.getExtension(absolute.getFile());
+  // try {
+  // if
+  // (type.equals(freemind.main.FreeMindCommon.FREEMIND_FILE_EXTENSION_WITHOUT_DOT))
+  // {
+  // getFrame().setWaitingCursor(true);
+  // load(absolute);
+  // } else {
+  // getFrame().openDocument(absolute);
+  // }
+  // } catch (Exception ex) {
+  // getController().errorMessage(getText("url_load_error") + absolute);
+  // freemind.main.Resources.getInstance().logExecption( ex);
+  // // for some reason, this exception is thrown anytime...
+  // } finally {
+  // getFrame().setWaitingCursor(false);
+  // }
+  //
+  // }
 
-	BrowseToolBar getToolBar() {
-		return (BrowseToolBar) toolbar;
-	}
+  public ModeController load(URL url) throws IOException, XMLParseException, URISyntaxException {
+    ModeController newModeController = (ModeController) super.load(url);
+    // decorator pattern.
+    ((BrowseToolBar) newModeController.getModeToolBar()).setURLField(url.toString());
+    return newModeController;
+  }
 
-	// public void loadURL(String relative) {
-	// // copy from mind map controller:
-	// if (relative.startsWith("#")) {
-	// // inner map link, fc, 12.10.2004
-	// String target = relative.substring(1);
-	// try {
-	// MindMapNode node = getNodeFromID(target);
-	// centerNode(node);
-	// return;
-	// } catch (Exception e) {
-	// // bad luck.
-	// getFrame().out(Tools.expandPlaceholders(getText("link_not_found"),
-	// target));
-	// return;
-	// }
-	// }
-	//
-	// URL absolute = null;
-	// try {
-	// absolute = new URL(getMap().getURL(), relative);
-	// getFrame().out(absolute.toString());
-	// } catch (MalformedURLException ex) {
-	// freemind.main.Resources.getInstance().logExecption(ex);
-	// getController().errorMessage(
-	// getText("url_error") + " " + ex.getMessage());
-	// // getFrame().err(getText("url_error"));
-	// return;
-	// }
-	//
-	// String type = Tools.getExtension(absolute.getFile());
-	// try {
-	// if
-	// (type.equals(freemind.main.FreeMindCommon.FREEMIND_FILE_EXTENSION_WITHOUT_DOT))
-	// {
-	// getFrame().setWaitingCursor(true);
-	// load(absolute);
-	// } else {
-	// getFrame().openDocument(absolute);
-	// }
-	// } catch (Exception ex) {
-	// getController().errorMessage(getText("url_load_error") + absolute);
-	// freemind.main.Resources.getInstance().logExecption( ex);
-	// // for some reason, this exception is thrown anytime...
-	// } finally {
-	// getFrame().setWaitingCursor(false);
-	// }
-	//
-	// }
+  public ModeController load(File pFile) throws IOException {
+    ModeController newModeController = (ModeController) super.load(pFile);
+    // decorator pattern.
+    ((BrowseToolBar) newModeController.getModeToolBar())
+        .setURLField(Tools.fileToUrl(pFile).toString());
+    return newModeController;
+  }
 
-	public ModeController load(URL url) throws IOException, XMLParseException, URISyntaxException {
-		ModeController newModeController = (ModeController) super.load(url);
-		// decorator pattern.
-		((BrowseToolBar) newModeController.getModeToolBar()).setURLField(url.toString());
-		return newModeController;
-	}
+  public void newMap(MindMap mapModel, ModeController modeController) {
+    setNoteIcon(mapModel.getRootNode());
+    super.newMap(mapModel, modeController);
+  }
 
-	public ModeController load(File pFile) throws IOException {
-		ModeController newModeController = (ModeController) super.load(pFile);
-		// decorator pattern.
-		((BrowseToolBar) newModeController.getModeToolBar())
-				.setURLField(Tools.fileToUrl(pFile).toString());
-		return newModeController;
-	}
+  private void setNoteIcon(MindMapNode node) {
+    String noteText = node.getNoteText();
+    if (noteText != null && !noteText.isEmpty()) {
+      // icon
+      if (noteIcon == null) {
+        noteIcon =
+            freemind.view.ImageFactory.getInstance()
+                .createUnscaledIcon(getController().getResource("images/knotes.png"));
+      }
+      node.setStateIcon(NodeNoteBase.NODE_NOTE_ICON, noteIcon);
+    }
+    ListIterator<? extends MindMapNode> children = node.childrenUnfolded();
+    while (children.hasNext()) {
+      setNoteIcon(children.next());
+    }
+  }
 
-	public void newMap(MindMap mapModel, ModeController modeController) {
-		setNoteIcon(mapModel.getRootNode());
-		super.newMap(mapModel, modeController);
-	}
+  /** Enabled/Disabled all actions that are dependent on whether there is a map open or not. */
+  protected void setAllActions(boolean enabled) {
+    super.setAllActions(enabled);
+    toggleFolded.setEnabled(enabled);
+    toggleChildrenFolded.setEnabled(enabled);
+    followLink.setEnabled(enabled);
+  }
 
-	private void setNoteIcon(MindMapNode node) {
-		String noteText = node.getNoteText();
-		if (noteText != null && !noteText.isEmpty()) {
-			// icon
-			if (noteIcon == null) {
-				noteIcon = freemind.view.ImageFactory.getInstance()
-						.createUnscaledIcon(getController().getResource("images/knotes.png"));
-			}
-			node.setStateIcon(NodeNoteBase.NODE_NOTE_ICON, noteIcon);
-		}
-		ListIterator<? extends MindMapNode> children = node.childrenUnfolded();
-		while (children.hasNext()) {
-			setNoteIcon(children.next());
-		}
+  // ////////
+  // Actions
+  // ///////
 
-	}
+  private class FollowLinkAction extends AbstractAction {
+    FollowLinkAction() {
+      super(getText("follow_link"));
+    }
 
-	/**
-	 * Enabled/Disabled all actions that are dependent on whether there is a map open or not.
-	 */
-	protected void setAllActions(boolean enabled) {
-		super.setAllActions(enabled);
-		toggleFolded.setEnabled(enabled);
-		toggleChildrenFolded.setEnabled(enabled);
-		followLink.setEnabled(enabled);
-	}
+    public void actionPerformed(ActionEvent e) {
+      loadURL();
+    }
+  }
 
-	// ////////
-	// Actions
-	// ///////
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.ModeController#updateMenus(freemind.controller. StructuredMenuHolder)
+   */
+  public void updateMenus(StructuredMenuHolder holder) {
+    add(holder, MenuBar.EDIT_MENU + "/find/find", find, "keystroke_find");
+    add(holder, MenuBar.EDIT_MENU + "/find/findNext", findNext, "keystroke_find_next");
+    add(holder, MenuBar.EDIT_MENU + "/find/followLink", followLink, "keystroke_follow_link");
+    holder.addSeparator(MenuBar.EDIT_MENU + "/find");
+    add(holder, MenuBar.EDIT_MENU + "/find/toggleFolded", toggleFolded, "keystroke_toggle_folded");
+    add(
+        holder,
+        MenuBar.EDIT_MENU + "/find/toggleChildrenFolded",
+        toggleChildrenFolded,
+        "keystroke_toggle_children_folded");
+  }
 
-	private class FollowLinkAction extends AbstractAction {
-		FollowLinkAction() {
-			super(getText("follow_link"));
-		}
+  public HookFactory getHookFactory() {
+    return mBrowseHookFactory;
+  }
 
-		public void actionPerformed(ActionEvent e) {
-			loadURL();
-		}
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.ControllerAdapter#loadInternally(java.net.URL, freemind.modes.MapAdapter)
+   */
+  @Override
+  protected void loadInternally(URL url, MapAdapter pModel) throws XMLParseException, IOException {
+    ((BrowseMapModel) pModel).setURL(url);
+    BrowseNodeModel root = loadTree(url);
+    if (root != null) {
+      pModel.setRoot(root);
+    } else {
+      // System.err.println("Err:"+root.toString());
+      throw new IOException();
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.ModeController#updateMenus(freemind.controller. StructuredMenuHolder)
-	 */
-	public void updateMenus(StructuredMenuHolder holder) {
-		add(holder, MenuBar.EDIT_MENU + "/find/find", find, "keystroke_find");
-		add(holder, MenuBar.EDIT_MENU + "/find/findNext", findNext, "keystroke_find_next");
-		add(holder, MenuBar.EDIT_MENU + "/find/followLink", followLink, "keystroke_follow_link");
-		holder.addSeparator(MenuBar.EDIT_MENU + "/find");
-		add(holder, MenuBar.EDIT_MENU + "/find/toggleFolded", toggleFolded,
-				"keystroke_toggle_folded");
-		add(holder, MenuBar.EDIT_MENU + "/find/toggleChildrenFolded", toggleChildrenFolded,
-				"keystroke_toggle_children_folded");
-	}
+  BrowseNodeModel loadTree(URL url) {
+    BrowseNodeModel root = null;
 
-	public HookFactory getHookFactory() {
-		return mBrowseHookFactory;
-	}
+    InputStreamReader urlStreamReader = null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.ControllerAdapter#loadInternally(java.net.URL, freemind.modes.MapAdapter)
-	 */
-	@Override
-	protected void loadInternally(URL url, MapAdapter pModel)
-			throws XMLParseException, IOException {
-		((BrowseMapModel) pModel).setURL(url);
-		BrowseNodeModel root = loadTree(url);
-		if (root != null) {
-			pModel.setRoot(root);
-		} else {
-			// System.err.println("Err:"+root.toString());
-			throw new IOException();
-		}
-	}
+    try {
+      urlStreamReader = new InputStreamReader(url.openStream());
+    } catch (Exception ex) {
+      getFrame().getController().errorMessage("Could not open URL " + url.toString() + ".");
+      System.err.println(ex);
+      // freemind.main.Resources.getInstance().logExecption(ex);
+      return null;
+    }
 
-	BrowseNodeModel loadTree(URL url) {
-		BrowseNodeModel root = null;
+    try {
+      HashMap<String, NodeAdapter> IDToTarget = new HashMap<>();
+      root = (BrowseNodeModel) getMap().createNodeTreeFromXml(urlStreamReader, IDToTarget);
+      urlStreamReader.close();
+      return root;
+    } catch (Exception ex) {
+      System.err.println(ex);
+      return null;
+    }
+  }
 
-		InputStreamReader urlStreamReader = null;
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap.MapFeedback#out(java.lang.String)
+   */
+  @Override
+  public void out(String pFormat) {
+    // TODO Auto-generated method stub
 
-		try {
-			urlStreamReader = new InputStreamReader(url.openStream());
-		} catch (Exception ex) {
-			getFrame().getController().errorMessage("Could not open URL " + url.toString() + ".");
-			System.err.println(ex);
-			// freemind.main.Resources.getInstance().logExecption(ex);
-			return null;
-		}
-
-		try {
-			HashMap<String, NodeAdapter> IDToTarget = new HashMap<>();
-			root = (BrowseNodeModel) getMap().createNodeTreeFromXml(urlStreamReader, IDToTarget);
-			urlStreamReader.close();
-			return root;
-		} catch (Exception ex) {
-			System.err.println(ex);
-			return null;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap.MapFeedback#out(java.lang.String)
-	 */
-	@Override
-	public void out(String pFormat) {
-		// TODO Auto-generated method stub
-
-	}
-
+  }
 }

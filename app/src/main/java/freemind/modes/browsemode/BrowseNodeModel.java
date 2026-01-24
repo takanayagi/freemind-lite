@@ -30,26 +30,26 @@ import freemind.modes.NodeAdapter;
  */
 public class BrowseNodeModel extends NodeAdapter {
 
-	//
-	// Constructors
-	//
+  //
+  // Constructors
+  //
 
-	public BrowseNodeModel(Object userObject, MindMap map) {
-		super(userObject, map);
-		children = new LinkedList<>();
-		setEdge(new BrowseEdgeModel(this, getMapFeedback()));
-	}
+  public BrowseNodeModel(Object userObject, MindMap map) {
+    super(userObject, map);
+    children = new LinkedList<>();
+    setEdge(new BrowseEdgeModel(this, getMapFeedback()));
+  }
 
-	//
-	// The mandatory load and save methods
-	//
+  //
+  // The mandatory load and save methods
+  //
 
-	// NanoXML save method
-	public XMLElement save() {
-		return null;
-	}
+  // NanoXML save method
+  public XMLElement save() {
+    return null;
+  }
 
-	public boolean isWriteable() {
-		return false;
-	}
+  public boolean isWriteable() {
+    return false;
+  }
 }

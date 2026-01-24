@@ -27,34 +27,34 @@ import freemind.main.XMLElement;
 import freemind.modes.MindMapNode;
 
 class NodeContainsCondition extends NodeCondition {
-	static final String VALUE = "value";
-	static final String NAME = "node_contains_condition";
-	private String value;
+  static final String VALUE = "value";
+  static final String NAME = "node_contains_condition";
+  private String value;
 
-	NodeContainsCondition(String value) {
-		super();
-		this.value = value;
-	}
+  NodeContainsCondition(String value) {
+    super();
+    this.value = value;
+  }
 
-	public boolean checkNode(Controller c, MindMapNode node) {
-		return node.getText().contains(value);
-	}
+  public boolean checkNode(Controller c, MindMapNode node) {
+    return node.getText().contains(value);
+  }
 
-	public void save(XMLElement element) {
-		XMLElement child = new XMLElement();
-		child.setName(NAME);
-		super.saveAttributes(child);
-		child.setAttribute(VALUE, value);
-		element.addChild(child);
-	}
+  public void save(XMLElement element) {
+    XMLElement child = new XMLElement();
+    child.setName(NAME);
+    super.saveAttributes(child);
+    child.setAttribute(VALUE, value);
+    element.addChild(child);
+  }
 
-	static Condition load(XMLElement element) {
-		return new NodeContainsCondition(element.getStringAttribute(VALUE));
-	}
+  static Condition load(XMLElement element) {
+    return new NodeContainsCondition(element.getStringAttribute(VALUE));
+  }
 
-	protected String createDesctiption() {
-		final String nodeCondition = ConditionFactory.FILTER_NODE.getName();
-		final String simpleCondition = ConditionFactory.FILTER_CONTAINS.getName();
-		return ConditionFactory.createDescription(nodeCondition, simpleCondition, value, false);
-	}
+  protected String createDesctiption() {
+    final String nodeCondition = ConditionFactory.FILTER_NODE.getName();
+    final String simpleCondition = ConditionFactory.FILTER_CONTAINS.getName();
+    return ConditionFactory.createDescription(nodeCondition, simpleCondition, value, false);
+  }
 }

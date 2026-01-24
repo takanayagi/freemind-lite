@@ -30,59 +30,57 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
 
 public class InsertAttributeActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public InsertAttributeActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public InsertAttributeActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof InsertAttributeAction setAttributeAction) {
-			NodeAdapter node = getNodeFromID(setAttributeAction.getNode());
-			Attribute newAttribute =
-					new Attribute(setAttributeAction.getName(), setAttributeAction.getValue());
-			int position = setAttributeAction.getPosition();
-			node.checkAttributePosition(position);
-			node.insertAttribute(position, newAttribute);
-			getExMapFeedback().nodeChanged(node);
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof InsertAttributeAction setAttributeAction) {
+      NodeAdapter node = getNodeFromID(setAttributeAction.getNode());
+      Attribute newAttribute =
+          new Attribute(setAttributeAction.getName(), setAttributeAction.getValue());
+      int position = setAttributeAction.getPosition();
+      node.checkAttributePosition(position);
+      node.insertAttribute(position, newAttribute);
+      getExMapFeedback().nodeChanged(node);
+    }
+  }
 
-	public Class<InsertAttributeAction> getDoActionClass() {
-		return InsertAttributeAction.class;
-	}
+  public Class<InsertAttributeAction> getDoActionClass() {
+    return InsertAttributeAction.class;
+  }
 
-	public ActionPair getActionPair(MindMapNode selected, int pPosition, Attribute pAttribute) {
-		InsertAttributeAction insertAttributeAction =
-				getInsertAttributeAction(selected, pPosition, pAttribute);
-		RemoveAttributeAction undoInsertAttributeAction = getXmlActorFactory()
-				.getRemoveAttributeActor().getRemoveAttributeAction(selected, pPosition);
-		return new ActionPair(insertAttributeAction, undoInsertAttributeAction);
-	}
+  public ActionPair getActionPair(MindMapNode selected, int pPosition, Attribute pAttribute) {
+    InsertAttributeAction insertAttributeAction =
+        getInsertAttributeAction(selected, pPosition, pAttribute);
+    RemoveAttributeAction undoInsertAttributeAction =
+        getXmlActorFactory()
+            .getRemoveAttributeActor()
+            .getRemoveAttributeAction(selected, pPosition);
+    return new ActionPair(insertAttributeAction, undoInsertAttributeAction);
+  }
 
-	/**
-	 * @param pSelected
-	 * @param pPosition
-	 * @param pAttribute
-	 * @return
-	 */
-	public InsertAttributeAction getInsertAttributeAction(MindMapNode pSelected, int pPosition,
-			Attribute pAttribute) {
-		InsertAttributeAction insertAttributeAction = new InsertAttributeAction();
-		insertAttributeAction.setNode(getNodeID(pSelected));
-		insertAttributeAction.setName(pAttribute.getName());
-		insertAttributeAction.setValue(pAttribute.getValue());
-		insertAttributeAction.setPosition(pPosition);
-		return insertAttributeAction;
-	}
+  /**
+   * @param pSelected
+   * @param pPosition
+   * @param pAttribute
+   * @return
+   */
+  public InsertAttributeAction getInsertAttributeAction(
+      MindMapNode pSelected, int pPosition, Attribute pAttribute) {
+    InsertAttributeAction insertAttributeAction = new InsertAttributeAction();
+    insertAttributeAction.setNode(getNodeID(pSelected));
+    insertAttributeAction.setName(pAttribute.getName());
+    insertAttributeAction.setValue(pAttribute.getValue());
+    insertAttributeAction.setPosition(pPosition);
+    return insertAttributeAction;
+  }
 
-	public void insertAttribute(MindMapNode pNode, int pPosition, Attribute pAttribute) {
-		ActionPair actionPair = getActionPair(pNode, pPosition, pAttribute);
-		execute(actionPair);
-
-	}
-
-
-
+  public void insertAttribute(MindMapNode pNode, int pPosition, Attribute pAttribute) {
+    ActionPair actionPair = getActionPair(pNode, pPosition, pAttribute);
+    execute(actionPair);
+  }
 }

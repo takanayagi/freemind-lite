@@ -27,51 +27,50 @@ import javax.swing.event.PopupMenuListener;
 
 public class BrowsePopupMenu extends JPopupMenu implements PopupMenuListener {
 
-	private BrowseController c;
+  private BrowseController c;
 
-	protected void add(Action action, String keystroke) {
-		JMenuItem item = add(action);
-		item.setAccelerator(KeyStroke.getKeyStroke(c.getFrame().getAdjustableProperty(keystroke)));
-	}
+  protected void add(Action action, String keystroke) {
+    JMenuItem item = add(action);
+    item.setAccelerator(KeyStroke.getKeyStroke(c.getFrame().getAdjustableProperty(keystroke)));
+  }
 
-	public BrowsePopupMenu(BrowseController c) {
-		this.c = c;
-		add(c.find, "keystroke_find");
-		add(c.findNext, "keystroke_find_next");
-		add(c.followLink, "keystroke_follow_link");
+  public BrowsePopupMenu(BrowseController c) {
+    this.c = c;
+    add(c.find, "keystroke_find");
+    add(c.findNext, "keystroke_find_next");
+    add(c.followLink, "keystroke_follow_link");
 
-		addSeparator();
+    addSeparator();
 
-		add(c.toggleFolded, "keystroke_toggle_folded");
-		add(c.toggleChildrenFolded, "keystroke_toggle_children_folded");
-		addSeparator();
-		add(c.followMapLink, "keystroke_follow_map_link");
-		addPopupMenuListener(this);
-	}
+    add(c.toggleFolded, "keystroke_toggle_folded");
+    add(c.toggleChildrenFolded, "keystroke_toggle_children_folded");
+    addSeparator();
+    add(c.followMapLink, "keystroke_follow_map_link");
+    addPopupMenuListener(this);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.
-	 * event.PopupMenuEvent)
-	 */
-	public void popupMenuWillBecomeVisible(PopupMenuEvent pE) {
-		c.followMapLink.setEnabled(c.followMapLink.isEnabled(null, null));
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.
+   * event.PopupMenuEvent)
+   */
+  public void popupMenuWillBecomeVisible(PopupMenuEvent pE) {
+    c.followMapLink.setEnabled(c.followMapLink.isEnabled(null, null));
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.
-	 * event.PopupMenuEvent)
-	 */
-	public void popupMenuWillBecomeInvisible(PopupMenuEvent pE) {}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.
+   * event.PopupMenuEvent)
+   */
+  public void popupMenuWillBecomeInvisible(PopupMenuEvent pE) {}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event. PopupMenuEvent)
-	 */
-	public void popupMenuCanceled(PopupMenuEvent pE) {}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event. PopupMenuEvent)
+   */
+  public void popupMenuCanceled(PopupMenuEvent pE) {}
 }

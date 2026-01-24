@@ -28,12 +28,10 @@ import freemind.modes.mindmapmode.actions.NodeActorXml;
  */
 public abstract class NodeXmlActorAdapter extends XmlActorAdapter implements NodeActorXml {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public NodeXmlActorAdapter(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
-
-
+  /**
+   * @param pMapFeedback
+   */
+  public NodeXmlActorAdapter(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 }

@@ -32,57 +32,54 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class NodeStyleActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public NodeStyleActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public NodeStyleActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public Class<NodeStyleFormatAction> getDoActionClass() {
-		return NodeStyleFormatAction.class;
-	}
+  public Class<NodeStyleFormatAction> getDoActionClass() {
+    return NodeStyleFormatAction.class;
+  }
 
-	public void setStyle(MindMapNode node, String style) {
-		if (style == null) {
-			execute(getActionPair(node, null));
-			return;
-		}
-		for (int i = 0; i < MindMapNode.NODE_STYLES.length; i++) {
-			String dstyle = MindMapNode.NODE_STYLES[i];
-			if (Tools.safeEquals(style, dstyle)) {
-				execute(getActionPair(node, style));
-				return;
-			}
-		}
-		throw new IllegalArgumentException("Unknown style " + style);
-	}
+  public void setStyle(MindMapNode node, String style) {
+    if (style == null) {
+      execute(getActionPair(node, null));
+      return;
+    }
+    for (int i = 0; i < MindMapNode.NODE_STYLES.length; i++) {
+      String dstyle = MindMapNode.NODE_STYLES[i];
+      if (Tools.safeEquals(style, dstyle)) {
+        execute(getActionPair(node, style));
+        return;
+      }
+    }
+    throw new IllegalArgumentException("Unknown style " + style);
+  }
 
-	public ActionPair getActionPair(MindMapNode targetNode, String style) {
-		NodeStyleFormatAction styleAction = createNodeStyleFormatAction(targetNode, style);
-		NodeStyleFormatAction undoStyleAction =
-				createNodeStyleFormatAction(targetNode, targetNode.getStyle());
-		return new ActionPair(styleAction, undoStyleAction);
-	}
+  public ActionPair getActionPair(MindMapNode targetNode, String style) {
+    NodeStyleFormatAction styleAction = createNodeStyleFormatAction(targetNode, style);
+    NodeStyleFormatAction undoStyleAction =
+        createNodeStyleFormatAction(targetNode, targetNode.getStyle());
+    return new ActionPair(styleAction, undoStyleAction);
+  }
 
-	private NodeStyleFormatAction createNodeStyleFormatAction(MindMapNode selected, String style) {
-		NodeStyleFormatAction nodeStyleAction = new NodeStyleFormatAction();
-		nodeStyleAction.setNode(getNodeID(selected));
-		nodeStyleAction.setStyle(style);
-		return nodeStyleAction;
-	}
+  private NodeStyleFormatAction createNodeStyleFormatAction(MindMapNode selected, String style) {
+    NodeStyleFormatAction nodeStyleAction = new NodeStyleFormatAction();
+    nodeStyleAction.setNode(getNodeID(selected));
+    nodeStyleAction.setStyle(style);
+    return nodeStyleAction;
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof NodeStyleFormatAction nodeStyleAction) {
-			MindMapNode node = getNodeFromID(nodeStyleAction.getNode());
-			String style = nodeStyleAction.getStyle();
-			if (!Tools.safeEquals(node.hasStyle() ? node.getBareStyle() : null, style)) {
-				node.setStyle(style);
-				getExMapFeedback().nodeStyleChanged(node);
-			}
-		}
-	}
-
-
-
+  public void act(XmlAction action) {
+    if (action instanceof NodeStyleFormatAction nodeStyleAction) {
+      MindMapNode node = getNodeFromID(nodeStyleAction.getNode());
+      String style = nodeStyleAction.getStyle();
+      if (!Tools.safeEquals(node.hasStyle() ? node.getBareStyle() : null, style)) {
+        node.setStyle(style);
+        getExMapFeedback().nodeStyleChanged(node);
+      }
+    }
+  }
 }

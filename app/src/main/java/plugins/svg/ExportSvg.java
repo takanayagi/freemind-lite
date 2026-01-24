@@ -34,37 +34,37 @@ import freemind.view.mindmapview.MapView;
 
 /**
  * @author foltin
- * 
  */
 public class ExportSvg extends ExportVectorGraphic {
 
-	public void startupMapHook() {
-		super.startupMapHook();
-		File chosenFile = chooseFile("svg", getResourceString("export_svg_text"), null);
-		if (chosenFile == null) {
-			return;
-		}
-		try {
-			MapView view = getController().getView();
-			if (view == null)
-				return;
+  public void startupMapHook() {
+    super.startupMapHook();
+    File chosenFile = chooseFile("svg", getResourceString("export_svg_text"), null);
+    if (chosenFile == null) {
+      return;
+    }
+    try {
+      MapView view = getController().getView();
+      if (view == null) return;
 
-			getController().getFrame().setWaitingCursor(true);
+      getController().getFrame().setWaitingCursor(true);
 
-			SVGGraphics2D g2d = fillSVGGraphics2D(view);
-			FileOutputStream bos = new FileOutputStream(chosenFile);
-			final BufferedOutputStream bufStream = new BufferedOutputStream(bos);
-			OutputStreamWriter osw = new OutputStreamWriter(bufStream, "UTF-8");
-			g2d.stream(osw);
-			osw.flush();
-			bos.flush();
-			bos.close();
-		} catch (Exception e) {
-			freemind.main.Resources.getInstance().logException(e);
-			JOptionPane.showMessageDialog(getController().getFrame().getContentPane(),
-					e.getLocalizedMessage(), null, JOptionPane.ERROR_MESSAGE);
-		}
-		getController().getFrame().setWaitingCursor(false);
-	}
-
+      SVGGraphics2D g2d = fillSVGGraphics2D(view);
+      FileOutputStream bos = new FileOutputStream(chosenFile);
+      final BufferedOutputStream bufStream = new BufferedOutputStream(bos);
+      OutputStreamWriter osw = new OutputStreamWriter(bufStream, "UTF-8");
+      g2d.stream(osw);
+      osw.flush();
+      bos.flush();
+      bos.close();
+    } catch (Exception e) {
+      freemind.main.Resources.getInstance().logException(e);
+      JOptionPane.showMessageDialog(
+          getController().getFrame().getContentPane(),
+          e.getLocalizedMessage(),
+          null,
+          JOptionPane.ERROR_MESSAGE);
+    }
+    getController().getFrame().setWaitingCursor(false);
+  }
 }

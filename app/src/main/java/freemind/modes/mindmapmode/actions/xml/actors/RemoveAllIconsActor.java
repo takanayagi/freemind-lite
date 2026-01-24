@@ -34,47 +34,47 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class RemoveAllIconsActor extends NodeXmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public RemoveAllIconsActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public RemoveAllIconsActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public RemoveAllIconsXmlAction createRemoveAllIconsXmlAction(MindMapNode node) {
-		RemoveAllIconsXmlAction action = new RemoveAllIconsXmlAction();
-		action.setNode(getNodeID(node));
-		return action;
-	}
+  public RemoveAllIconsXmlAction createRemoveAllIconsXmlAction(MindMapNode node) {
+    RemoveAllIconsXmlAction action = new RemoveAllIconsXmlAction();
+    action.setNode(getNodeID(node));
+    return action;
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof RemoveAllIconsXmlAction removeAction) {
-			MindMapNode node = getNodeFromID(removeAction.getNode());
-			while (!node.getIcons().isEmpty()) {
-				node.removeIcon(MindIcon.LAST);
-			}
-			getExMapFeedback().nodeChanged(node);
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof RemoveAllIconsXmlAction removeAction) {
+      MindMapNode node = getNodeFromID(removeAction.getNode());
+      while (!node.getIcons().isEmpty()) {
+        node.removeIcon(MindIcon.LAST);
+      }
+      getExMapFeedback().nodeChanged(node);
+    }
+  }
 
-	public void removeAllIcons(MindMapNode node) {
-		getExMapFeedback().doTransaction(this.getClass().getName(),
-				apply(getExMapFeedback().getMap(), node));
-	}
+  public void removeAllIcons(MindMapNode node) {
+    getExMapFeedback()
+        .doTransaction(this.getClass().getName(), apply(getExMapFeedback().getMap(), node));
+  }
 
-	public Class<RemoveAllIconsXmlAction> getDoActionClass() {
-		return RemoveAllIconsXmlAction.class;
-	}
+  public Class<RemoveAllIconsXmlAction> getDoActionClass() {
+    return RemoveAllIconsXmlAction.class;
+  }
 
-	public ActionPair apply(MindMap model, MindMapNode selected) {
-		CompoundAction undoAction = new CompoundAction();
-		for (MindIcon icon : selected.getIcons()) {
-			undoAction.addChoice(getExMapFeedback().getActorFactory().getAddIconActor()
-					.createAddIconAction(selected, icon, MindIcon.LAST));
-		}
-		return new ActionPair(createRemoveAllIconsXmlAction(selected), undoAction);
-	}
-
-
-
+  public ActionPair apply(MindMap model, MindMapNode selected) {
+    CompoundAction undoAction = new CompoundAction();
+    for (MindIcon icon : selected.getIcons()) {
+      undoAction.addChoice(
+          getExMapFeedback()
+              .getActorFactory()
+              .getAddIconActor()
+              .createAddIconAction(selected, icon, MindIcon.LAST));
+    }
+    return new ActionPair(createRemoveAllIconsXmlAction(selected), undoAction);
+  }
 }

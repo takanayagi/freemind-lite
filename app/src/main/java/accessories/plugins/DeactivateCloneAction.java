@@ -32,38 +32,36 @@ import freemind.modes.mindmapmode.hooks.MindMapNodeHookAdapter;
  * @date 11.10.2013
  */
 public class DeactivateCloneAction extends MindMapNodeHookAdapter
-		implements MenuItemEnabledListener {
+    implements MenuItemEnabledListener {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.NodeHookAdapter#invoke(freemind.modes.MindMapNode)
-	 */
-	public void invoke(MindMapNode pNode) {
-		super.invoke(pNode);
-		ClonePlugin hook = ClonePlugin.getHook(pNode);
-		if (hook != null) {
-			// has it been removed due to the deregister in the meantime?
-			hook = ClonePlugin.getHook(pNode);
-			if (hook != null) {
-				hook.removeHook();
-			}
-		}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.NodeHookAdapter#invoke(freemind.modes.MindMapNode)
+   */
+  public void invoke(MindMapNode pNode) {
+    super.invoke(pNode);
+    ClonePlugin hook = ClonePlugin.getHook(pNode);
+    if (hook != null) {
+      // has it been removed due to the deregister in the meantime?
+      hook = ClonePlugin.getHook(pNode);
+      if (hook != null) {
+        hook.removeHook();
+      }
+    }
+  }
 
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.MenuItemEnabledListener#isEnabled(javax.swing.JMenuItem,
+   * javax.swing.Action)
+   */
+  public boolean isEnabled(JMenuItem pItem, Action pAction) {
+    return getRegistration().isEnabled(pItem, pAction);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.MenuItemEnabledListener#isEnabled(javax.swing.JMenuItem,
-	 * javax.swing.Action)
-	 */
-	public boolean isEnabled(JMenuItem pItem, Action pAction) {
-		return getRegistration().isEnabled(pItem, pAction);
-	}
-
-	protected Registration getRegistration() {
-		return (Registration) getPluginBaseClass();
-	}
-
+  protected Registration getRegistration() {
+    return (Registration) getPluginBaseClass();
+  }
 }

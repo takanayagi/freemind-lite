@@ -25,71 +25,68 @@ import java.awt.HeadlessException;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-
 /**
  * File Chooser for OS windows and linux (without Mac)
- * 
+ *
  * @author foltin
  * @date 23.02.2012
  */
 public class FreeMindJFileDialog extends JFileChooser implements FreeMindFileDialog {
 
-	private DirectoryResultListener mDirectoryResultListener = null;
+  private DirectoryResultListener mDirectoryResultListener = null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.FreeMindFileDialog#registerDirectoryResultListener(freemind.modes.
-	 * FreeMindFileDialog.DirectoryResultListener)
-	 */
-	public void registerDirectoryResultListener(DirectoryResultListener pDirectoryResultListener) {
-		mDirectoryResultListener = pDirectoryResultListener;
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.FreeMindFileDialog#registerDirectoryResultListener(freemind.modes.
+   * FreeMindFileDialog.DirectoryResultListener)
+   */
+  public void registerDirectoryResultListener(DirectoryResultListener pDirectoryResultListener) {
+    mDirectoryResultListener = pDirectoryResultListener;
+  }
 
-	}
+  protected void callDirectoryListener(final int result) {
+    if (result == JFileChooser.APPROVE_OPTION && mDirectoryResultListener != null) {
+      try {
+        mDirectoryResultListener.setChosenDirectory(getCurrentDirectory());
+      } catch (Exception e) {
+        freemind.main.Resources.getInstance().logException(e);
+      }
+    }
+  }
 
-	protected void callDirectoryListener(final int result) {
-		if (result == JFileChooser.APPROVE_OPTION && mDirectoryResultListener != null) {
-			try {
-				mDirectoryResultListener.setChosenDirectory(getCurrentDirectory());
-			} catch (Exception e) {
-				freemind.main.Resources.getInstance().logException(e);
-			}
-		}
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.JFileChooser#showOpenDialog(java.awt.Component)
+   */
+  public int showOpenDialog(Component pParent) throws HeadlessException {
+    // TODO Auto-generated method stub
+    final int result = super.showOpenDialog(pParent);
+    callDirectoryListener(result);
+    return result;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.JFileChooser#showOpenDialog(java.awt.Component)
-	 */
-	public int showOpenDialog(Component pParent) throws HeadlessException {
-		// TODO Auto-generated method stub
-		final int result = super.showOpenDialog(pParent);
-		callDirectoryListener(result);
-		return result;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.JFileChooser#showSaveDialog(java.awt.Component)
+   */
+  public int showSaveDialog(Component pParent) throws HeadlessException {
+    final int result = super.showSaveDialog(pParent);
+    callDirectoryListener(result);
+    return result;
+  }
 
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.JFileChooser#showSaveDialog(java.awt.Component)
-	 */
-	public int showSaveDialog(Component pParent) throws HeadlessException {
-		final int result = super.showSaveDialog(pParent);
-		callDirectoryListener(result);
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * freemind.modes.FreeMindFileDialog#addChoosableFileFilterAsDefault(javax.swing.filechooser.
-	 * FileFilter)
-	 */
-	public void addChoosableFileFilterAsDefault(FileFilter pFilter) {
-		addChoosableFileFilter(pFilter);
-		setFileFilter(pFilter);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * freemind.modes.FreeMindFileDialog#addChoosableFileFilterAsDefault(javax.swing.filechooser.
+   * FileFilter)
+   */
+  public void addChoosableFileFilterAsDefault(FileFilter pFilter) {
+    addChoosableFileFilter(pFilter);
+    setFileFilter(pFilter);
+  }
 }

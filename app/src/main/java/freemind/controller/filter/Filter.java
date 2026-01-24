@@ -29,26 +29,26 @@ import freemind.modes.MindMapNode;
  * @author dimitri 07.05.2005
  */
 public interface Filter {
-	int FILTER_INITIAL_VALUE = 1;
-	int FILTER_SHOW_MATCHED = 2;
-	int FILTER_SHOW_ANCESTOR = 4;
-	int FILTER_SHOW_DESCENDANT = 8;
-	int FILTER_SHOW_ECLIPSED = 16;
-	int FILTER_SHOW_HIDDEN = 32;
+  int FILTER_INITIAL_VALUE = 1;
+  int FILTER_SHOW_MATCHED = 2;
+  int FILTER_SHOW_ANCESTOR = 4;
+  int FILTER_SHOW_DESCENDANT = 8;
+  int FILTER_SHOW_ECLIPSED = 16;
+  int FILTER_SHOW_HIDDEN = 32;
 
-	void applyFilter(Controller c);
+  void applyFilter(Controller c);
 
-	boolean isVisible(MindMapNode node);
+  boolean isVisible(MindMapNode node);
 
-	boolean areMatchedShown();
+  boolean areMatchedShown();
 
-	boolean areHiddenShown();
+  boolean areHiddenShown();
 
-	boolean areAncestorsShown();
+  boolean areAncestorsShown();
 
-	boolean areDescendantsShown();
+  boolean areDescendantsShown();
 
-	boolean areEclipsedShown();
+  boolean areEclipsedShown();
 
-	Object getCondition();
+  Object getCondition();
 }

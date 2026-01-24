@@ -33,51 +33,47 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class ChangeNoteTextActor extends XmlActorAdapter {
 
+  public ChangeNoteTextActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public ChangeNoteTextActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  public void act(XmlAction action) {
+    if (action instanceof EditNoteToNodeAction noteTextAction) {
+      MindMapNode node = getNodeFromID(noteTextAction.getNode());
+      String newText = noteTextAction.getText();
+      String oldText = node.getNoteText();
+      if (HtmlTools.compareHtmlBodies(newText, oldText) != 0) {
+        node.setNoteText(newText);
+        getExMapFeedback().nodeChanged(node);
+      }
+    }
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof EditNoteToNodeAction noteTextAction) {
-			MindMapNode node = getNodeFromID(noteTextAction.getNode());
-			String newText = noteTextAction.getText();
-			String oldText = node.getNoteText();
-			if (HtmlTools.compareHtmlBodies(newText, oldText) != 0) {
-				node.setNoteText(newText);
-				getExMapFeedback().nodeChanged(node);
-			}
-		}
-	}
+  public Class<EditNoteToNodeAction> getDoActionClass() {
+    return EditNoteToNodeAction.class;
+  }
 
-	public Class<EditNoteToNodeAction> getDoActionClass() {
-		return EditNoteToNodeAction.class;
-	}
+  public EditNoteToNodeAction createEditNoteToNodeAction(MindMapNode node, String text) {
+    EditNoteToNodeAction nodeAction = new EditNoteToNodeAction();
+    nodeAction.setNode(getNodeID(node));
+    if (text != null && (!HtmlTools.htmlToPlain(text).isEmpty() || text.contains("<img"))) {
+      nodeAction.setText(text);
+    } else {
+      nodeAction.setText(null);
+    }
+    return nodeAction;
+  }
 
-	public EditNoteToNodeAction createEditNoteToNodeAction(MindMapNode node, String text) {
-		EditNoteToNodeAction nodeAction = new EditNoteToNodeAction();
-		nodeAction.setNode(getNodeID(node));
-		if (text != null && (!HtmlTools.htmlToPlain(text).isEmpty() || text.contains("<img"))) {
-			nodeAction.setText(text);
-		} else {
-			nodeAction.setText(null);
-		}
-		return nodeAction;
-	}
-
-	public void setNoteText(MindMapNode node, String text) {
-		String oldNoteText = node.getNoteText();
-		if (HtmlTools.compareHtmlBodies(text, oldNoteText) == 0) {
-			// they are equal.
-			return;
-		}
-		logger.fine("Old Note Text:'" + oldNoteText + ", new:'" + text + "'.");
-		logger.fine(Tools.compareText(oldNoteText, text));
-		EditNoteToNodeAction doAction = createEditNoteToNodeAction(node, text);
-		EditNoteToNodeAction undoAction = createEditNoteToNodeAction(node, oldNoteText);
-		execute(new ActionPair(doAction, undoAction));
-	}
-
-
-
+  public void setNoteText(MindMapNode node, String text) {
+    String oldNoteText = node.getNoteText();
+    if (HtmlTools.compareHtmlBodies(text, oldNoteText) == 0) {
+      // they are equal.
+      return;
+    }
+    logger.fine("Old Note Text:'" + oldNoteText + ", new:'" + text + "'.");
+    logger.fine(Tools.compareText(oldNoteText, text));
+    EditNoteToNodeAction doAction = createEditNoteToNodeAction(node, text);
+    EditNoteToNodeAction undoAction = createEditNoteToNodeAction(node, oldNoteText);
+    execute(new ActionPair(doAction, undoAction));
+  }
 }

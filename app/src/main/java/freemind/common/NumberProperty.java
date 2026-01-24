@@ -27,74 +27,71 @@ import javax.swing.SpinnerNumberModel;
 import freemind.swing.FreeMindFormBuilder;
 
 public class NumberProperty extends PropertyBean implements PropertyControl {
-	String description;
-	// JSlider slider;
-	String label;
-	private JSpinner spinner;
-	private final int min;
-	private final int max;
-	private final int step;
+  String description;
+  // JSlider slider;
+  String label;
+  private JSpinner spinner;
+  private final int min;
+  private final int max;
+  private final int step;
 
-	/**
-	     */
-	public NumberProperty(String description, String label, int min, int max, int step) {
-		this.min = min;
-		this.max = max;
-		this.step = step;
-		// slider = new JSlider(JSlider.HORIZONTAL, 5, 1000, 100);
-		spinner = new JSpinner(new SpinnerNumberModel(min, min, max, step));
+  /** */
+  public NumberProperty(String description, String label, int min, int max, int step) {
+    this.min = min;
+    this.max = max;
+    this.step = step;
+    // slider = new JSlider(JSlider.HORIZONTAL, 5, 1000, 100);
+    spinner = new JSpinner(new SpinnerNumberModel(min, min, max, step));
 
-		this.description = description;
-		this.label = label;
-		spinner.addChangeListener(pE -> firePropertyChangeEvent());
+    this.description = description;
+    this.label = label;
+    spinner.addChangeListener(pE -> firePropertyChangeEvent());
+  }
 
-	}
+  @Override
+  public String getDescription() {
+    return description;
+  }
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+  @Override
+  public String getLabel() {
+    return label;
+  }
 
-	@Override
-	public String getLabel() {
-		return label;
-	}
+  @Override
+  public void setValue(String value) {
+    int intValue = min;
+    try {
+      intValue = Integer.parseInt(value);
+      int stepModule = (intValue - min) % step;
+      if (intValue < min || intValue > max || (stepModule != 0)) {
+        System.err.println(
+            "Actual value of property " + getLabel() + " is not in the allowed range: " + value);
+        intValue = min;
+      }
+    } catch (NumberFormatException e) {
+      freemind.main.Resources.getInstance().logException(e);
+    }
+    spinner.setValue(intValue);
+  }
 
-	@Override
-	public void setValue(String value) {
-		int intValue = min;
-		try {
-			intValue = Integer.parseInt(value);
-			int stepModule = (intValue - min) % step;
-			if (intValue < min || intValue > max || (stepModule != 0)) {
-				System.err.println("Actual value of property " + getLabel()
-						+ " is not in the allowed range: " + value);
-				intValue = min;
-			}
-		} catch (NumberFormatException e) {
-			freemind.main.Resources.getInstance().logException(e);
-		}
-		spinner.setValue(intValue);
-	}
+  @Override
+  public String getValue() {
+    return spinner.getValue().toString();
+  }
 
-	@Override
-	public String getValue() {
-		return spinner.getValue().toString();
-	}
+  public int getIntValue() {
+    return (Integer) (spinner.getValue());
+  }
 
-	public int getIntValue() {
-		return (Integer) (spinner.getValue());
-	}
+  @Override
+  public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
+    JLabel label = builder.append(pTranslator.getText(getLabel()), spinner);
+    label.setToolTipText(pTranslator.getText(getDescription()));
+  }
 
-	@Override
-	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
-		JLabel label = builder.append(pTranslator.getText(getLabel()), spinner);
-		label.setToolTipText(pTranslator.getText(getDescription()));
-	}
-
-	@Override
-	public void setEnabled(boolean pEnabled) {
-		spinner.setEnabled(pEnabled);
-	}
-
+  @Override
+  public void setEnabled(boolean pEnabled) {
+    spinner.setEnabled(pEnabled);
+  }
 }

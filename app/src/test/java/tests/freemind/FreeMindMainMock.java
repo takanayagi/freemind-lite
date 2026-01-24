@@ -46,187 +46,183 @@ import freemind.view.mindmapview.MapView;
 /** */
 public final class FreeMindMainMock implements FreeMindMain {
 
-	private Properties mProperties;
+  private Properties mProperties;
 
-	/**
-	 * 
-	 */
-	public FreeMindMainMock() {
-		super();
-		mProperties = new FreeMindStarter().readDefaultPreferences();
-		Resources.createInstance(this);
+  /** */
+  public FreeMindMainMock() {
+    super();
+    mProperties = new FreeMindStarter().readDefaultPreferences();
+    Resources.createInstance(this);
+  }
 
-	}
+  public JFrame getJFrame() {
+    return null;
+  }
 
-	public JFrame getJFrame() {
-		return null;
-	}
+  public boolean isApplet() {
+    return false;
+  }
 
-	public boolean isApplet() {
-		return false;
-	}
+  public MapView getView() {
+    return null;
+  }
 
-	public MapView getView() {
-		return null;
-	}
+  public void setView(MapView view) {}
 
-	public void setView(MapView view) {}
+  public Controller getController() {
+    return null;
+  }
 
-	public Controller getController() {
-		return null;
-	}
+  public void setWaitingCursor(boolean waiting) {}
 
-	public void setWaitingCursor(boolean waiting) {}
+  public File getPatternsFile() {
+    return null;
+  }
 
-	public File getPatternsFile() {
-		return null;
-	}
+  public MenuBar getFreeMindMenuBar() {
+    return null;
+  }
 
-	public MenuBar getFreeMindMenuBar() {
-		return null;
-	}
+  public ResourceBundle getResources() {
+    return null;
+  }
 
-	public ResourceBundle getResources() {
-		return null;
-	}
+  public String getResourceString(String key) {
+    return key;
+  }
 
-	public String getResourceString(String key) {
-		return key;
-	}
+  public String getResourceString(String key, String resource) {
+    return key;
+  }
 
-	public String getResourceString(String key, String resource) {
-		return key;
-	}
+  public Container getContentPane() {
+    return null;
+  }
 
-	public Container getContentPane() {
-		return null;
-	}
+  public void out(String msg) {}
 
-	public void out(String msg) {}
+  public void err(String msg) {}
 
-	public void err(String msg) {}
+  public void openDocument(URL location) throws Exception {}
 
-	public void openDocument(URL location) throws Exception {}
+  public void repaint() {}
 
-	public void repaint() {}
+  public URL getResource(String name) {
+    return ClassLoader.getSystemResource(name);
+  }
 
-	public URL getResource(String name) {
-		return ClassLoader.getSystemResource(name);
-	}
+  public int getIntProperty(String key, int defaultValue) {
+    try {
+      return Integer.parseInt(getProperty(key));
+    } catch (NumberFormatException nfe) {
+      return defaultValue;
+    }
+  }
 
-	public int getIntProperty(String key, int defaultValue) {
-		try {
-			return Integer.parseInt(getProperty(key));
-		} catch (NumberFormatException nfe) {
-			return defaultValue;
-		}
-	}
+  public Properties getProperties() {
+    return mProperties;
+  }
 
-	public Properties getProperties() {
-		return mProperties;
-	}
+  public String getProperty(String key) {
+    return mProperties.getProperty(key);
+  }
 
-	public String getProperty(String key) {
-		return mProperties.getProperty(key);
-	}
+  public void setProperty(String key, String value) {}
 
-	public void setProperty(String key, String value) {}
+  public void saveProperties(boolean pIsShutdown) {}
 
-	public void saveProperties(boolean pIsShutdown) {}
+  public String getFreemindDirectory() {
+    return ".";
+  }
 
-	public String getFreemindDirectory() {
-		return ".";
-	}
+  public JLayeredPane getLayeredPane() {
+    return null;
+  }
 
-	public JLayeredPane getLayeredPane() {
-		return null;
-	}
+  public void setTitle(String title) {}
 
-	public void setTitle(String title) {}
+  public int getWinHeight() {
+    return 0;
+  }
 
-	public int getWinHeight() {
-		return 0;
-	}
+  public int getWinWidth() {
+    return 0;
+  }
 
-	public int getWinWidth() {
-		return 0;
-	}
+  public int getWinState() {
+    return 0;
+  }
 
-	public int getWinState() {
-		return 0;
-	}
+  public int getWinX() {
+    return 0;
+  }
 
-	public int getWinX() {
-		return 0;
-	}
+  public int getWinY() {
+    return 0;
+  }
 
-	public int getWinY() {
-		return 0;
-	}
+  public VersionInformation getFreemindVersion() {
+    return new VersionInformation("1.0.0 Alpha 42");
+  }
 
-	public VersionInformation getFreemindVersion() {
-		return new VersionInformation("1.0.0 Alpha 42");
-	}
+  public Logger getLogger(String forClass) {
+    return java.util.logging.Logger.getLogger(forClass);
+  }
 
-	public Logger getLogger(String forClass) {
-		return java.util.logging.Logger.getLogger(forClass);
-	}
+  public ClassLoader getFreeMindClassLoader() {
+    ClassLoader classLoader = this.getClass().getClassLoader();
+    try {
+      return new URLClassLoader(
+          new URL[] {Tools.fileToUrl(new File(getFreemindBaseDir()))}, classLoader);
+    } catch (MalformedURLException e) {
+      freemind.main.Resources.getInstance().logException(e);
+      return classLoader;
+    }
+  }
 
-	public ClassLoader getFreeMindClassLoader() {
-		ClassLoader classLoader = this.getClass().getClassLoader();
-		try {
-			return new URLClassLoader(new URL[] {Tools.fileToUrl(new File(getFreemindBaseDir()))},
-					classLoader);
-		} catch (MalformedURLException e) {
-			freemind.main.Resources.getInstance().logException(e);
-			return classLoader;
-		}
-	}
+  public String getFreemindBaseDir() {
+    return ".";
+  }
 
-	public String getFreemindBaseDir() {
-		return ".";
-	}
+  public String getAdjustableProperty(String pLabel) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	public String getAdjustableProperty(String pLabel) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public void setDefaultProperty(String pKey, String pValue) {
+    // TODO Auto-generated method stub
 
-	public void setDefaultProperty(String pKey, String pValue) {
-		// TODO Auto-generated method stub
+  }
 
-	}
+  public JSplitPane insertComponentIntoSplitPane(JComponent pParameter) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	public JSplitPane insertComponentIntoSplitPane(JComponent pParameter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public void removeSplitPane() {
+    // TODO Auto-generated method stub
 
-	public void removeSplitPane() {
-		// TODO Auto-generated method stub
+  }
 
-	}
+  public JComponent getContentComponent() {
+    return null;
+  }
 
-	public JComponent getContentComponent() {
-		return null;
-	}
+  public JScrollPane getScrollPane() {
+    return null;
+  }
 
-	public JScrollPane getScrollPane() {
-		return null;
-	}
+  public void registerStartupDoneListener(StartupDoneListener pStartupDoneListener) {
+    // TODO Auto-generated method stub
 
-	public void registerStartupDoneListener(StartupDoneListener pStartupDoneListener) {
-		// TODO Auto-generated method stub
+  }
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.main.FreeMindMain#getLoggerList()
-	 */
-	public List<Logger> getLoggerList() {
-		return new Vector<>();
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.main.FreeMindMain#getLoggerList()
+   */
+  public List<Logger> getLoggerList() {
+    return new Vector<>();
+  }
 }

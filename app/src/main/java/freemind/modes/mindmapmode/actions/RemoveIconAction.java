@@ -19,7 +19,6 @@
  * Created on 29.09.2004
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import javax.swing.Action;
@@ -33,38 +32,34 @@ import freemind.modes.mindmapmode.MindMapController;
 
 /**
  * @author foltin
- * 
  */
 public class RemoveIconAction extends NodeGeneralAction implements IconInformation {
 
-	/**
-	 */
-	public RemoveIconAction(MindMapController modeController) {
-		super(modeController, "remove_last_icon", "images/remove.png");
-		setDoActionClass(RemoveIconXmlAction.class);
-	}
+  /** */
+  public RemoveIconAction(MindMapController modeController) {
+    super(modeController, "remove_last_icon", "images/remove.png");
+    setDoActionClass(RemoveIconXmlAction.class);
+  }
 
+  /**
+   * @param iconAction The addIconAction to set.
+   */
+  public void setIconAction(IconAction iconAction) {}
 
+  public String getDescription() {
+    return (String) getValue(Action.SHORT_DESCRIPTION);
+  }
 
-	/**
-	 * @param iconAction The addIconAction to set.
-	 */
-	public void setIconAction(IconAction iconAction) {}
+  public ImageIcon getIcon() {
+    return (ImageIcon) getValue(Action.SMALL_ICON);
+  }
 
-	public String getDescription() {
-		return (String) getValue(Action.SHORT_DESCRIPTION);
-	}
+  public KeyStroke getKeyStroke() {
+    return Tools.getKeyStroke(
+        getMindMapController().getFrame().getAdjustableProperty(getKeystrokeResourceName()));
+  }
 
-	public ImageIcon getIcon() {
-		return (ImageIcon) getValue(Action.SMALL_ICON);
-	}
-
-	public KeyStroke getKeyStroke() {
-		return Tools.getKeyStroke(getMindMapController().getFrame()
-				.getAdjustableProperty(getKeystrokeResourceName()));
-	}
-
-	public String getKeystrokeResourceName() {
-		return "keystroke_remove_last_icon";
-	}
+  public String getKeystrokeResourceName() {
+    return "keystroke_remove_last_icon";
+  }
 }

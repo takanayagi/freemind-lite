@@ -33,121 +33,118 @@ import freemind.main.Tools;
 
 /**
  * @author foltin
- * 
  */
 public class LastStateStorageManagement {
-	public static final int LIST_AMOUNT_LIMIT = 50;
-	private MindmapLastStateMapStorage mLastStatesMap = null;
-	protected static Logger logger = null;
+  public static final int LIST_AMOUNT_LIMIT = 50;
+  private MindmapLastStateMapStorage mLastStatesMap = null;
+  protected static Logger logger = null;
 
-	public LastStateStorageManagement(String pXml) {
-		if (logger == null) {
-			logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
-		}
-		try {
-			XmlAction action = Tools.unMarshall(pXml);
-			if (action != null) {
-				if (action instanceof MindmapLastStateMapStorage) {
-					mLastStatesMap = (MindmapLastStateMapStorage) action;
+  public LastStateStorageManagement(String pXml) {
+    if (logger == null) {
+      logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
+    }
+    try {
+      XmlAction action = Tools.unMarshall(pXml);
+      if (action != null) {
+        if (action instanceof MindmapLastStateMapStorage) {
+          mLastStatesMap = (MindmapLastStateMapStorage) action;
+        }
+      }
+    } catch (Exception e) {
+      freemind.main.Resources.getInstance().logException(e);
+    }
+    if (mLastStatesMap == null) {
+      logger.warning(
+          "Creating a new last state map storage as there was no old one or it was corrupt.");
+      mLastStatesMap = new MindmapLastStateMapStorage();
+    }
+  }
 
-				}
-			}
-		} catch (Exception e) {
-			freemind.main.Resources.getInstance().logException(e);
-		}
-		if (mLastStatesMap == null) {
-			logger.warning(
-					"Creating a new last state map storage as there was no old one or it was corrupt.");
-			mLastStatesMap = new MindmapLastStateMapStorage();
-		}
-	}
+  public String getXml() {
+    return Tools.marshall(mLastStatesMap);
+  }
 
-	public String getXml() {
-		return Tools.marshall(mLastStatesMap);
-	}
+  public void clearTabIndices() {
+    for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
+      store.setTabIndex(-1);
+    }
+  }
 
-	public void clearTabIndices() {
-		for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
-			store.setTabIndex(-1);
-		}
-	}
+  public void changeOrAdd(MindmapLastStateStorage pStore) {
+    boolean found = false;
+    for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
+      if (Tools.safeEquals(pStore.getRestorableName(), store.getRestorableName())) {
+        // deep copy
+        store.setLastZoom(pStore.getLastZoom());
+        store.setLastSelected(pStore.getLastSelected());
+        store.setX(pStore.getX());
+        store.setY(pStore.getY());
+        Vector<NodeListMember> listCopy = new Vector<>(pStore.getListNodeListMemberList());
+        store.clearNodeListMemberList();
+        for (NodeListMember member : listCopy) {
+          store.addNodeListMember(member);
+        }
+        found = true;
+        setLastChanged(store);
+        break;
+      }
+    }
+    if (!found) {
+      setLastChanged(pStore);
+      mLastStatesMap.addMindmapLastStateStorage(pStore);
+    }
+    // size limit
+    if (mLastStatesMap.sizeMindmapLastStateStorageList() > LIST_AMOUNT_LIMIT) {
+      // make map from date to object:
+      TreeMap<Long, MindmapLastStateStorage> dateToStoreMap = new TreeMap<>();
+      for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
+        dateToStoreMap.put(-store.getLastChanged(), store);
+      }
+      // clear list
+      mLastStatesMap.clearMindmapLastStateStorageList();
+      // rebuild
+      int counter = 0;
+      for (Entry<Long, MindmapLastStateStorage> entry : dateToStoreMap.entrySet()) {
+        mLastStatesMap.addMindmapLastStateStorage(entry.getValue());
+        counter++;
+        if (counter >= LIST_AMOUNT_LIMIT) {
+          // drop the rest of the elements.
+          break;
+        }
+      }
+    }
+  }
 
-	public void changeOrAdd(MindmapLastStateStorage pStore) {
-		boolean found = false;
-		for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
-			if (Tools.safeEquals(pStore.getRestorableName(), store.getRestorableName())) {
-				// deep copy
-				store.setLastZoom(pStore.getLastZoom());
-				store.setLastSelected(pStore.getLastSelected());
-				store.setX(pStore.getX());
-				store.setY(pStore.getY());
-				Vector<NodeListMember> listCopy = new Vector<>(pStore.getListNodeListMemberList());
-				store.clearNodeListMemberList();
-				for (NodeListMember member : listCopy) {
-					store.addNodeListMember(member);
-				}
-				found = true;
-				setLastChanged(store);
-				break;
-			}
-		}
-		if (!found) {
-			setLastChanged(pStore);
-			mLastStatesMap.addMindmapLastStateStorage(pStore);
-		}
-		// size limit
-		if (mLastStatesMap.sizeMindmapLastStateStorageList() > LIST_AMOUNT_LIMIT) {
-			// make map from date to object:
-			TreeMap<Long, MindmapLastStateStorage> dateToStoreMap = new TreeMap<>();
-			for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
-				dateToStoreMap.put(-store.getLastChanged(), store);
-			}
-			// clear list
-			mLastStatesMap.clearMindmapLastStateStorageList();
-			// rebuild
-			int counter = 0;
-			for (Entry<Long, MindmapLastStateStorage> entry : dateToStoreMap.entrySet()) {
-				mLastStatesMap.addMindmapLastStateStorage(entry.getValue());
-				counter++;
-				if (counter >= LIST_AMOUNT_LIMIT) {
-					// drop the rest of the elements.
-					break;
-				}
-			}
-		}
-	}
+  private void setLastChanged(MindmapLastStateStorage pStore) {
+    pStore.setLastChanged(System.currentTimeMillis());
+  }
 
-	private void setLastChanged(MindmapLastStateStorage pStore) {
-		pStore.setLastChanged(System.currentTimeMillis());
-	}
+  public MindmapLastStateStorage getStorage(String pRestorableName) {
+    for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
+      if (Tools.safeEquals(pRestorableName, store.getRestorableName())) {
+        setLastChanged(store);
+        return store;
+      }
+    }
+    return null;
+  }
 
-	public MindmapLastStateStorage getStorage(String pRestorableName) {
-		for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
-			if (Tools.safeEquals(pRestorableName, store.getRestorableName())) {
-				setLastChanged(store);
-				return store;
-			}
-		}
-		return null;
-	}
+  public List<MindmapLastStateStorage> getLastOpenList() {
+    Vector<MindmapLastStateStorage> ret = new Vector<>();
+    for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
+      if (store.getTabIndex() >= 0) {
+        ret.add(store);
+      }
+    }
+    ret.sort(Comparator.comparingInt(MindmapLastStateStorage::getTabIndex));
+    return ret;
+  }
 
-	public List<MindmapLastStateStorage> getLastOpenList() {
-		Vector<MindmapLastStateStorage> ret = new Vector<>();
-		for (MindmapLastStateStorage store : mLastStatesMap.getListMindmapLastStateStorageList()) {
-			if (store.getTabIndex() >= 0) {
-				ret.add(store);
-			}
-		}
-		ret.sort(Comparator.comparingInt(MindmapLastStateStorage::getTabIndex));
-		return ret;
-	}
+  public int getLastFocussedTab() {
+    return mLastStatesMap.getLastFocusedTab();
+  }
 
-	public int getLastFocussedTab() {
-		return mLastStatesMap.getLastFocusedTab();
-	}
-
-	public void setLastFocussedTab(int pIndex) {
-		mLastStatesMap.setLastFocusedTab(pIndex);
-	}
-
+  public void setLastFocussedTab(int pIndex) {
+    mLastStatesMap.setLastFocusedTab(pIndex);
+  }
 }

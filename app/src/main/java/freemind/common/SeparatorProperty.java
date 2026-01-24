@@ -25,31 +25,28 @@ import freemind.swing.FreeMindFormBuilder;
 
 public class SeparatorProperty implements PropertyControl {
 
-	String label;
+  String label;
 
-	public SeparatorProperty(String label) {
-		super();
-		this.label = label;
-	}
+  public SeparatorProperty(String label) {
+    super();
+    this.label = label;
+  }
 
-	@Override
-	public String getDescription() {
-		return null;
-	}
+  @Override
+  public String getDescription() {
+    return null;
+  }
 
-	@Override
-	public String getLabel() {
-		return label;
-	}
+  @Override
+  public String getLabel() {
+    return label;
+  }
 
-	@Override
-	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
-		builder.appendSeparator(pTranslator.getText("separator." + getLabel()));
-	}
+  @Override
+  public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
+    builder.appendSeparator(pTranslator.getText("separator." + getLabel()));
+  }
 
-	@Override
-	public void setEnabled(boolean pEnabled) {
-
-	}
-
+  @Override
+  public void setEnabled(boolean pEnabled) {}
 }

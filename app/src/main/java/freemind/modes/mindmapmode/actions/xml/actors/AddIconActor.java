@@ -33,96 +33,91 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class AddIconActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public AddIconActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public AddIconActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void addIcon(MindMapNode node, MindIcon icon) {
-		execute(getAddLastIconActionPair(node, icon));
-	}
+  public void addIcon(MindMapNode node, MindIcon icon) {
+    execute(getAddLastIconActionPair(node, icon));
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof AddIconAction iconAction) {
-			MindMapNode node = getNodeFromID(iconAction.getNode());
-			String iconName = iconAction.getIconName();
-			int position = iconAction.getIconPosition();
-			MindIcon icon = MindIcon.factory(iconName);
-			node.addIcon(icon, position);
-			getExMapFeedback().nodeChanged(node);
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof AddIconAction iconAction) {
+      MindMapNode node = getNodeFromID(iconAction.getNode());
+      String iconName = iconAction.getIconName();
+      int position = iconAction.getIconPosition();
+      MindIcon icon = MindIcon.factory(iconName);
+      node.addIcon(icon, position);
+      getExMapFeedback().nodeChanged(node);
+    }
+  }
 
-	public Class<AddIconAction> getDoActionClass() {
-		return AddIconAction.class;
-	}
+  public Class<AddIconAction> getDoActionClass() {
+    return AddIconAction.class;
+  }
 
-	public AddIconAction createAddIconAction(MindMapNode node, MindIcon icon, int iconPosition) {
-		AddIconAction action = new AddIconAction();
-		action.setNode(getNodeID(node));
-		action.setIconName(icon.getName());
-		action.setIconPosition(iconPosition);
-		return action;
-	}
+  public AddIconAction createAddIconAction(MindMapNode node, MindIcon icon, int iconPosition) {
+    AddIconAction action = new AddIconAction();
+    action.setNode(getNodeID(node));
+    action.setIconName(icon.getName());
+    action.setIconPosition(iconPosition);
+    return action;
+  }
 
-	/**
-	 */
-	private ActionPair getAddLastIconActionPair(MindMapNode node, MindIcon icon) {
-		int iconIndex = MindIcon.LAST;
-		return getAddIconActionPair(node, icon, iconIndex);
-	}
+  /** */
+  private ActionPair getAddLastIconActionPair(MindMapNode node, MindIcon icon) {
+    int iconIndex = MindIcon.LAST;
+    return getAddIconActionPair(node, icon, iconIndex);
+  }
 
-	private ActionPair getAddIconActionPair(MindMapNode node, MindIcon icon, int iconIndex) {
-		AddIconAction doAction = createAddIconAction(node, icon, iconIndex);
-		XmlAction undoAction = getXmlActorFactory().getRemoveIconActor()
-				.createRemoveIconXmlAction(node, iconIndex);
-		return new ActionPair(doAction, undoAction);
-	}
+  private ActionPair getAddIconActionPair(MindMapNode node, MindIcon icon, int iconIndex) {
+    AddIconAction doAction = createAddIconAction(node, icon, iconIndex);
+    XmlAction undoAction =
+        getXmlActorFactory().getRemoveIconActor().createRemoveIconXmlAction(node, iconIndex);
+    return new ActionPair(doAction, undoAction);
+  }
 
-	/**
-	 */
-	private ActionPair getToggleIconActionPair(MindMapNode node, MindIcon icon) {
-		int iconIndex = Tools.iconFirstIndex(node, icon.getName());
-		if (iconIndex == -1) {
-			return getAddLastIconActionPair(node, icon);
-		} else {
-			return getRemoveIconActionPair(node, icon, iconIndex);
-		}
-	}
+  /** */
+  private ActionPair getToggleIconActionPair(MindMapNode node, MindIcon icon) {
+    int iconIndex = Tools.iconFirstIndex(node, icon.getName());
+    if (iconIndex == -1) {
+      return getAddLastIconActionPair(node, icon);
+    } else {
+      return getRemoveIconActionPair(node, icon, iconIndex);
+    }
+  }
 
-	/**
-	 * @param removeFirst
-	 */
-	private ActionPair getRemoveIconActionPair(MindMapNode node, MindIcon icon,
-			boolean removeFirst) {
-		int iconIndex = removeFirst ? Tools.iconFirstIndex(node, icon.getName())
-				: Tools.iconLastIndex(node, icon.getName());
-		return iconIndex >= 0 ? getRemoveIconActionPair(node, icon, iconIndex) : null;
-	}
+  /**
+   * @param removeFirst
+   */
+  private ActionPair getRemoveIconActionPair(MindMapNode node, MindIcon icon, boolean removeFirst) {
+    int iconIndex =
+        removeFirst
+            ? Tools.iconFirstIndex(node, icon.getName())
+            : Tools.iconLastIndex(node, icon.getName());
+    return iconIndex >= 0 ? getRemoveIconActionPair(node, icon, iconIndex) : null;
+  }
 
-	private ActionPair getRemoveIconActionPair(MindMapNode node, MindIcon icon, int iconIndex) {
-		XmlAction doAction = getXmlActorFactory().getRemoveIconActor()
-				.createRemoveIconXmlAction(node, iconIndex);
-		XmlAction undoAction = createAddIconAction(node, icon, iconIndex);
-		return new ActionPair(doAction, undoAction);
-	}
+  private ActionPair getRemoveIconActionPair(MindMapNode node, MindIcon icon, int iconIndex) {
+    XmlAction doAction =
+        getXmlActorFactory().getRemoveIconActor().createRemoveIconXmlAction(node, iconIndex);
+    XmlAction undoAction = createAddIconAction(node, icon, iconIndex);
+    return new ActionPair(doAction, undoAction);
+  }
 
-	public void toggleIcon(MindMapNode node, MindIcon icon) {
-		getExMapFeedback().doTransaction(this.getClass().getName() + "/toggle",
-				getToggleIconActionPair(node, icon));
-	}
+  public void toggleIcon(MindMapNode node, MindIcon icon) {
+    getExMapFeedback()
+        .doTransaction(this.getClass().getName() + "/toggle", getToggleIconActionPair(node, icon));
+  }
 
-	public void removeIcon(MindMapNode node, MindIcon icon, boolean removeFirst) {
-		final ActionPair removeIconActionPair = getRemoveIconActionPair(node, icon, removeFirst);
-		if (removeIconActionPair == null) {
-			return;
-		}
-		getExMapFeedback().doTransaction(this.getClass().getName() + "/remove",
-				removeIconActionPair);
-	}
-
-
-
+  public void removeIcon(MindMapNode node, MindIcon icon, boolean removeFirst) {
+    final ActionPair removeIconActionPair = getRemoveIconActionPair(node, icon, removeFirst);
+    if (removeIconActionPair == null) {
+      return;
+    }
+    getExMapFeedback().doTransaction(this.getClass().getName() + "/remove", removeIconActionPair);
+  }
 }

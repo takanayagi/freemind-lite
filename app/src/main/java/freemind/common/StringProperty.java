@@ -29,63 +29,61 @@ import javax.swing.JTextField;
 import freemind.swing.FreeMindFormBuilder;
 
 public class StringProperty extends PropertyBean implements PropertyControl {
-	String description;
+  String description;
 
-	String label;
+  String label;
 
-	JTextField mTextField;
+  JTextField mTextField;
 
-	/**
-	 */
-	public StringProperty(String description, String label) {
-		super();
-		initializeTextfield();
-		this.description = description;
-		this.label = label;
+  /** */
+  public StringProperty(String description, String label) {
+    super();
+    initializeTextfield();
+    this.description = description;
+    this.label = label;
 
-		mTextField.addKeyListener(new KeyAdapter() {
+    mTextField.addKeyListener(
+        new KeyAdapter() {
 
-			public void keyReleased(KeyEvent pE) {
-				firePropertyChangeEvent();
-			}
-		});
+          public void keyReleased(KeyEvent pE) {
+            firePropertyChangeEvent();
+          }
+        });
+  }
 
-	}
+  protected void initializeTextfield() {
+    mTextField = new JTextField();
+  }
 
-	protected void initializeTextfield() {
-		mTextField = new JTextField();
-	}
+  @Override
+  public String getDescription() {
+    return description;
+  }
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+  @Override
+  public String getLabel() {
+    return label;
+  }
 
-	@Override
-	public String getLabel() {
-		return label;
-	}
+  @Override
+  public void setValue(String value) {
+    mTextField.setText(value);
+    mTextField.selectAll();
+  }
 
-	@Override
-	public void setValue(String value) {
-		mTextField.setText(value);
-		mTextField.selectAll();
-	}
+  @Override
+  public String getValue() {
+    return mTextField.getText();
+  }
 
-	@Override
-	public String getValue() {
-		return mTextField.getText();
-	}
+  @Override
+  public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
+    JLabel label = builder.append(pTranslator.getText(getLabel()), mTextField);
+    label.setToolTipText(pTranslator.getText(getDescription()));
+  }
 
-	@Override
-	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
-		JLabel label = builder.append(pTranslator.getText(getLabel()), mTextField);
-		label.setToolTipText(pTranslator.getText(getDescription()));
-	}
-
-	@Override
-	public void setEnabled(boolean pEnabled) {
-		mTextField.setEnabled(pEnabled);
-	}
-
+  @Override
+  public void setEnabled(boolean pEnabled) {
+    mTextField.setEnabled(pEnabled);
+  }
 }

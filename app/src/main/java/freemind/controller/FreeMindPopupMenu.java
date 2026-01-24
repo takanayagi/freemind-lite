@@ -29,50 +29,48 @@ import javax.swing.event.MenuListener;
 
 /**
  * @author foltin
- * 
  */
 public class FreeMindPopupMenu extends JPopupMenu
-		implements StructuredMenuHolder.MenuEventSupplier {
-	private HashSet<MenuListener> listeners = new HashSet<>();
+    implements StructuredMenuHolder.MenuEventSupplier {
+  private HashSet<MenuListener> listeners = new HashSet<>();
 
-	protected static Logger logger = null;
+  protected static Logger logger = null;
 
-	public FreeMindPopupMenu() {
-		if (logger == null) {
-			logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
-		}
-	}
+  public FreeMindPopupMenu() {
+    if (logger == null) {
+      logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
+    }
+  }
 
-	protected void firePopupMenuWillBecomeVisible() {
-		super.firePopupMenuWillBecomeVisible();
-		logger.fine("Popup firePopupMenuWillBecomeVisible called.");
-		for (MenuListener listener : listeners) {
-			listener.menuSelected(null);
-		}
-	}
+  protected void firePopupMenuWillBecomeVisible() {
+    super.firePopupMenuWillBecomeVisible();
+    logger.fine("Popup firePopupMenuWillBecomeVisible called.");
+    for (MenuListener listener : listeners) {
+      listener.menuSelected(null);
+    }
+  }
 
-	public void addMenuListener(MenuListener listener) {
-		listeners.add(listener);
-	}
+  public void addMenuListener(MenuListener listener) {
+    listeners.add(listener);
+  }
 
-	public void removeMenuListener(MenuListener listener) {
-		listeners.remove(listener);
-	}
+  public void removeMenuListener(MenuListener listener) {
+    listeners.remove(listener);
+  }
 
-	protected void firePopupMenuCanceled() {
-		super.firePopupMenuCanceled();
-		// logger.info("Popup firePopupMenuCanceled called.");
-		for (MenuListener listener : listeners) {
-			listener.menuCanceled(null);
-		}
-	}
+  protected void firePopupMenuCanceled() {
+    super.firePopupMenuCanceled();
+    // logger.info("Popup firePopupMenuCanceled called.");
+    for (MenuListener listener : listeners) {
+      listener.menuCanceled(null);
+    }
+  }
 
-	protected void firePopupMenuWillBecomeInvisible() {
-		super.firePopupMenuWillBecomeInvisible();
-		// logger.info("Popup firePopupMenuWillBecomeInvisible called.");
-		for (MenuListener listener : listeners) {
-			listener.menuDeselected(null);
-		}
-	}
-
+  protected void firePopupMenuWillBecomeInvisible() {
+    super.firePopupMenuWillBecomeInvisible();
+    // logger.info("Popup firePopupMenuWillBecomeInvisible called.");
+    for (MenuListener listener : listeners) {
+      listener.menuDeselected(null);
+    }
+  }
 }

@@ -25,48 +25,48 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 
 public class StructuredMenuItemHolder {
-	private JMenuItem menuItem;
-	private Action action;
-	private MenuItemEnabledListener enabledListener;
-	private MenuItemSelectedListener selectionListener;
+  private JMenuItem menuItem;
+  private Action action;
+  private MenuItemEnabledListener enabledListener;
+  private MenuItemSelectedListener selectionListener;
 
-	public StructuredMenuItemHolder() {}
+  public StructuredMenuItemHolder() {}
 
-	public Action getAction() {
-		return action;
-	}
+  public Action getAction() {
+    return action;
+  }
 
-	public void setAction(Action action) {
-		this.action = action;
-		if (action instanceof MenuItemEnabledListener listener) {
-			setEnabledListener(listener);
-		}
-		if (action instanceof MenuItemSelectedListener listener) {
-			setSelectedListener(listener);
-		}
-	}
+  public void setAction(Action action) {
+    this.action = action;
+    if (action instanceof MenuItemEnabledListener listener) {
+      setEnabledListener(listener);
+    }
+    if (action instanceof MenuItemSelectedListener listener) {
+      setSelectedListener(listener);
+    }
+  }
 
-	public MenuItemEnabledListener getEnabledListener() {
-		return enabledListener;
-	}
+  public MenuItemEnabledListener getEnabledListener() {
+    return enabledListener;
+  }
 
-	public void setEnabledListener(MenuItemEnabledListener enabledListener) {
-		this.enabledListener = enabledListener;
-	}
+  public void setEnabledListener(MenuItemEnabledListener enabledListener) {
+    this.enabledListener = enabledListener;
+  }
 
-	public JMenuItem getMenuItem() {
-		return menuItem;
-	}
+  public JMenuItem getMenuItem() {
+    return menuItem;
+  }
 
-	public void setMenuItem(JMenuItem menuItem) {
-		this.menuItem = menuItem;
-	}
+  public void setMenuItem(JMenuItem menuItem) {
+    this.menuItem = menuItem;
+  }
 
-	public MenuItemSelectedListener getSelectionListener() {
-		return selectionListener;
-	}
+  public MenuItemSelectedListener getSelectionListener() {
+    return selectionListener;
+  }
 
-	public void setSelectedListener(MenuItemSelectedListener selectionListener) {
-		this.selectionListener = selectionListener;
-	}
+  public void setSelectedListener(MenuItemSelectedListener selectionListener) {
+    this.selectionListener = selectionListener;
+  }
 }

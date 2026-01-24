@@ -31,158 +31,156 @@ import freemind.swing.DefaultListModel;
 
 public class ListTransferHandler extends TransferHandler {
 
-	static private DataFlavor localListFlavor;
-	static private DataFlavor[] dataFlavors;
-	static {
-		try {
-			localListFlavor =
-					new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.List");
-			dataFlavors = new DataFlavor[] {localListFlavor};
-		} catch (ClassNotFoundException e) {
-			System.out.println("ArrayListTransferHandler: unable to create data flavor");
-		}
-	}
+  private static DataFlavor localListFlavor;
+  private static DataFlavor[] dataFlavors;
 
-	JList<?> source = null;
-	int[] indices = null;
-	int addIndex = -1; // Location where items were added
-	int addCount = 0; // Number of items added
+  static {
+    try {
+      localListFlavor =
+          new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.List");
+      dataFlavors = new DataFlavor[] {localListFlavor};
+    } catch (ClassNotFoundException e) {
+      System.out.println("ArrayListTransferHandler: unable to create data flavor");
+    }
+  }
 
-	@Override
-	public boolean importData(JComponent c, Transferable t) {
-		JList<?> target = (JList<?>) c;
-		Collection<Object> alist = null;
+  JList<?> source = null;
+  int[] indices = null;
+  int addIndex = -1; // Location where items were added
+  int addCount = 0; // Number of items added
 
-		if (!canImport(c, t.getTransferDataFlavors())) {
-			return false;
-		}
-		try {
-			@SuppressWarnings("unchecked")
-			Collection<Object> o = (Collection<Object>) t.getTransferData(localListFlavor);
-			alist = o;
-		} catch (UnsupportedFlavorException ufe) {
-			System.out.println("importData: unsupported data flavor");
-			return false;
-		} catch (IOException ioe) {
-			System.out.println("importData: I/O exception");
-			return false;
-		}
+  @Override
+  public boolean importData(JComponent c, Transferable t) {
+    JList<?> target = (JList<?>) c;
+    Collection<Object> alist = null;
 
-		// At this point we use the same code to retrieve the data
-		// locally or serially.
+    if (!canImport(c, t.getTransferDataFlavors())) {
+      return false;
+    }
+    try {
+      @SuppressWarnings("unchecked")
+      Collection<Object> o = (Collection<Object>) t.getTransferData(localListFlavor);
+      alist = o;
+    } catch (UnsupportedFlavorException ufe) {
+      System.out.println("importData: unsupported data flavor");
+      return false;
+    } catch (IOException ioe) {
+      System.out.println("importData: I/O exception");
+      return false;
+    }
 
-		// We'll drop at the current selected index.
-		int index = target.getSelectedIndex();
+    // At this point we use the same code to retrieve the data
+    // locally or serially.
 
-		// Prevent the user from dropping data back on itself.
-		// For example, if the user is moving items #4,#5,#6 and #7 and
-		// attempts to insert the items after item #5, this would
-		// be problematic when removing the original items.
-		// This is interpreted as dropping the same data on itself
-		// and has no effect.
-		if (source.equals(target)) {
-			if (indices != null && index >= indices[0] - 1
-					&& index <= indices[indices.length - 1]) {
-				indices = null;
-				return true;
-			}
-		}
+    // We'll drop at the current selected index.
+    int index = target.getSelectedIndex();
 
-		@SuppressWarnings("unchecked")
-		DefaultListModel<Object> listModel = (DefaultListModel<Object>) target.getModel();
-		int max = listModel.getSize();
-		if (index < 0) {
-			index = max;
-		} else {
-			index++;
-			if (index > max) {
-				index = max;
-			}
-		}
-		addIndex = index;
-		addCount = alist.size();
+    // Prevent the user from dropping data back on itself.
+    // For example, if the user is moving items #4,#5,#6 and #7 and
+    // attempts to insert the items after item #5, this would
+    // be problematic when removing the original items.
+    // This is interpreted as dropping the same data on itself
+    // and has no effect.
+    if (source.equals(target)) {
+      if (indices != null && index >= indices[0] - 1 && index <= indices[indices.length - 1]) {
+        indices = null;
+        return true;
+      }
+    }
 
-		listModel.addAll(index, alist);
+    @SuppressWarnings("unchecked")
+    DefaultListModel<Object> listModel = (DefaultListModel<Object>) target.getModel();
+    int max = listModel.getSize();
+    if (index < 0) {
+      index = max;
+    } else {
+      index++;
+      if (index > max) {
+        index = max;
+      }
+    }
+    addIndex = index;
+    addCount = alist.size();
 
-		return true;
-	}
+    listModel.addAll(index, alist);
 
-	@Override
-	protected void exportDone(JComponent c, Transferable data, int action) {
-		if ((action == MOVE) && (indices != null)) {
-			DefaultListModel<?> model = (DefaultListModel<?>) source.getModel();
+    return true;
+  }
 
-			// If we are moving items around in the same list, we
-			// need to adjust the indices accordingly since those
-			// after the insertion point have moved.
-			if (addCount > 0) {
-				for (int i = 0; i < indices.length; i++) {
-					if (indices[i] > addIndex) {
-						indices[i] += addCount;
-					}
-				}
-			}
-			for (int i = indices.length - 1; i >= 0; i--)
-				model.remove(indices[i]);
-		}
-		indices = null;
-		addIndex = -1;
-		addCount = 0;
-	}
+  @Override
+  protected void exportDone(JComponent c, Transferable data, int action) {
+    if ((action == MOVE) && (indices != null)) {
+      DefaultListModel<?> model = (DefaultListModel<?>) source.getModel();
 
-	private boolean hasLocalListFlavor(DataFlavor[] flavors) {
-		for (DataFlavor flavor : flavors) {
-			if (flavor.equals(localListFlavor)) {
-				return true;
-			}
-		}
-		return false;
-	}
+      // If we are moving items around in the same list, we
+      // need to adjust the indices accordingly since those
+      // after the insertion point have moved.
+      if (addCount > 0) {
+        for (int i = 0; i < indices.length; i++) {
+          if (indices[i] > addIndex) {
+            indices[i] += addCount;
+          }
+        }
+      }
+      for (int i = indices.length - 1; i >= 0; i--) model.remove(indices[i]);
+    }
+    indices = null;
+    addIndex = -1;
+    addCount = 0;
+  }
 
-	@Override
-	public boolean canImport(JComponent c, DataFlavor[] flavors) {
-		return hasLocalListFlavor(flavors);
-	}
+  private boolean hasLocalListFlavor(DataFlavor[] flavors) {
+    for (DataFlavor flavor : flavors) {
+      if (flavor.equals(localListFlavor)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	@Override
-	protected Transferable createTransferable(JComponent c) {
-		if (c instanceof JList) {
-			source = (JList<?>) c;
-			indices = source.getSelectedIndices();
-			return new ListTransferable(source.getSelectedValuesList());
-		}
-		return null;
-	}
+  @Override
+  public boolean canImport(JComponent c, DataFlavor[] flavors) {
+    return hasLocalListFlavor(flavors);
+  }
 
-	@Override
-	public int getSourceActions(JComponent c) {
-		return COPY_OR_MOVE;
-	}
+  @Override
+  protected Transferable createTransferable(JComponent c) {
+    if (c instanceof JList) {
+      source = (JList<?>) c;
+      indices = source.getSelectedIndices();
+      return new ListTransferable(source.getSelectedValuesList());
+    }
+    return null;
+  }
 
-	public static class ListTransferable implements Transferable {
-		private final List<?> data;
+  @Override
+  public int getSourceActions(JComponent c) {
+    return COPY_OR_MOVE;
+  }
 
-		public ListTransferable(List<?> list) {
-			data = list;
-		}
+  public static class ListTransferable implements Transferable {
+    private final List<?> data;
 
-		@Override
-		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-			if (!isDataFlavorSupported(flavor)) {
-				throw new UnsupportedFlavorException(flavor);
-			}
-			return data;
-		}
+    public ListTransferable(List<?> list) {
+      data = list;
+    }
 
-		@Override
-		public DataFlavor[] getTransferDataFlavors() {
-			return dataFlavors;
-		}
+    @Override
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+      if (!isDataFlavorSupported(flavor)) {
+        throw new UnsupportedFlavorException(flavor);
+      }
+      return data;
+    }
 
-		@Override
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			return localListFlavor.equals(flavor);
-		}
-	}
+    @Override
+    public DataFlavor[] getTransferDataFlavors() {
+      return dataFlavors;
+    }
 
+    @Override
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+      return localListFlavor.equals(flavor);
+    }
+  }
 }

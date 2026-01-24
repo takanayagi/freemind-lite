@@ -30,25 +30,22 @@ import freemind.modes.mindmapmode.hooks.MindMapNodeHookAdapter;
 
 /**
  * @author foltin
- * 
  */
 public class RemoveReminderHook extends MindMapNodeHookAdapter {
 
-	/**
-	 *
-	 */
-	public RemoveReminderHook() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+  /** */
+  public RemoveReminderHook() {
+    super();
+    // TODO Auto-generated constructor stub
+  }
 
-	public void invoke(MindMapNode node) {
-		super.invoke(node);
-		ReminderHookBase hook = TimeManagementOrganizer.getHook(node);
-		if (hook != null) {
-			List<MindMapNode> selected = Arrays.asList(new MindMapNode[] {node});
-			// adding the hook the second time, it is removed.
-			getMindMapController().addHook(node, selected, TimeManagement.REMINDER_HOOK_NAME, null);
-		}
-	}
+  public void invoke(MindMapNode node) {
+    super.invoke(node);
+    ReminderHookBase hook = TimeManagementOrganizer.getHook(node);
+    if (hook != null) {
+      List<MindMapNode> selected = Arrays.asList(new MindMapNode[] {node});
+      // adding the hook the second time, it is removed.
+      getMindMapController().addHook(node, selected, TimeManagement.REMINDER_HOOK_NAME, null);
+    }
+  }
 }

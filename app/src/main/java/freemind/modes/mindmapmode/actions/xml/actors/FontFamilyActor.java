@@ -35,54 +35,49 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class FontFamilyActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public FontFamilyActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-		// TODO Auto-generated constructor stub
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public FontFamilyActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+    // TODO Auto-generated constructor stub
+  }
 
-	public Class<FontNodeAction> getDoActionClass() {
-		return FontNodeAction.class;
-	}
+  public Class<FontNodeAction> getDoActionClass() {
+    return FontNodeAction.class;
+  }
 
-	/**
-	 */
-	public void setFontFamily(MindMapNode node, String fontFamilyValue) {
-		execute(getActionPair(node, fontFamilyValue));
-	}
+  /** */
+  public void setFontFamily(MindMapNode node, String fontFamilyValue) {
+    execute(getActionPair(node, fontFamilyValue));
+  }
 
-	public ActionPair getActionPair(MindMapNode node, String fontFamilyValue) {
-		FontNodeAction fontFamilyAction = createFontNodeAction(node, fontFamilyValue);
-		FontNodeAction undoFontFamilyAction = createFontNodeAction(node, node.getFontFamilyName());
-		return new ActionPair(fontFamilyAction, undoFontFamilyAction);
-	}
+  public ActionPair getActionPair(MindMapNode node, String fontFamilyValue) {
+    FontNodeAction fontFamilyAction = createFontNodeAction(node, fontFamilyValue);
+    FontNodeAction undoFontFamilyAction = createFontNodeAction(node, node.getFontFamilyName());
+    return new ActionPair(fontFamilyAction, undoFontFamilyAction);
+  }
 
-	private FontNodeAction createFontNodeAction(MindMapNode node, String fontValue) {
-		FontNodeAction fontFamilyAction = new FontNodeAction();
-		fontFamilyAction.setNode(getNodeID(node));
-		fontFamilyAction.setFont(fontValue);
-		return fontFamilyAction;
+  private FontNodeAction createFontNodeAction(MindMapNode node, String fontValue) {
+    FontNodeAction fontFamilyAction = new FontNodeAction();
+    fontFamilyAction.setNode(getNodeID(node));
+    fontFamilyAction.setFont(fontValue);
+    return fontFamilyAction;
+  }
 
-	}
-
-	/**
-	 *
-	 */
-
-	public void act(XmlAction action) {
-		if (action instanceof FontNodeAction fontFamilyAction) {
-			NodeAdapter node = getNodeFromID(fontFamilyAction.getNode());
-			String fontFamily = fontFamilyAction.getFont();
-			if (!Tools.safeEquals(node.getFontFamilyName(), fontFamily)) {
-				node.establishOwnFont();
-				node.setFont(getExMapFeedback().getFontThroughMap(
-						new Font(fontFamily, node.getFont().getStyle(), node.getFont().getSize())));
-				getExMapFeedback().nodeChanged(node);
-			}
-		}
-	}
-
-
+  /** */
+  public void act(XmlAction action) {
+    if (action instanceof FontNodeAction fontFamilyAction) {
+      NodeAdapter node = getNodeFromID(fontFamilyAction.getNode());
+      String fontFamily = fontFamilyAction.getFont();
+      if (!Tools.safeEquals(node.getFontFamilyName(), fontFamily)) {
+        node.establishOwnFont();
+        node.setFont(
+            getExMapFeedback()
+                .getFontThroughMap(
+                    new Font(fontFamily, node.getFont().getStyle(), node.getFont().getSize())));
+        getExMapFeedback().nodeChanged(node);
+      }
+    }
+  }
 }
