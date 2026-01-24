@@ -87,8 +87,8 @@ public class FreeMindStarter {
 			return;
 		}
 		Locale localeDef = switch (lang.length()) {
-			case 2 -> new Locale(lang);
-			case 5 -> new Locale(lang.substring(0, 1), lang.substring(3, 4));
+			case 2 -> Locale.of(lang);
+			case 5 -> Locale.of(lang.substring(0, 1), lang.substring(3, 4));
 			default -> null;
 		};
 		if (localeDef == null) {

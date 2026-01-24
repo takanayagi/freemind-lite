@@ -1037,7 +1037,7 @@ public abstract class NodeAdapter implements MindMapNode {
 			}
 			if (addIt) {
 				try {
-					File mmFile = Tools.urlToFile(new URL(getMap().getURL(), link));
+					File mmFile = new File(getMap().getURL().toURI().resolve(link));
 					String thumbnailFileName =
 							Resources.getInstance().createThumbnailFileName(mmFile);
 					if (new File(thumbnailFileName).exists()) {

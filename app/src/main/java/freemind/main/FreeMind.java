@@ -43,6 +43,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -690,10 +691,10 @@ public class FreeMind extends JFrame implements FreeMindMain, ActionListener {
 				String decodedPath = Tools.getFreeMindBasePath();
 				URL url = null;
 				if (new File(decodedPath).exists()) {
-					url = new URL("file", null, decodedPath);
+					url = new URI("file", null, decodedPath, null).toURL();
 				}
 				SpellChecker.registerDictionaries(url, Locale.getDefault().getLanguage());
-			} catch (MalformedURLException e) {
+			} catch (MalformedURLException | URISyntaxException e) {
 				freemind.main.Resources.getInstance().logException(e);
 			}
 		}

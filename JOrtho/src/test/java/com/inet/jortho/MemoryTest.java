@@ -84,7 +84,6 @@ public class MemoryTest extends TestCase {
             if( Toolkit.getDefaultToolkit().getSystemEventQueue().peekEvent() != null ){
                 continue;
             }
-            System.runFinalization();
             System.gc();
             Thread.sleep( 10 );
             long current = runtime.totalMemory() - runtime.freeMemory();

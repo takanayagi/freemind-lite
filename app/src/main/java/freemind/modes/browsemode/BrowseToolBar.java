@@ -17,7 +17,7 @@
 
 package freemind.modes.browsemode;
 
-import java.net.URL;
+import java.net.URI;
 
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
@@ -44,7 +44,7 @@ public class BrowseToolBar extends JToolBar {
 			if ("".equals(urlText) || e.getActionCommand().equals("comboBoxEdited"))
 				return;
 			try {
-				c.load(new URL(urlText));
+				c.load(new URI(urlText).toURL());
 			} catch (Exception e1) {
 				freemind.main.Resources.getInstance().logException(e1);
 				// FIXME: Give a good error message.

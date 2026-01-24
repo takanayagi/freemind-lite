@@ -44,7 +44,7 @@ import javax.swing.text.Utilities;
  * Is used from CheckerMenu and CheckerPopup to handle the user events.
  * @author Volker Berlin
  */
-public class CheckerListener implements PopupMenuListener, LanguageChangeListener {
+public final class CheckerListener implements PopupMenuListener, LanguageChangeListener {
 
     private final JComponent          menu;
 

@@ -44,7 +44,7 @@ import freemind.main.Tools;
 import freemind.view.mindmapview.MapView;
 
 /** */
-public class FreeMindMainMock implements FreeMindMain {
+public final class FreeMindMainMock implements FreeMindMain {
 
 	private Properties mProperties;
 

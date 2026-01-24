@@ -500,7 +500,7 @@ public abstract class ControllerAdapter extends MapFeedbackAdapter
 				 * Remark: getMap().getURL() returns URLs like file:/C:/... It seems, that it does
 				 * not cause any problems.
 				 */
-				absolute = new URL(getMap().getURL(), relative);
+				absolute = getMap().getURL().toURI().resolve(relative).toURL();
 			}
 			// look for reference part in URL:
 			URL originalURL = absolute;
@@ -543,7 +543,7 @@ public abstract class ControllerAdapter extends MapFeedbackAdapter
 				// ---- Open URL in browser
 				getFrame().openDocument(originalURL);
 			}
-		} catch (MalformedURLException ex) {
+		} catch (URISyntaxException | MalformedURLException ex) {
 			freemind.main.Resources.getInstance().logException(ex);
 			getController().errorMessage(getText("url_error") + "\n" + ex);
 		} catch (Exception e) {

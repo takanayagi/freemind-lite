@@ -22,6 +22,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -99,7 +100,7 @@ public class BrowseController extends ViewControllerAdapter {
 							+ barePositions[3] + "&zoom=" + barePositions[4] + "&layers="
 							+ tileSources.get(barePositions[5]);
 					logger.fine("Try to open link " + link);
-					modeController.getFrame().openDocument(new URL(link));
+					modeController.getFrame().openDocument(new URI(link).toURL());
 				} catch (Exception e1) {
 					freemind.main.Resources.getInstance().logException(e1);
 				}

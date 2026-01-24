@@ -72,12 +72,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -490,8 +492,8 @@ public class Tools {
 		String osNameStart = System.getProperty("os.name").substring(0, 3);
 		if (osNameStart.equals("Win")) {
 			try {
-				Runtime.getRuntime().exec(
-						"attrib " + (hidden ? "+" : "-") + "H \"" + file.getAbsolutePath() + "\"");
+				Runtime.getRuntime().exec(new String[] {"attrib", (hidden ? "+" : "-") + "H",
+						"\"" + file.getAbsolutePath() + "\""});
 				// Synchronize the effect, because it is asynchronous in
 				// general.
 				if (!synchronously) {
@@ -1147,10 +1149,11 @@ public class Tools {
 	 * Returns the same URL as input with the addition, that the reference part "#..." is filtered
 	 * out.
 	 * 
+	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
-	public static URL getURLWithoutReference(URL input) throws MalformedURLException {
-		return new URL(input.toString().replaceFirst("#.*", ""));
+	public static URL getURLWithoutReference(URL input) throws URISyntaxException, MalformedURLException {
+		return new URI(input.toString().replaceFirst("#.*", "")).toURL();
 	}
 
 	public static void copyStream(InputStream in, OutputStream out, boolean pCloseOutput)
@@ -1467,14 +1470,6 @@ public class Tools {
 		return JAVA_VERSION.compareTo("1.4.0") > 0;
 	}
 
-	public static File urlToFile(URL pUrl) throws URISyntaxException {
-		// fix for java1.4 and java5 only.
-		if (isBelowJava6()) {
-			return new File(urlGetFile(pUrl));
-		}
-		return new File(new URI(pUrl.toString()));
-	}
-
 	public static void restoreAntialiasing(Graphics2D g, Object renderingHint) {
 		if (RenderingHints.KEY_ANTIALIASING.isCompatibleValue(renderingHint)) {
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, renderingHint);
@@ -1686,15 +1681,14 @@ public class Tools {
 
 	public static Vector<URL> urlStringToUrls(String pUrls) {
 		String[] urls = pUrls.split("\n");
-		Vector<URL> ret = new Vector<>();
-		for (String url : urls) {
+		return new Vector<>(Arrays.stream(urls).map(url -> {
 			try {
-				ret.add(new URL(url));
-			} catch (MalformedURLException e) {
+				return new URI(url).toURL();
+			} catch (URISyntaxException | MalformedURLException e) {
 				Resources.getInstance().logException(e);
+				return null;
 			}
-		}
-		return ret;
+		}).filter(Objects::nonNull).toList());
 	}
 
 	/**

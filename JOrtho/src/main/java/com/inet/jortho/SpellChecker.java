@@ -32,6 +32,8 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -215,31 +217,36 @@ public class SpellChecker {
      *            the locale that should be loaded and made active. If null or empty then the default locale is used.
      * @see #setUserDictionaryProvider(UserDictionaryProvider)
      * @see #registerDictionaries(URL, String, String)
-     * @see #registerDictionaries(URL, String, String, String)           
+     * @see #registerDictionaries(URL, String, String, String)
      */
     public static void registerDictionaries( URL baseURL, String activeLocale ) {
-        if( baseURL == null ){
-            try {
-                baseURL = SpellChecker.class.getResource( "/dictionaries.cnf" );
-                if( baseURL != null ) {
-                    baseURL = new URL( baseURL, "." );
+        URI baseUri = null;
+        try {
+            if( baseURL == null ){
+                URL url = SpellChecker.class.getResource( "/dictionaries.cnf" );
+                if( url != null ) {
+                    baseUri = url.toURI().resolve( "." );
                 } else {
-                    baseURL = new URL( "file", null, "" );
+                    baseUri = new URI( "file:/" );
                 }
-            } catch( MalformedURLException e ) {
-                // should never occur because the URL is valid
-            	SpellChecker.getMessageHandler().handleException( e );
+                baseURL = baseUri.toURL();
+            } else {
+                baseUri = baseURL.toURI();
             }
+        } catch( MalformedURLException | URISyntaxException e ) {
+            // should never occur because the URL is valid
+            SpellChecker.getMessageHandler().handleException( e );
         }
+
         InputStream input;
         try {
-            input = new URL( baseURL, "dictionaries.cnf" ).openStream();
+            input = baseUri.resolve( "dictionaries.cnf" ).toURL().openStream();
         } catch( Exception e1 ) {
             try {
-                input = new URL( baseURL, "dictionaries.properties" ).openStream();
+                input = baseUri.resolve( "dictionaries.properties" ).toURL().openStream();
             } catch( Exception e2 ) {
                 try {
-                    input = new URL( baseURL, "dictionaries.txt" ).openStream();
+                    input = baseUri.resolve( "dictionaries.txt" ).toURL().openStream();
                 } catch( Exception e3 ) {
                     System.err.println( "JOrtho configuration file not found!" );
                 	SpellChecker.getMessageHandler().handleException( e1 );
@@ -339,8 +346,8 @@ public class SpellChecker {
     public static void registerDictionaries( URL baseURL, String availableLocales, String activeLocale, String extension ) {
         if( baseURL == null ){
             try {
-                baseURL = new URL("file", null, "");
-            } catch( MalformedURLException e ) {
+                baseURL = new URI( "file:/" ).toURL();
+            } catch( MalformedURLException | URISyntaxException e ) {
                 // should never occur because the URL is valid
             	SpellChecker.getMessageHandler().handleException( e );
             }
@@ -357,7 +364,7 @@ public class SpellChecker {
         for( String locale : availableLocales.split( "," ) ) {
             locale = locale.trim().toLowerCase();
             if( !locale.isEmpty() ){
-                LanguageAction action = new LanguageAction( baseURL, new Locale( locale ), extension );
+                LanguageAction action = new LanguageAction( baseURL, Locale.of( locale ), extension );
                 languages.remove( action );
                 languages.add( action );
                 if( locale.equals( activeLocale ) ) {
@@ -817,7 +824,7 @@ public class SpellChecker {
 				try {
 					DictionaryFactory factory = new DictionaryFactory();
 					try {
-						factory.loadWordList( new URL( baseURL, "dictionary_" + locale + extension ) );
+						factory.loadWordList( baseURL.toURI().resolve( "dictionary_" + locale + extension ).toURL() );
 					} catch( Exception ex ) {
 						SpellChecker.getMessageHandler().handleError( ex.toString(), "Error", ex );
 					}
