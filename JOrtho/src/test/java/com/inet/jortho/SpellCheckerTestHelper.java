@@ -23,12 +23,7 @@ package com.inet.jortho;
  * Created on 14.10.2008
  */
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import com.inet.jorthodictionaries.BookUtilsTest;
-
-public class AllTests {
+public class SpellCheckerTestHelper {
 
   private static boolean isInit;
 
@@ -51,14 +46,5 @@ public class AllTests {
         }
       }
     }
-  }
-
-  public static Test suite() {
-    TestSuite suite = new TestSuite("JOrtho Tests");
-    suite.addTestSuite(EventTest.class);
-    suite.addTestSuite(MemoryTest.class);
-    suite.addTestSuite(UtilsTest.class);
-    suite.addTestSuite(BookUtilsTest.class);
-    return suite;
   }
 }

@@ -22,10 +22,13 @@
  */
 package com.inet.jortho;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class UtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
+public class UtilsTest {
+
+  @Test
   public void testRemoveUnicodeQuotation() {
     assertSame("abc", Utils.replaceUnicodeQuotation("abc"));
     assertEquals("ab'c", Utils.replaceUnicodeQuotation("ab´c"));
