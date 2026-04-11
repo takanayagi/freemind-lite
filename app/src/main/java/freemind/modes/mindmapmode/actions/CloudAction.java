@@ -19,7 +19,6 @@
  * Created on 06.10.2004
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import javax.swing.Action;
@@ -31,20 +30,19 @@ import freemind.modes.mindmapmode.MindMapController;
 
 /**
  * @author foltin
- * 
  */
 public class CloudAction extends NodeGeneralAction implements MenuItemSelectedListener {
 
-	public CloudAction(MindMapController controller) {
-		super(controller, "cloud", "images/Cloud24.gif");
-		setDoActionClass(getDoActionClass());
-	}
+  public CloudAction(MindMapController controller) {
+    super(controller, "cloud", "images/Cloud24.gif");
+    setDoActionClass(getDoActionClass());
+  }
 
-	public Class<AddCloudXmlAction> getDoActionClass() {
-		return AddCloudXmlAction.class;
-	}
+  public Class<AddCloudXmlAction> getDoActionClass() {
+    return AddCloudXmlAction.class;
+  }
 
-	public boolean isSelected(JMenuItem pCheckItem, Action pAction) {
-		return modeController.getSelected().getCloud() != null;
-	}
+  public boolean isSelected(JMenuItem pCheckItem, Action pAction) {
+    return modeController.getSelected().getCloud() != null;
+  }
 }

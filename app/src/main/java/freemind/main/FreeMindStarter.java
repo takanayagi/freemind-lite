@@ -32,107 +32,115 @@ import java.util.Properties;
 import javax.swing.JOptionPane;
 
 /**
- * 
  * @author foltin
- * 
  */
 public class FreeMindStarter {
 
-	public static void main(String[] args) {
-		FreeMindStarter starter = new FreeMindStarter();
-		Properties defaultPreferences = starter.readDefaultPreferences();
-		starter.createUserDirectory(defaultPreferences);
-		Properties userPreferences = starter.readUsersPreferences(defaultPreferences);
-		starter.setDefaultLocale(userPreferences);
+  public static void main(String[] args) {
+    FreeMindStarter starter = new FreeMindStarter();
+    Properties defaultPreferences = starter.readDefaultPreferences();
+    starter.createUserDirectory(defaultPreferences);
+    Properties userPreferences = starter.readUsersPreferences(defaultPreferences);
+    starter.setDefaultLocale(userPreferences);
 
-		// Christopher Robin Elmersson: set
-		Toolkit.getDefaultToolkit();
+    // Christopher Robin Elmersson: set
+    Toolkit.getDefaultToolkit();
 
-		try {
-			FreeMind.main(args, defaultPreferences, userPreferences,
-					starter.getUserPreferencesFile(defaultPreferences));
+    try {
+      FreeMind.main(
+          args,
+          defaultPreferences,
+          userPreferences,
+          starter.getUserPreferencesFile(defaultPreferences));
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(
-					null, "freemind.main.FreeMind can't be started: " + e.getLocalizedMessage()
-							+ "\n" + Tools.getStacktrace(e),
-					"Startup problem", JOptionPane.ERROR_MESSAGE);
-			System.exit(1);
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      JOptionPane.showMessageDialog(
+          null,
+          "freemind.main.FreeMind can't be started: "
+              + e.getLocalizedMessage()
+              + "\n"
+              + Tools.getStacktrace(e),
+          "Startup problem",
+          JOptionPane.ERROR_MESSAGE);
+      System.exit(1);
+    }
+  }
 
-	private void createUserDirectory(Properties pDefaultProperties) {
-		File userPropertiesFolder = new File(getFreeMindDirectory(pDefaultProperties));
-		try {
-			// create user directory:
-			if (!userPropertiesFolder.exists()) {
-				userPropertiesFolder.mkdir();
-			}
-		} catch (Exception e) {
-			// exception is logged to console as we don't have a logger
-			e.printStackTrace();
-			System.err.println("Cannot create folder for user properties and logging: '"
-					+ userPropertiesFolder.getAbsolutePath() + "'");
+  private void createUserDirectory(Properties pDefaultProperties) {
+    File userPropertiesFolder = new File(getFreeMindDirectory(pDefaultProperties));
+    try {
+      // create user directory:
+      if (!userPropertiesFolder.exists()) {
+        userPropertiesFolder.mkdir();
+      }
+    } catch (Exception e) {
+      // exception is logged to console as we don't have a logger
+      e.printStackTrace();
+      System.err.println(
+          "Cannot create folder for user properties and logging: '"
+              + userPropertiesFolder.getAbsolutePath()
+              + "'");
+    }
+  }
 
-		}
-	}
+  /**
+   * @param pProperties
+   */
+  private void setDefaultLocale(Properties pProperties) {
+    String lang = pProperties.getProperty(FreeMindCommon.RESOURCE_LANGUAGE);
+    if (lang == null) {
+      return;
+    }
+    Locale localeDef =
+        switch (lang.length()) {
+          case 2 -> Locale.of(lang);
+          case 5 -> Locale.of(lang.substring(0, 1), lang.substring(3, 4));
+          default -> null;
+        };
+    if (localeDef == null) {
+      return;
+    }
+    Locale.setDefault(localeDef);
+  }
 
-	/**
-	 * @param pProperties
-	 */
-	private void setDefaultLocale(Properties pProperties) {
-		String lang = pProperties.getProperty(FreeMindCommon.RESOURCE_LANGUAGE);
-		if (lang == null) {
-			return;
-		}
-		Locale localeDef = switch (lang.length()) {
-			case 2 -> Locale.of(lang);
-			case 5 -> Locale.of(lang.substring(0, 1), lang.substring(3, 4));
-			default -> null;
-		};
-		if (localeDef == null) {
-			return;
-		}
-		Locale.setDefault(localeDef);
-	}
+  private Properties readUsersPreferences(Properties defaultPreferences) {
+    Properties auto = new Properties(defaultPreferences);
+    try (InputStream in = new FileInputStream(getUserPreferencesFile(defaultPreferences))) {
+      auto.load(in);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      System.err.println("Panic! Error while loading user preferences.");
+    }
+    return auto;
+  }
 
-	private Properties readUsersPreferences(Properties defaultPreferences) {
-		Properties auto = new Properties(defaultPreferences);
-		try (InputStream in = new FileInputStream(getUserPreferencesFile(defaultPreferences))) {
-			auto.load(in);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("Panic! Error while loading user preferences.");
-		}
-		return auto;
-	}
+  private File getUserPreferencesFile(Properties defaultPreferences) {
+    if (defaultPreferences == null) {
+      System.err.println("Panic! Error while loading default properties.");
+      System.exit(1);
+    }
+    String freemindDirectory = getFreeMindDirectory(defaultPreferences);
+    File userPropertiesFolder = new File(freemindDirectory);
+    return new File(userPropertiesFolder, defaultPreferences.getProperty("autoproperties"));
+  }
 
-	private File getUserPreferencesFile(Properties defaultPreferences) {
-		if (defaultPreferences == null) {
-			System.err.println("Panic! Error while loading default properties.");
-			System.exit(1);
-		}
-		String freemindDirectory = getFreeMindDirectory(defaultPreferences);
-		File userPropertiesFolder = new File(freemindDirectory);
-		return new File(userPropertiesFolder, defaultPreferences.getProperty("autoproperties"));
-	}
+  private String getFreeMindDirectory(Properties defaultPreferences) {
+    return System.getProperty("user.home")
+        + File.separator
+        + defaultPreferences.getProperty("properties_folder");
+  }
 
-	private String getFreeMindDirectory(Properties defaultPreferences) {
-		return System.getProperty("user.home") + File.separator
-				+ defaultPreferences.getProperty("properties_folder");
-	}
-
-	public Properties readDefaultPreferences() {
-		String propsLoc = "freemind.properties";
-		URL defaultPropsURL = this.getClass().getClassLoader().getResource(propsLoc);
-		Properties props = new Properties();
-		try (InputStream in = defaultPropsURL.openStream()) {
-			props.load(in);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("Panic! Error while loading default properties.");
-		}
-		return props;
-	}
+  public Properties readDefaultPreferences() {
+    String propsLoc = "freemind.properties";
+    URL defaultPropsURL = this.getClass().getClassLoader().getResource(propsLoc);
+    Properties props = new Properties();
+    try (InputStream in = defaultPropsURL.openStream()) {
+      props.load(in);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      System.err.println("Panic! Error while loading default properties.");
+    }
+    return props;
+  }
 }

@@ -28,29 +28,28 @@ import freemind.main.XMLElement;
  */
 public class PermanentNodeHookSubstituteUnknown extends PermanentNodeHookAdapter {
 
-	private final String hookName;
+  private final String hookName;
 
-	public PermanentNodeHookSubstituteUnknown(String name) {
-		super();
-		hookName = name;
-	}
+  public PermanentNodeHookSubstituteUnknown(String name) {
+    super();
+    hookName = name;
+  }
 
-	private XMLElement child;
+  private XMLElement child;
 
-	public void loadFrom(XMLElement child) {
-		this.child = child;
-		super.loadFrom(child);
-	}
+  public void loadFrom(XMLElement child) {
+    this.child = child;
+    super.loadFrom(child);
+  }
 
-	public void save(XMLElement xml) {
-		super.save(xml);
-		for (XMLElement childchild : child.getChildren()) {
-			xml.addChild(childchild);
-		}
-	}
+  public void save(XMLElement xml) {
+    super.save(xml);
+    for (XMLElement childchild : child.getChildren()) {
+      xml.addChild(childchild);
+    }
+  }
 
-	public String getName() {
-		return hookName;
-	}
-
+  public String getName() {
+    return hookName;
+  }
 }

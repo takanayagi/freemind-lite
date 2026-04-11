@@ -26,36 +26,33 @@ import freemind.view.mindmapview.NodeView;
 
 /**
  * Abstraction for the MapView Handles selections, focus, etc.
- * 
+ *
  * @author foltin
  * @date 18.03.2014
  */
 public interface ViewAbstraction {
 
-	/**
-	 * Makes the node the only selected, scrolls it to the visible rect of the screen.
-	 */
-	void select(NodeView node);
+  /** Makes the node the only selected, scrolls it to the visible rect of the screen. */
+  void select(NodeView node);
 
-	/**
-	 * Removes the selection for this node. Take care, that at least one selected node is remaining.
-	 * 
-	 * @param node
-	 */
-	void deselect(NodeView node);
+  /**
+   * Removes the selection for this node. Take care, that at least one selected node is remaining.
+   *
+   * @param node
+   */
+  void deselect(NodeView node);
 
-	NodeView getNodeView(MindMapNode node);
+  NodeView getNodeView(MindMapNode node);
 
-	boolean isSelected(NodeView n);
+  boolean isSelected(NodeView n);
 
-	LinkedList<? extends NodeView> getSelecteds();
+  LinkedList<? extends NodeView> getSelecteds();
 
-	NodeView getSelected();
+  NodeView getSelected();
 
-	/**
-	 * @return an ArrayList of MindMapNode objects. If both ancestor and descendant node are
-	 *         selected, only the ancestor is returned
-	 */
-	ArrayList<MindMapNode> getSelectedNodesSortedByY();
-
+  /**
+   * @return an ArrayList of MindMapNode objects. If both ancestor and descendant node are selected,
+   *     only the ancestor is returned
+   */
+  ArrayList<MindMapNode> getSelectedNodesSortedByY();
 }

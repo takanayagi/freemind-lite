@@ -15,7 +15,6 @@
  * 02111-1307, USA.
  */
 
-
 package freemind.modes.filemode;
 
 import java.awt.event.ActionEvent;
@@ -44,134 +43,136 @@ import freemind.view.mindmapview.MainView;
 
 public class FileController extends ViewControllerAdapter {
 
-	Action newMap = new NewMapAction(this);
-	Action center = new CenterAction();
-	Action openPath = new OpenPathAction();
+  Action newMap = new NewMapAction(this);
+  Action center = new CenterAction();
+  Action openPath = new OpenPathAction();
 
-	private JPopupMenu popupmenu = new FilePopupMenu(this);
+  private JPopupMenu popupmenu = new FilePopupMenu(this);
 
-	public FileController(Mode mode) {
-		super(mode);
-	}
+  public FileController(Mode mode) {
+    super(mode);
+  }
 
-	public JToolBar getModeToolBar() {
-		return ((FileMode) getMode()).getToolbar();
-	}
+  public JToolBar getModeToolBar() {
+    return ((FileMode) getMode()).getToolbar();
+  }
 
-	public MapAdapter newModel(ModeController modeController) {
-		FileMapModel model = new FileMapModel(getFrame(), modeController);
-		modeController.setModel(model);
-		return model;
-	}
+  public MapAdapter newModel(ModeController modeController) {
+    FileMapModel model = new FileMapModel(getFrame(), modeController);
+    modeController.setModel(model);
+    return model;
+  }
 
-	public MindMapNode newNode(Object userObject, MindMap map) {
-		return new FileNodeModel((File) userObject, map);
-	}
+  public MindMapNode newNode(Object userObject, MindMap map) {
+    return new FileNodeModel((File) userObject, map);
+  }
 
-	public JPopupMenu getPopupMenu() {
-		return this.popupmenu;
-	}
+  public JPopupMenu getPopupMenu() {
+    return this.popupmenu;
+  }
 
-	// -----------------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------------
 
-	// Private
-	//
+  // Private
+  //
 
-	private class CenterAction extends AbstractAction {
-		CenterAction() {
-			super(getController().getResourceString("center"));
-		}
+  private class CenterAction extends AbstractAction {
+    CenterAction() {
+      super(getController().getResourceString("center"));
+    }
 
-		public void actionPerformed(ActionEvent e) {
-			if (getSelected() != null) {
-				MindMap map =
-						new FileMapModel(((FileNodeModel) getSelected()).getFile(), getFrame(),
-								/*
-								 * DON'T COPY THIS, AS THIS IS A BAD HACK! The Constructor needs a
-								 * new instance of a modecontroller.
-								 */
-								FileController.this);
-				newMap(map, FileController.this);
-			}
-		}
-	}
+    public void actionPerformed(ActionEvent e) {
+      if (getSelected() != null) {
+        MindMap map =
+            new FileMapModel(
+                ((FileNodeModel) getSelected()).getFile(),
+                getFrame(),
+                /*
+                 * DON'T COPY THIS, AS THIS IS A BAD HACK! The Constructor needs a
+                 * new instance of a modecontroller.
+                 */
+                FileController.this);
+        newMap(map, FileController.this);
+      }
+    }
+  }
 
-	private class OpenPathAction extends AbstractAction {
-		OpenPathAction() {
-			super(getController().getResourceString("open"));
-		}
+  private class OpenPathAction extends AbstractAction {
+    OpenPathAction() {
+      super(getController().getResourceString("open"));
+    }
 
-		public void actionPerformed(ActionEvent e) {
-			String inputValue = JOptionPane.showInputDialog(getController().getView().getSelected(),
-					getText("open"), "");
-			if (inputValue != null) {
-				File newCenter = new File(inputValue);
-				if (newCenter.exists()) { // and is a folder
-					MindMap map = new FileMapModel(newCenter, getFrame(),
-							/*
-							 * DON'T COPY THIS, AS THIS IS A BAD HACK! The Constructor needs a new
-							 * instance of a modecontroller.
-							 */
-							FileController.this);
-					newMap(map, FileController.this);
-				}
-			}
-		}
-	}
+    public void actionPerformed(ActionEvent e) {
+      String inputValue =
+          JOptionPane.showInputDialog(getController().getView().getSelected(), getText("open"), "");
+      if (inputValue != null) {
+        File newCenter = new File(inputValue);
+        if (newCenter.exists()) { // and is a folder
+          MindMap map =
+              new FileMapModel(
+                  newCenter,
+                  getFrame(),
+                  /*
+                   * DON'T COPY THIS, AS THIS IS A BAD HACK! The Constructor needs a new
+                   * instance of a modecontroller.
+                   */
+                  FileController.this);
+          newMap(map, FileController.this);
+        }
+      }
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.ModeController#updateMenus(freemind.controller. StructuredMenuHolder)
-	 */
-	public void updateMenus(StructuredMenuHolder holder) {
-		add(holder, MenuBar.EDIT_MENU + "/find", find, "keystroke_find");
-		add(holder, MenuBar.EDIT_MENU + "/findNext", findNext, "keystroke_find_next");
-		add(holder, MenuBar.EDIT_MENU + "/openPath", openPath, null);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.ModeController#updateMenus(freemind.controller. StructuredMenuHolder)
+   */
+  public void updateMenus(StructuredMenuHolder holder) {
+    add(holder, MenuBar.EDIT_MENU + "/find", find, "keystroke_find");
+    add(holder, MenuBar.EDIT_MENU + "/findNext", findNext, "keystroke_find_next");
+    add(holder, MenuBar.EDIT_MENU + "/openPath", openPath, null);
+  }
 
-	public HookFactory getHookFactory() {
-		throw new IllegalArgumentException("Not implemented yet.");
-	}
+  public HookFactory getHookFactory() {
+    throw new IllegalArgumentException("Not implemented yet.");
+  }
 
-	public void plainClick(MouseEvent e) {
-		/* perform action only if one selected node. */
-		if (getSelecteds().size() != 1)
-			return;
-		final MainView component = (MainView) e.getComponent();
-		if (component.isInFollowLinkRegion(e.getX())) {
-			loadURL();
-		} else {
-			MindMapNode node = (component).getNodeView().getModel();
-			toggleFolded(node);
-		}
-	}
+  public void plainClick(MouseEvent e) {
+    /* perform action only if one selected node. */
+    if (getSelecteds().size() != 1) return;
+    final MainView component = (MainView) e.getComponent();
+    if (component.isInFollowLinkRegion(e.getX())) {
+      loadURL();
+    } else {
+      MindMapNode node = (component).getNodeView().getModel();
+      toggleFolded(node);
+    }
+  }
 
-	private void toggleFolded(MindMapNode node) {
-		if (node.hasChildren() && !node.isRoot()) {
-			setFolded(node, !node.isFolded());
-		}
-	}
+  private void toggleFolded(MindMapNode node) {
+    if (node.hasChildren() && !node.isRoot()) {
+      setFolded(node, !node.isFolded());
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.ControllerAdapter#loadInternally(java.net.URL, freemind.modes.MapAdapter)
-	 */
-	@Override
-	protected void loadInternally(URL pUrl, MapAdapter pModel)
-			throws XMLParseException {
-		// empty on purpose.
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.ControllerAdapter#loadInternally(java.net.URL, freemind.modes.MapAdapter)
+   */
+  @Override
+  protected void loadInternally(URL pUrl, MapAdapter pModel) throws XMLParseException {
+    // empty on purpose.
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap.MapFeedback#out(java.lang.String)
-	 */
-	@Override
-	public void out(String pFormat) {
-		getFrame().out(pFormat);
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap.MapFeedback#out(java.lang.String)
+   */
+  @Override
+  public void out(String pFormat) {
+    getFrame().out(pFormat);
+  }
 }

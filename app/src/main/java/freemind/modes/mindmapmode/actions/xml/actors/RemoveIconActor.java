@@ -36,60 +36,57 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class RemoveIconActor extends NodeXmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public RemoveIconActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public RemoveIconActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public Class<RemoveIconXmlAction> getDoActionClass() {
-		return RemoveIconXmlAction.class;
-	}
+  public Class<RemoveIconXmlAction> getDoActionClass() {
+    return RemoveIconXmlAction.class;
+  }
 
-	public RemoveIconXmlAction createRemoveIconXmlAction(MindMapNode node, int iconPosition) {
-		RemoveIconXmlAction action = new RemoveIconXmlAction();
-		action.setNode(getNodeID(node));
-		action.setIconPosition(iconPosition);
-		return action;
-	}
+  public RemoveIconXmlAction createRemoveIconXmlAction(MindMapNode node, int iconPosition) {
+    RemoveIconXmlAction action = new RemoveIconXmlAction();
+    action.setNode(getNodeID(node));
+    action.setIconPosition(iconPosition);
+    return action;
+  }
 
-	private ActionPair apply(MindMapNode selected) {
-		List<MindIcon> icons = selected.getIcons();
-		if (icons.isEmpty())
-			return null;
-		AddIconAction undoAction = getXmlActorFactory().getAddIconActor().createAddIconAction(
-				selected, icons.get(icons.size() - 1), MindIcon.LAST);
-		return new ActionPair(createRemoveIconXmlAction(selected, MindIcon.LAST), undoAction);
-	}
+  private ActionPair apply(MindMapNode selected) {
+    List<MindIcon> icons = selected.getIcons();
+    if (icons.isEmpty()) return null;
+    AddIconAction undoAction =
+        getXmlActorFactory()
+            .getAddIconActor()
+            .createAddIconAction(selected, icons.get(icons.size() - 1), MindIcon.LAST);
+    return new ActionPair(createRemoveIconXmlAction(selected, MindIcon.LAST), undoAction);
+  }
 
-	public int removeLastIcon(MindMapNode node) {
-		execute(apply(node));
-		return node.getIcons().size();
-	}
+  public int removeLastIcon(MindMapNode node) {
+    execute(apply(node));
+    return node.getIcons().size();
+  }
 
-	/**
-	*
-	*/
+  /** */
+  public void act(XmlAction action) {
+    if (action instanceof RemoveIconXmlAction removeAction) {
+      MindMapNode node = getNodeFromID(removeAction.getNode());
+      int position = removeAction.getIconPosition();
+      node.removeIcon(position);
+      getExMapFeedback().nodeChanged(node);
+    }
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof RemoveIconXmlAction removeAction) {
-			MindMapNode node = getNodeFromID(removeAction.getNode());
-			int position = removeAction.getIconPosition();
-			node.removeIcon(position);
-			getExMapFeedback().nodeChanged(node);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.mindmapmode.actions.NodeActorXml#apply(freemind.modes.MindMap,
-	 * freemind.modes.MindMapNode)
-	 */
-	@Override
-	public ActionPair apply(MindMap pModel, MindMapNode pSelected) {
-		return apply(pSelected);
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.mindmapmode.actions.NodeActorXml#apply(freemind.modes.MindMap,
+   * freemind.modes.MindMapNode)
+   */
+  @Override
+  public ActionPair apply(MindMap pModel, MindMapNode pSelected) {
+    return apply(pSelected);
+  }
 }

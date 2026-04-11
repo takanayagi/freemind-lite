@@ -26,51 +26,47 @@ package freemind.controller.filter;
  * @author dimitri 15.05.2005
  */
 public class FilterInfo {
-	private int info = Filter.FILTER_INITIAL_VALUE;
+  private int info = Filter.FILTER_INITIAL_VALUE;
 
-	/**
-	 * 
-	 */
-	public FilterInfo() {
-		super();
-	}
+  /** */
+  public FilterInfo() {
+    super();
+  }
 
-	public void reset() {
-		info = Filter.FILTER_INITIAL_VALUE;
-	}
+  public void reset() {
+    info = Filter.FILTER_INITIAL_VALUE;
+  }
 
-	public void setAncestor() {
-		add(Filter.FILTER_SHOW_ANCESTOR);
-	}
+  public void setAncestor() {
+    add(Filter.FILTER_SHOW_ANCESTOR);
+  }
 
-	public void setDescendant() {
-		add(Filter.FILTER_SHOW_DESCENDANT);
-	}
+  public void setDescendant() {
+    add(Filter.FILTER_SHOW_DESCENDANT);
+  }
 
-	public void setMatched() {
-		add(Filter.FILTER_SHOW_MATCHED);
-	}
+  public void setMatched() {
+    add(Filter.FILTER_SHOW_MATCHED);
+  }
 
-	void add(int flag) {
-		if ((flag & (Filter.FILTER_SHOW_MATCHED | Filter.FILTER_SHOW_HIDDEN)) != 0) {
-			info &= ~Filter.FILTER_INITIAL_VALUE;
-		}
-		info |= flag;
-	}
+  void add(int flag) {
+    if ((flag & (Filter.FILTER_SHOW_MATCHED | Filter.FILTER_SHOW_HIDDEN)) != 0) {
+      info &= ~Filter.FILTER_INITIAL_VALUE;
+    }
+    info |= flag;
+  }
 
-	int get() {
-		return info;
-	}
+  int get() {
+    return info;
+  }
 
-	/**
-	 */
-	public boolean isAncestor() {
-		return (info & Filter.FILTER_SHOW_ANCESTOR) != 0;
-	}
+  /** */
+  public boolean isAncestor() {
+    return (info & Filter.FILTER_SHOW_ANCESTOR) != 0;
+  }
 
-	/**
-	 */
-	public boolean isMatched() {
-		return (info & Filter.FILTER_SHOW_MATCHED) != 0;
-	}
+  /** */
+  public boolean isMatched() {
+    return (info & Filter.FILTER_SHOW_MATCHED) != 0;
+  }
 }

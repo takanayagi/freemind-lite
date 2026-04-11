@@ -31,40 +31,40 @@ import freemind.view.mindmapview.NodeView;
 
 public class SelectedViewCondition implements Condition {
 
-	private static String description;
-	private static JComponent renderer;
-	private static Condition condition;
+  private static String description;
+  private static JComponent renderer;
+  private static Condition condition;
 
-	public SelectedViewCondition() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+  public SelectedViewCondition() {
+    super();
+    // TODO Auto-generated constructor stub
+  }
 
-	public String toString() {
-		if (description == null) {
-			description = Resources.getInstance().getResourceString("filter_selected_node_view");
-		}
-		return description;
-	}
+  public String toString() {
+    if (description == null) {
+      description = Resources.getInstance().getResourceString("filter_selected_node_view");
+    }
+    return description;
+  }
 
-	public boolean checkNode(Controller c, MindMapNode node) {
-		NodeView viewer = c.getModeController().getNodeView(node);
-		return viewer != null && viewer.isSelected();
-	}
+  public boolean checkNode(Controller c, MindMapNode node) {
+    NodeView viewer = c.getModeController().getNodeView(node);
+    return viewer != null && viewer.isSelected();
+  }
 
-	public JComponent getListCellRendererComponent() {
-		if (renderer == null) {
-			renderer = ConditionFactory.createCellRendererComponent(description);
-		}
-		return renderer;
-	}
+  public JComponent getListCellRendererComponent() {
+    if (renderer == null) {
+      renderer = ConditionFactory.createCellRendererComponent(description);
+    }
+    return renderer;
+  }
 
-	public static Condition CreateCondition() {
-		if (condition == null) {
-			condition = new SelectedViewCondition();
-		}
-		return condition;
-	}
+  public static Condition CreateCondition() {
+    if (condition == null) {
+      condition = new SelectedViewCondition();
+    }
+    return condition;
+  }
 
-	public void save(XMLElement element) {}
+  public void save(XMLElement element) {}
 }

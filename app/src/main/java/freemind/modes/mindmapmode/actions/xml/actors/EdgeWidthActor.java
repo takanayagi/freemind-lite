@@ -32,54 +32,51 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class EdgeWidthActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public EdgeWidthActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public EdgeWidthActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public Class<EdgeWidthFormatAction> getDoActionClass() {
-		return EdgeWidthFormatAction.class;
-	}
+  public Class<EdgeWidthFormatAction> getDoActionClass() {
+    return EdgeWidthFormatAction.class;
+  }
 
-	public void setEdgeWidth(MindMapNode node, int width) {
-		if (width == getWidth(node)) {
-			return;
-		}
-		execute(getActionPair(node, width));
+  public void setEdgeWidth(MindMapNode node, int width) {
+    if (width == getWidth(node)) {
+      return;
+    }
+    execute(getActionPair(node, width));
+  }
 
-	}
+  public ActionPair getActionPair(MindMapNode selected, int width) {
+    EdgeWidthFormatAction styleAction = createEdgeWidthFormatAction(selected, width);
+    EdgeWidthFormatAction undoStyleAction =
+        createEdgeWidthFormatAction(selected, getWidth(selected));
+    return new ActionPair(styleAction, undoStyleAction);
+  }
 
-	public ActionPair getActionPair(MindMapNode selected, int width) {
-		EdgeWidthFormatAction styleAction = createEdgeWidthFormatAction(selected, width);
-		EdgeWidthFormatAction undoStyleAction =
-				createEdgeWidthFormatAction(selected, getWidth(selected));
-		return new ActionPair(styleAction, undoStyleAction);
-	}
+  public int getWidth(MindMapNode selected) {
+    return selected.getEdge().getRealWidth();
+  }
 
-	public int getWidth(MindMapNode selected) {
-		return selected.getEdge().getRealWidth();
-	}
+  private EdgeWidthFormatAction createEdgeWidthFormatAction(MindMapNode selected, int width) {
+    EdgeWidthFormatAction edgeWidthAction = new EdgeWidthFormatAction();
+    edgeWidthAction.setNode(getNodeID(selected));
+    edgeWidthAction.setWidth(width);
+    return edgeWidthAction;
+  }
 
-	private EdgeWidthFormatAction createEdgeWidthFormatAction(MindMapNode selected, int width) {
-		EdgeWidthFormatAction edgeWidthAction = new EdgeWidthFormatAction();
-		edgeWidthAction.setNode(getNodeID(selected));
-		edgeWidthAction.setWidth(width);
-		return edgeWidthAction;
-	}
-
-	public void act(XmlAction action) {
-		if (action instanceof EdgeWidthFormatAction edgeWithAction) {
-			MindMapNode node = getNodeFromID(edgeWithAction.getNode());
-			int width = edgeWithAction.getWidth();
-			EdgeAdapter edge = (EdgeAdapter) node.getEdge();
-			if (edge.getRealWidth() != width) {
-				edge.setWidth(width);
-				getExMapFeedback().nodeChanged(node);
-			}
-		}
-	}
-
-
+  public void act(XmlAction action) {
+    if (action instanceof EdgeWidthFormatAction edgeWithAction) {
+      MindMapNode node = getNodeFromID(edgeWithAction.getNode());
+      int width = edgeWithAction.getWidth();
+      EdgeAdapter edge = (EdgeAdapter) node.getEdge();
+      if (edge.getRealWidth() != width) {
+        edge.setWidth(width);
+        getExMapFeedback().nodeChanged(node);
+      }
+    }
+  }
 }

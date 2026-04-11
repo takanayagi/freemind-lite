@@ -35,42 +35,41 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class ColorArrowLinkActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public ColorArrowLinkActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public ColorArrowLinkActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void setArrowLinkColor(MindMapLink arrowLink, Color color) {
-		execute(getActionPair(arrowLink, color));
-	}
+  public void setArrowLinkColor(MindMapLink arrowLink, Color color) {
+    execute(getActionPair(arrowLink, color));
+  }
 
-	/**
-	 */
-	private ActionPair getActionPair(MindMapLink arrowLink, Color color) {
-		return new ActionPair(createArrowLinkColorXmlAction(arrowLink, color),
-				createArrowLinkColorXmlAction(arrowLink, arrowLink.getColor()));
-	}
+  /** */
+  private ActionPair getActionPair(MindMapLink arrowLink, Color color) {
+    return new ActionPair(
+        createArrowLinkColorXmlAction(arrowLink, color),
+        createArrowLinkColorXmlAction(arrowLink, arrowLink.getColor()));
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof ArrowLinkColorXmlAction colorAction) {
-			MindMapLink link = getLinkRegistry().getLinkForId(colorAction.getId());
-			((LineAdapter) link).setColor(Tools.xmlToColor(colorAction.getColor()));
-			getExMapFeedback().nodeChanged(link.getSource());
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof ArrowLinkColorXmlAction colorAction) {
+      MindMapLink link = getLinkRegistry().getLinkForId(colorAction.getId());
+      ((LineAdapter) link).setColor(Tools.xmlToColor(colorAction.getColor()));
+      getExMapFeedback().nodeChanged(link.getSource());
+    }
+  }
 
-	public Class<ArrowLinkColorXmlAction> getDoActionClass() {
-		return ArrowLinkColorXmlAction.class;
-	}
+  public Class<ArrowLinkColorXmlAction> getDoActionClass() {
+    return ArrowLinkColorXmlAction.class;
+  }
 
-	private ArrowLinkColorXmlAction createArrowLinkColorXmlAction(MindMapLink arrowLink,
-			Color color) {
-		ArrowLinkColorXmlAction action = new ArrowLinkColorXmlAction();
-		action.setColor(Tools.colorToXml(color));
-		action.setId(arrowLink.getUniqueId());
-		return action;
-	}
-
+  private ArrowLinkColorXmlAction createArrowLinkColorXmlAction(
+      MindMapLink arrowLink, Color color) {
+    ArrowLinkColorXmlAction action = new ArrowLinkColorXmlAction();
+    action.setColor(Tools.colorToXml(color));
+    action.setId(arrowLink.getUniqueId());
+    return action;
+  }
 }

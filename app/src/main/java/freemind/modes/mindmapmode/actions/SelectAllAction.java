@@ -15,7 +15,6 @@
  * 02111-1307, USA.
  */
 
-
 package freemind.modes.mindmapmode.actions;
 
 import freemind.modes.mindmapmode.MindMapController;
@@ -23,12 +22,12 @@ import freemind.modes.mindmapmode.MindMapController;
 /** */
 public class SelectAllAction extends NodeGeneralAction {
 
-	/**
-	 *
-	 */
-	public SelectAllAction(final MindMapController modeController) {
-		super(modeController, "select_all", null,
-				(map, node) -> modeController.selectBranch(modeController.getView().getRoot(), false));
-	}
-
+  /** */
+  public SelectAllAction(final MindMapController modeController) {
+    super(
+        modeController,
+        "select_all",
+        null,
+        (map, node) -> modeController.selectBranch(modeController.getView().getRoot(), false));
+  }
 }

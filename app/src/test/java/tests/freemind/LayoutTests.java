@@ -49,185 +49,185 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class LayoutTests extends FreeMindTestBase {
 
-	private MindMapNodeModel mRoot;
-	private MindMapNodeModel mChild1;
-	private MindMapNodeModel mChild2;
-	private MapView mMapView;
-	private MindMapMapModel mModel;
-	private ScrollPane mScrollPane;
+  private MindMapNodeModel mRoot;
+  private MindMapNodeModel mChild1;
+  private MindMapNodeModel mChild2;
+  private MapView mMapView;
+  private MindMapMapModel mModel;
+  private ScrollPane mScrollPane;
 
-	@BeforeEach
-	protected void setUp() throws Exception {
-		super.setUp();
-		JPanel parent = new JPanel();
-		Rectangle bounds = new Rectangle(0, 0, 400, 600);
-		parent.setBounds(bounds);
-		mScrollPane = new MapView.ScrollPane();
-		parent.add(mScrollPane, BorderLayout.CENTER);
-		Controller controller = new Controller(mFreeMindMain);
-		controller.initialization();
-		MindMapMode mode = new MindMapMode() {
-			public freemind.modes.ModeController createModeController() {
-				return new MindMapController(this) {
-					protected void init() {}
-				};
-			}
-		};
-		mode.init(controller);
-		MindMapController mc = (MindMapController) mode.createModeController();
-		mModel = new MindMapMapModel(mc);
-		mc.setModel(mModel);
-		mRoot = new MindMapNodeModel("ROOT", mModel);
-		mChild1 = new MindMapNodeModel("CHILD1", mModel);
-		mRoot.insert(mChild1, 0);
-		mChild2 = new MindMapNodeModel("CHILD2", mModel);
-		mRoot.insert(mChild2, 1);
-		mModel.setRoot(mRoot);
-		mMapView = new MapView(mModel, mc) {
-			public void selectAsTheOnlyOneSelected(NodeView pNewSelected) {}
+  @BeforeEach
+  protected void setUp() throws Exception {
+    super.setUp();
+    JPanel parent = new JPanel();
+    Rectangle bounds = new Rectangle(0, 0, 400, 600);
+    parent.setBounds(bounds);
+    mScrollPane = new MapView.ScrollPane();
+    parent.add(mScrollPane, BorderLayout.CENTER);
+    Controller controller = new Controller(mFreeMindMain);
+    controller.initialization();
+    MindMapMode mode =
+        new MindMapMode() {
+          public freemind.modes.ModeController createModeController() {
+            return new MindMapController(this) {
+              protected void init() {}
+            };
+          }
+        };
+    mode.init(controller);
+    MindMapController mc = (MindMapController) mode.createModeController();
+    mModel = new MindMapMapModel(mc);
+    mc.setModel(mModel);
+    mRoot = new MindMapNodeModel("ROOT", mModel);
+    mChild1 = new MindMapNodeModel("CHILD1", mModel);
+    mRoot.insert(mChild1, 0);
+    mChild2 = new MindMapNodeModel("CHILD2", mModel);
+    mRoot.insert(mChild2, 1);
+    mModel.setRoot(mRoot);
+    mMapView =
+        new MapView(mModel, mc) {
+          public void selectAsTheOnlyOneSelected(NodeView pNewSelected) {}
+        };
+    mScrollPane.setViewportView(mMapView);
+    mc.setView(mMapView);
+    mMapView.setBounds(parent.getBounds());
+    parent.setOpaque(true);
+    parent.setDoubleBuffered(false); // for better performance
+    parent.doLayout();
+    Tools.waitForEventQueue();
+    mMapView.addNotify();
+  }
 
-		};
-		mScrollPane.setViewportView(mMapView);
-		mc.setView(mMapView);
-		mMapView.setBounds(parent.getBounds());
-		parent.setOpaque(true);
-		parent.setDoubleBuffered(false); // for better performance
-		parent.doLayout();
-		Tools.waitForEventQueue();
-		mMapView.addNotify();
-	}
+  @Test
+  public void testYShift() throws Exception {
+    layout(mMapView);
+    int yCoordinate = getYCoordinate(mChild2);
+    int yCoordinateRoot = getYCoordinate(mRoot);
+    mChild2.setShiftY(10);
+    layout(mMapView);
+    assertTrue(getYCoordinate(mChild1) != getYCoordinate(mChild2));
+    assertEquals(yCoordinateRoot, getYCoordinate(mRoot));
+    assertEquals(yCoordinate + 10, getYCoordinate(mChild2));
+  }
 
-	@Test
-	public void testYShift() throws Exception {
-		layout(mMapView);
-		int yCoordinate = getYCoordinate(mChild2);
-		int yCoordinateRoot = getYCoordinate(mRoot);
-		mChild2.setShiftY(10);
-		layout(mMapView);
-		assertTrue(getYCoordinate(mChild1) != getYCoordinate(mChild2));
-		assertEquals(yCoordinateRoot, getYCoordinate(mRoot));
-		assertEquals(yCoordinate + 10, getYCoordinate(mChild2));
-	}
+  @Test
+  public void testYShiftNegative() throws Exception {
+    layout(mMapView);
+    int yCoordinate = getYCoordinate(mChild2);
+    int yCoordinateRoot = getYCoordinate(mRoot);
+    int yCoordinateChild1 = getYCoordinate(mChild1);
+    int delta = -10;
+    mChild2.setShiftY(delta);
+    layout(mMapView);
+    assertTrue(getYCoordinate(mChild1) != getYCoordinate(mChild2));
+    assertEquals(yCoordinateRoot - delta, getYCoordinate(mRoot));
+    assertEquals(yCoordinateChild1, getYCoordinate(mChild1));
+    assertEquals(yCoordinate, getYCoordinate(mChild2));
+  }
 
-	@Test
-	public void testYShiftNegative() throws Exception {
-		layout(mMapView);
-		int yCoordinate = getYCoordinate(mChild2);
-		int yCoordinateRoot = getYCoordinate(mRoot);
-		int yCoordinateChild1 = getYCoordinate(mChild1);
-		int delta = -10;
-		mChild2.setShiftY(delta);
-		layout(mMapView);
-		assertTrue(getYCoordinate(mChild1) != getYCoordinate(mChild2));
-		assertEquals(yCoordinateRoot - delta, getYCoordinate(mRoot));
-		assertEquals(yCoordinateChild1, getYCoordinate(mChild1));
-		assertEquals(yCoordinate, getYCoordinate(mChild2));
-	}
+  @Test
+  public void testYShiftNegativeWith3Childs() throws Exception {
+    MindMapNodeModel child3 = new MindMapNodeModel("CHILD3", mModel);
+    mModel.insertNodeInto(child3, mRoot, 2);
+    layout(mMapView);
+    int yCoordinate = getYCoordinate(mChild2);
+    int yCoordinateRoot = getYCoordinate(mRoot);
+    int yCoordinateChild1 = getYCoordinate(mChild1);
+    int yCoordinate3 = getYCoordinate(child3);
+    int delta = -10;
+    mChild2.setShiftY(delta);
+    // mModel.save(new File("/tmp/testYShiftNegativeWith3Childs.mm"));
+    layout(mMapView);
+    assertTrue(getYCoordinate(mChild1) != getYCoordinate(mChild2));
+    assertEquals(yCoordinateRoot - delta, getYCoordinate(mRoot));
+    assertEquals(yCoordinateChild1, getYCoordinate(mChild1));
+    assertEquals(yCoordinate, getYCoordinate(mChild2));
+    assertEquals(yCoordinate3 - delta, getYCoordinate(child3));
+  }
 
-	@Test
-	public void testYShiftNegativeWith3Childs() throws Exception {
-		MindMapNodeModel child3 = new MindMapNodeModel("CHILD3", mModel);
-		mModel.insertNodeInto(child3, mRoot, 2);
-		layout(mMapView);
-		int yCoordinate = getYCoordinate(mChild2);
-		int yCoordinateRoot = getYCoordinate(mRoot);
-		int yCoordinateChild1 = getYCoordinate(mChild1);
-		int yCoordinate3 = getYCoordinate(child3);
-		int delta = -10;
-		mChild2.setShiftY(delta);
-		// mModel.save(new File("/tmp/testYShiftNegativeWith3Childs.mm"));
-		layout(mMapView);
-		assertTrue(getYCoordinate(mChild1) != getYCoordinate(mChild2));
-		assertEquals(yCoordinateRoot - delta, getYCoordinate(mRoot));
-		assertEquals(yCoordinateChild1, getYCoordinate(mChild1));
-		assertEquals(yCoordinate, getYCoordinate(mChild2));
-		assertEquals(yCoordinate3 - delta, getYCoordinate(child3));
-	}
+  @Test
+  public void testScrollMap() throws Exception {
+    layout(mMapView);
+    int yCoordinateRoot = getYCoordinateToViewport(mRoot);
+    int delta = 10;
+    Point viewPosition = mMapView.getViewPosition();
+    mMapView.scrollBy(0, delta);
+    layout(mMapView);
+    assertEquals(viewPosition.y + delta, mMapView.getViewPosition().y);
+    assertEquals(yCoordinateRoot - delta, getYCoordinateToViewport(mRoot));
+  }
 
-	@Test
-	public void testScrollMap() throws Exception {
-		layout(mMapView);
-		int yCoordinateRoot = getYCoordinateToViewport(mRoot);
-		int delta = 10;
-		Point viewPosition = mMapView.getViewPosition();
-		mMapView.scrollBy(0, delta);
-		layout(mMapView);
-		assertEquals(viewPosition.y + delta, mMapView.getViewPosition().y);
-		assertEquals(yCoordinateRoot - delta, getYCoordinateToViewport(mRoot));
-	}
+  @Test
+  public void testYShiftNegativeWith3ChildsWithRootMovement() throws Exception {
+    MindMapNodeModel child3 = new MindMapNodeModel("CHILD3", mModel);
+    mModel.insertNodeInto(child3, mRoot, 2);
+    layout(mMapView);
+    int yCoordinate = getYCoordinateToViewport(mChild2);
+    int yCoordinateRoot = getYCoordinateToViewport(mRoot);
+    int yCoordinateChild1 = getYCoordinateToViewport(mChild1);
+    int yCoordinate3 = getYCoordinateToViewport(child3);
+    int delta = -10;
+    mChild2.setShiftY(delta);
+    mMapView.scrollBy(0, -delta);
+    layout(mMapView);
+    assertTrue(getYCoordinateToViewport(mChild1) != getYCoordinateToViewport(mChild2));
+    assertEquals(yCoordinateRoot, getYCoordinateToViewport(mRoot));
+    assertEquals(yCoordinateChild1 + delta, getYCoordinateToViewport(mChild1));
+    assertEquals(yCoordinate + delta, getYCoordinateToViewport(mChild2));
+    assertEquals(yCoordinate3, getYCoordinateToViewport(child3));
+  }
 
-	@Test
-	public void testYShiftNegativeWith3ChildsWithRootMovement() throws Exception {
-		MindMapNodeModel child3 = new MindMapNodeModel("CHILD3", mModel);
-		mModel.insertNodeInto(child3, mRoot, 2);
-		layout(mMapView);
-		int yCoordinate = getYCoordinateToViewport(mChild2);
-		int yCoordinateRoot = getYCoordinateToViewport(mRoot);
-		int yCoordinateChild1 = getYCoordinateToViewport(mChild1);
-		int yCoordinate3 = getYCoordinateToViewport(child3);
-		int delta = -10;
-		mChild2.setShiftY(delta);
-		mMapView.scrollBy(0, -delta);
-		layout(mMapView);
-		assertTrue(getYCoordinateToViewport(mChild1) != getYCoordinateToViewport(mChild2));
-		assertEquals(yCoordinateRoot, getYCoordinateToViewport(mRoot));
-		assertEquals(yCoordinateChild1 + delta, getYCoordinateToViewport(mChild1));
-		assertEquals(yCoordinate + delta, getYCoordinateToViewport(mChild2));
-		assertEquals(yCoordinate3, getYCoordinateToViewport(child3));
-	}
+  @Test
+  public void testYShiftNegativeWith3ChildsYCalcToRoot() throws Exception {
+    MindMapNodeModel child3 = new MindMapNodeModel("CHILD3", mModel);
+    mModel.insertNodeInto(child3, mRoot, 2);
+    layout(mMapView);
+    int yCoordinateRoot = getYCoordinate(mRoot);
+    int yCoordinate = getYCoordinate(mChild2) - yCoordinateRoot;
+    int yCoordinateChild1 = getYCoordinate(mChild1) - yCoordinateRoot;
+    int yCoordinate3 = getYCoordinate(child3) - yCoordinateRoot;
+    int delta = -10;
+    mChild2.setShiftY(delta);
+    layout(mMapView);
+    int yCoordinateRoot2 = getYCoordinate(mRoot);
+    assertEquals(yCoordinateChild1 + delta, getYCoordinate(mChild1) - yCoordinateRoot2);
+    assertEquals(yCoordinate + delta, getYCoordinate(mChild2) - yCoordinateRoot2);
+    assertEquals(yCoordinate3, getYCoordinate(child3) - yCoordinateRoot2);
+  }
 
-	@Test
-	public void testYShiftNegativeWith3ChildsYCalcToRoot() throws Exception {
-		MindMapNodeModel child3 = new MindMapNodeModel("CHILD3", mModel);
-		mModel.insertNodeInto(child3, mRoot, 2);
-		layout(mMapView);
-		int yCoordinateRoot = getYCoordinate(mRoot);
-		int yCoordinate = getYCoordinate(mChild2) - yCoordinateRoot;
-		int yCoordinateChild1 = getYCoordinate(mChild1) - yCoordinateRoot;
-		int yCoordinate3 = getYCoordinate(child3) - yCoordinateRoot;
-		int delta = -10;
-		mChild2.setShiftY(delta);
-		layout(mMapView);
-		int yCoordinateRoot2 = getYCoordinate(mRoot);
-		assertEquals(yCoordinateChild1 + delta, getYCoordinate(mChild1) - yCoordinateRoot2);
-		assertEquals(yCoordinate + delta, getYCoordinate(mChild2) - yCoordinateRoot2);
-		assertEquals(yCoordinate3, getYCoordinate(child3) - yCoordinateRoot2);
-	}
+  protected void layout(MapView mapView) {
+    NodeView root = mapView.getRoot();
+    LayoutManager layout = root.getLayout();
+    layout.layoutContainer(root);
+    root.getMainView().doLayout();
+    Vector<NodeView> nodes = Tools.getVectorWithSingleElement(root);
+    // print summary
+    System.out.println("------------------");
+    while (!nodes.isEmpty()) {
+      NodeView view = nodes.lastElement();
+      nodes.remove(view);
+      nodes.addAll(view.getChildrenViews());
+      int yCoordinate = getYCoordinate(view.getModel());
+      int yCoordinateRoot = getYCoordinate(root.getModel());
+      System.out.println(
+          "Y coordinate of node " + view.getModel() + " is " + (yCoordinate - yCoordinateRoot));
+    }
+    System.out.println("------------------");
+  }
 
-	protected void layout(MapView mapView) {
-		NodeView root = mapView.getRoot();
-		LayoutManager layout = root.getLayout();
-		layout.layoutContainer(root);
-		root.getMainView().doLayout();
-		Vector<NodeView> nodes = Tools.getVectorWithSingleElement(root);
-		// print summary
-		System.out.println("------------------");
-		while (!nodes.isEmpty()) {
-			NodeView view = nodes.lastElement();
-			nodes.remove(view);
-			nodes.addAll(view.getChildrenViews());
-			int yCoordinate = getYCoordinate(view.getModel());
-			int yCoordinateRoot = getYCoordinate(root.getModel());
-			System.out.println("Y coordinate of node " + view.getModel() + " is "
-					+ (yCoordinate - yCoordinateRoot));
-		}
-		System.out.println("------------------");
-	}
+  protected int getYCoordinate(MindMapNode child2) {
+    assertFalse(mMapView.getViewers(child2).isEmpty());
+    NodeView nodeView = mMapView.getViewers(child2).iterator().next();
+    Point point = nodeView.getMainView().getLocation();
+    Tools.convertPointToAncestor(nodeView, point, mMapView);
+    return point.y;
+  }
 
-	protected int getYCoordinate(MindMapNode child2) {
-		assertFalse(mMapView.getViewers(child2).isEmpty());
-		NodeView nodeView = mMapView.getViewers(child2).iterator().next();
-		Point point = nodeView.getMainView().getLocation();
-		Tools.convertPointToAncestor(nodeView, point, mMapView);
-		return point.y;
-	}
-
-	protected int getYCoordinateToViewport(MindMapNode child2) {
-		assertFalse(mMapView.getViewers(child2).isEmpty());
-		NodeView nodeView = mMapView.getViewers(child2).iterator().next();
-		Point point = nodeView.getMainView().getLocation();
-		Tools.convertPointToAncestor(nodeView, point, mScrollPane);
-		return point.y;
-	}
-
+  protected int getYCoordinateToViewport(MindMapNode child2) {
+    assertFalse(mMapView.getViewers(child2).isEmpty());
+    NodeView nodeView = mMapView.getViewers(child2).iterator().next();
+    Point point = nodeView.getMainView().getLocation();
+    Tools.convertPointToAncestor(nodeView, point, mScrollPane);
+    return point.y;
+  }
 }

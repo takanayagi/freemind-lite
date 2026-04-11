@@ -39,65 +39,62 @@ import freemind.main.Tools;
 import freemind.view.mindmapview.MapView;
 
 public class PreviewDialog extends JDialog implements ActionListener {
-	private final static double DEFAULT_ZOOM_FACTOR_STEP = 0.1;
+  private static final double DEFAULT_ZOOM_FACTOR_STEP = 0.1;
 
-	public PreviewDialog(String title, MapView view, PageFormat pPageFormat) {
-		super(JOptionPane.getFrameForComponent(view), title, true);
-		this.view = view;
-		Preview preview = new Preview(view, 1, pPageFormat);
-		JScrollPane scrollPane = new JScrollPane(preview);
-		getContentPane().add(scrollPane, "Center");
-		JToolBar toolbar = new JToolBar();
-		// toolbar.setRollover(true);
-		getContentPane().add(toolbar, "North");
-		JLabel pageNumber = new JLabel("- 1 -");
-		final JButton button = getButton("Back24.gif", new BrowseAction(preview, pageNumber, -1));
-		toolbar.add(button);
-		pageNumber.setPreferredSize(button.getPreferredSize());
-		pageNumber.setHorizontalAlignment(JLabel.CENTER);
-		toolbar.add(pageNumber);
-		toolbar.add(getButton("Forward24.gif", new BrowseAction(preview, pageNumber, 1)));
-		toolbar.add(new JToolBar.Separator());
-		toolbar.add(getButton("ZoomIn24.gif", new ZoomAction(preview, DEFAULT_ZOOM_FACTOR_STEP)));
-		toolbar.add(getButton("ZoomOut24.gif", new ZoomAction(preview, -DEFAULT_ZOOM_FACTOR_STEP)));
-		toolbar.add(new JToolBar.Separator());
-		JPanel dialog = new JPanel();
-		dialog.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		JButton ok = new JButton("OK");
-		ok.addActionListener(this);
-		dialog.add(ok);
-		getContentPane().add(dialog, "South");
-		Tools.addEscapeActionToDialog(this);
-	}
+  public PreviewDialog(String title, MapView view, PageFormat pPageFormat) {
+    super(JOptionPane.getFrameForComponent(view), title, true);
+    this.view = view;
+    Preview preview = new Preview(view, 1, pPageFormat);
+    JScrollPane scrollPane = new JScrollPane(preview);
+    getContentPane().add(scrollPane, "Center");
+    JToolBar toolbar = new JToolBar();
+    // toolbar.setRollover(true);
+    getContentPane().add(toolbar, "North");
+    JLabel pageNumber = new JLabel("- 1 -");
+    final JButton button = getButton("Back24.gif", new BrowseAction(preview, pageNumber, -1));
+    toolbar.add(button);
+    pageNumber.setPreferredSize(button.getPreferredSize());
+    pageNumber.setHorizontalAlignment(JLabel.CENTER);
+    toolbar.add(pageNumber);
+    toolbar.add(getButton("Forward24.gif", new BrowseAction(preview, pageNumber, 1)));
+    toolbar.add(new JToolBar.Separator());
+    toolbar.add(getButton("ZoomIn24.gif", new ZoomAction(preview, DEFAULT_ZOOM_FACTOR_STEP)));
+    toolbar.add(getButton("ZoomOut24.gif", new ZoomAction(preview, -DEFAULT_ZOOM_FACTOR_STEP)));
+    toolbar.add(new JToolBar.Separator());
+    JPanel dialog = new JPanel();
+    dialog.setLayout(new FlowLayout(FlowLayout.RIGHT));
+    JButton ok = new JButton("OK");
+    ok.addActionListener(this);
+    dialog.add(ok);
+    getContentPane().add(dialog, "South");
+    Tools.addEscapeActionToDialog(this);
+  }
 
-	private JButton getButton(String iconName, AbstractAction action) {
-		return getButton(null, iconName, action);
-	}
+  private JButton getButton(String iconName, AbstractAction action) {
+    return getButton(null, iconName, action);
+  }
 
-	private JButton getButton(String name, String iconName, AbstractAction action) {
-		JButton result = null;
+  private JButton getButton(String name, String iconName, AbstractAction action) {
+    JButton result = null;
 
-		ImageIcon icon = null;
-		URL imageURL = getClass().getClassLoader().getResource("images/" + iconName);
-		if (imageURL != null)
-			icon = freemind.view.ImageFactory.getInstance().createIcon(imageURL);
+    ImageIcon icon = null;
+    URL imageURL = getClass().getClassLoader().getResource("images/" + iconName);
+    if (imageURL != null) icon = freemind.view.ImageFactory.getInstance().createIcon(imageURL);
 
-		if (action != null) {
-			if (icon != null)
-				action.putValue(Action.SMALL_ICON,
-						freemind.view.ImageFactory.getInstance().createIcon(imageURL));
-			if (name != null)
-				action.putValue(Action.NAME, name);
-			result = new JButton(action);
-		} else
-			result = new JButton(name, icon);
+    if (action != null) {
+      if (icon != null)
+        action.putValue(
+            Action.SMALL_ICON, freemind.view.ImageFactory.getInstance().createIcon(imageURL));
+      if (name != null) action.putValue(Action.NAME, name);
+      result = new JButton(action);
+    } else result = new JButton(name, icon);
 
-		return result;
-	}
+    return result;
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		dispose();
-	}
+  public void actionPerformed(ActionEvent e) {
+    dispose();
+  }
 
-	protected MapView view;
+  protected MapView view;
 }

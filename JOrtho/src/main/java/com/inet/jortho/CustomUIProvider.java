@@ -22,47 +22,46 @@
  */
 package com.inet.jortho;
 
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTextField;
 
 /**
- * Interface used by other application to provide custom UI components
- * with added functionality if needed.
+ * Interface used by other application to provide custom UI components with added functionality if
+ * needed.
  *
  * @author Jesper Nielsen, jesniels@gmail.com
  */
 public interface CustomUIProvider {
 
-    /**
-     * Creates a JButton.
-     * @param resource The resource text for this button
-     * @return A JButton that can be used by the spell checker
-     */
-    JButton getButton( String resource );
+  /**
+   * Creates a JButton.
+   *
+   * @param resource The resource text for this button
+   * @return A JButton that can be used by the spell checker
+   */
+  JButton getButton(String resource);
 
-    /**
-     * Creates a JTextField.
-     *
-     * @return A JTextField that can be used by the spell checker
-     */
-    JTextField getTextField();
+  /**
+   * Creates a JTextField.
+   *
+   * @return A JTextField that can be used by the spell checker
+   */
+  JTextField getTextField();
 
+  /**
+   * Creates a JLabel.
+   *
+   * @param text The text for the Label
+   * @return A JLabel that can be used by the spell checker
+   */
+  JLabel getLabel(String text);
 
-    /**
-     * Creates a JLabel.
-     *
-     * @param text The text for the Label
-     * @return A JLabel that can be used by the spell checker
-     */
-    JLabel getLabel( String text );
-
-    /**
-     * Creates a JList.
-     *
-     * @return A JList that can be used by the spell checker
-     */
-    JList<String> getList();
+  /**
+   * Creates a JList.
+   *
+   * @return A JList that can be used by the spell checker
+   */
+  JList<String> getList();
 }

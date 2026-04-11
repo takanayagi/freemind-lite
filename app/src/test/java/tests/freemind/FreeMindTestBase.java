@@ -23,28 +23,25 @@ import org.junit.jupiter.api.BeforeEach;
 /** */
 public class FreeMindTestBase {
 
-	protected FreeMindMainMock mFreeMindMain;
+  protected FreeMindMainMock mFreeMindMain;
 
-	protected static final String TMPDIR = System.getProperty("java.io.tmpdir");
+  protected static final String TMPDIR = System.getProperty("java.io.tmpdir");
 
-	/**
-	 * 
-	 */
-	public FreeMindTestBase() {}
+  /** */
+  public FreeMindTestBase() {}
 
-	/**
-	 */
-	public FreeMindTestBase(String arg0) {}
+  /** */
+  public FreeMindTestBase(String arg0) {}
 
-	@BeforeEach
-	protected void setUp() throws Exception {
-		mFreeMindMain = new FreeMindMainMock();
-		System.out.println("Starting " + this.getClass().getSimpleName());
-	}
+  @BeforeEach
+  protected void setUp() throws Exception {
+    mFreeMindMain = new FreeMindMainMock();
+    System.out.println("Starting " + this.getClass().getSimpleName());
+  }
 
-	public FreeMindMainMock getFrame() {
-		return mFreeMindMain;
-	}
+  public FreeMindMainMock getFrame() {
+    return mFreeMindMain;
+  }
 }
 
 // private static java.util.logging.Logger logger =

@@ -34,83 +34,82 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class AddArrowLinkActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public AddArrowLinkActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public AddArrowLinkActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof AddArrowLinkXmlAction arrowAction) {
-			MindMapNode source = getNodeFromID(arrowAction.getNode());
-			MindMapNode target = getNodeFromID(arrowAction.getDestination());
-			if (source == target) {
-				logger.warning("Can't create link between itself. (" + source + ").");
-				return;
-			}
-			String proposedId = arrowAction.getNewId();
+  public void act(XmlAction action) {
+    if (action instanceof AddArrowLinkXmlAction arrowAction) {
+      MindMapNode source = getNodeFromID(arrowAction.getNode());
+      MindMapNode target = getNodeFromID(arrowAction.getDestination());
+      if (source == target) {
+        logger.warning("Can't create link between itself. (" + source + ").");
+        return;
+      }
+      String proposedId = arrowAction.getNewId();
 
-			if (getLinkRegistry().getLabel(target) == null) {
-				// call registry to give new label
-				getLinkRegistry().registerLinkTarget(target);
-			}
-			MindMapArrowLinkModel linkModel =
-					new MindMapArrowLinkModel(source, target, getExMapFeedback());
-			linkModel.setDestinationLabel(getLinkRegistry().getLabel(target));
-			// give label:
-			linkModel.setUniqueId(getLinkRegistry().generateUniqueLinkId(proposedId));
-			// check for other attributes:
-			if (arrowAction.getColor() != null) {
-				linkModel.setColor(Tools.xmlToColor(arrowAction.getColor()));
-			}
-			if (arrowAction.getEndArrow() != null) {
-				linkModel.setEndArrow(arrowAction.getEndArrow());
-			}
-			if (arrowAction.getEndInclination() != null) {
-				linkModel.setEndInclination(Tools.xmlToPoint(arrowAction.getEndInclination()));
-			}
-			if (arrowAction.getStartArrow() != null) {
-				linkModel.setStartArrow(arrowAction.getStartArrow());
-			}
-			if (arrowAction.getStartInclination() != null) {
-				linkModel.setStartInclination(Tools.xmlToPoint(arrowAction.getStartInclination()));
-			}
-			// register link.
-			getLinkRegistry().registerLink(linkModel);
-			getExMapFeedback().nodeChanged(target);
-			getExMapFeedback().nodeChanged(source);
+      if (getLinkRegistry().getLabel(target) == null) {
+        // call registry to give new label
+        getLinkRegistry().registerLinkTarget(target);
+      }
+      MindMapArrowLinkModel linkModel =
+          new MindMapArrowLinkModel(source, target, getExMapFeedback());
+      linkModel.setDestinationLabel(getLinkRegistry().getLabel(target));
+      // give label:
+      linkModel.setUniqueId(getLinkRegistry().generateUniqueLinkId(proposedId));
+      // check for other attributes:
+      if (arrowAction.getColor() != null) {
+        linkModel.setColor(Tools.xmlToColor(arrowAction.getColor()));
+      }
+      if (arrowAction.getEndArrow() != null) {
+        linkModel.setEndArrow(arrowAction.getEndArrow());
+      }
+      if (arrowAction.getEndInclination() != null) {
+        linkModel.setEndInclination(Tools.xmlToPoint(arrowAction.getEndInclination()));
+      }
+      if (arrowAction.getStartArrow() != null) {
+        linkModel.setStartArrow(arrowAction.getStartArrow());
+      }
+      if (arrowAction.getStartInclination() != null) {
+        linkModel.setStartInclination(Tools.xmlToPoint(arrowAction.getStartInclination()));
+      }
+      // register link.
+      getLinkRegistry().registerLink(linkModel);
+      getExMapFeedback().nodeChanged(target);
+      getExMapFeedback().nodeChanged(source);
+    }
+  }
 
-		}
-	}
+  public Class<AddArrowLinkXmlAction> getDoActionClass() {
+    return AddArrowLinkXmlAction.class;
+  }
 
-	public Class<AddArrowLinkXmlAction> getDoActionClass() {
-		return AddArrowLinkXmlAction.class;
-	}
+  private ActionPair getActionPair(MindMapNode source, MindMapNode target) {
+    AddArrowLinkXmlAction doAction =
+        createAddArrowLinkXmlAction(source, target, getLinkRegistry().generateUniqueLinkId(null));
+    // now, the id is clear:
+    RemoveArrowLinkXmlAction undoAction =
+        getExMapFeedback()
+            .getActorFactory()
+            .getRemoveArrowLinkActor()
+            .createRemoveArrowLinkXmlAction(doAction.getNewId());
+    return new ActionPair(doAction, undoAction);
+  }
 
-	private ActionPair getActionPair(MindMapNode source, MindMapNode target) {
-		AddArrowLinkXmlAction doAction = createAddArrowLinkXmlAction(source, target,
-				getLinkRegistry().generateUniqueLinkId(null));
-		// now, the id is clear:
-		RemoveArrowLinkXmlAction undoAction = getExMapFeedback().getActorFactory()
-				.getRemoveArrowLinkActor().createRemoveArrowLinkXmlAction(doAction.getNewId());
-		return new ActionPair(doAction, undoAction);
-	}
+  public AddArrowLinkXmlAction createAddArrowLinkXmlAction(
+      MindMapNode source, MindMapNode target, String proposedID) {
+    AddArrowLinkXmlAction action = new AddArrowLinkXmlAction();
+    action.setNode(getNodeID(source));
+    action.setDestination(getNodeID(target));
+    action.setNewId(proposedID);
+    return action;
+  }
 
-	public AddArrowLinkXmlAction createAddArrowLinkXmlAction(MindMapNode source, MindMapNode target,
-			String proposedID) {
-		AddArrowLinkXmlAction action = new AddArrowLinkXmlAction();
-		action.setNode(getNodeID(source));
-		action.setDestination(getNodeID(target));
-		action.setNewId(proposedID);
-		return action;
-	}
-
-	/**
-	 * Source holds the MindMapArrowLinkModel and points to the id placed in target.
-	 */
-	public void addLink(MindMapNode source, MindMapNode target) {
-		execute(getActionPair(source, target));
-	}
-
+  /** Source holds the MindMapArrowLinkModel and points to the id placed in target. */
+  public void addLink(MindMapNode source, MindMapNode target) {
+    execute(getActionPair(source, target));
+  }
 }

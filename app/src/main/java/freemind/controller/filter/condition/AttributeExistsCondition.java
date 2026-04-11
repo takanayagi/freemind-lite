@@ -31,46 +31,44 @@ import freemind.modes.attributes.Attribute;
  * @author Dimitri Polivaev 12.07.2005
  */
 public class AttributeExistsCondition extends NodeCondition {
-	static final String ATTRIBUTE = "attribute";
-	static final String NAME = "attribute_exists_condition";
-	private String attribute;
+  static final String ATTRIBUTE = "attribute";
+  static final String NAME = "attribute_exists_condition";
+  private String attribute;
 
-	/**
-	 */
-	public AttributeExistsCondition(String attribute) {
-		super();
-		this.attribute = attribute;
-	}
+  /** */
+  public AttributeExistsCondition(String attribute) {
+    super();
+    this.attribute = attribute;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.filter.condition.Condition#checkNode(freemind.modes .MindMapNode)
-	 */
-	public boolean checkNode(Controller c, MindMapNode node) {
-		for (int i = 0; i < node.getAttributeTableLength(); i++) {
-			Attribute attribute2 = node.getAttribute(i);
-			if (attribute2.getName().equals(attribute))
-				return true;
-		}
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.filter.condition.Condition#checkNode(freemind.modes .MindMapNode)
+   */
+  public boolean checkNode(Controller c, MindMapNode node) {
+    for (int i = 0; i < node.getAttributeTableLength(); i++) {
+      Attribute attribute2 = node.getAttribute(i);
+      if (attribute2.getName().equals(attribute)) return true;
+    }
+    return false;
+  }
 
-	public void save(XMLElement element) {
-		XMLElement child = new XMLElement();
-		child.setName(NAME);
-		super.saveAttributes(child);
-		child.setAttribute(ATTRIBUTE, attribute);
-		element.addChild(child);
-	}
+  public void save(XMLElement element) {
+    XMLElement child = new XMLElement();
+    child.setName(NAME);
+    super.saveAttributes(child);
+    child.setAttribute(ATTRIBUTE, attribute);
+    element.addChild(child);
+  }
 
-	static Condition load(XMLElement element) {
-		return new AttributeExistsCondition(element.getStringAttribute(ATTRIBUTE));
-	}
+  static Condition load(XMLElement element) {
+    return new AttributeExistsCondition(element.getStringAttribute(ATTRIBUTE));
+  }
 
-	protected String createDesctiption() {
-		final String simpleCondition =
-				Resources.getInstance().getResourceString(ConditionFactory.FILTER_EXIST);
-		return ConditionFactory.createDescription(attribute, simpleCondition, null, false);
-	}
+  protected String createDesctiption() {
+    final String simpleCondition =
+        Resources.getInstance().getResourceString(ConditionFactory.FILTER_EXIST);
+    return ConditionFactory.createDescription(attribute, simpleCondition, null, false);
+  }
 }

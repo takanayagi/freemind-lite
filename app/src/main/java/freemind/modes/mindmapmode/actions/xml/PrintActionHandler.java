@@ -19,7 +19,6 @@
  * Created on 24.04.2004
  */
 
-
 package freemind.modes.mindmapmode.actions.xml;
 
 import java.util.logging.Logger;
@@ -28,53 +27,44 @@ import freemind.modes.mindmapmode.MindMapController;
 
 /**
  * @author foltin
- * 
  */
 public class PrintActionHandler implements ActionHandler {
 
-	private MindMapController c;
+  private MindMapController c;
 
-	// Logging:
-	private static Logger logger;
+  // Logging:
+  private static Logger logger;
 
-	/**
-	 *
-	 */
-	public PrintActionHandler(MindMapController c) {
-		super();
-		this.c = c;
-		if (logger == null)
-			logger = c.getFrame().getLogger(this.getClass().getName());
-	}
+  /** */
+  public PrintActionHandler(MindMapController c) {
+    super();
+    this.c = c;
+    if (logger == null) logger = c.getFrame().getLogger(this.getClass().getName());
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#startTransaction(java.lang. String)
-	 */
-	public void startTransaction(String name) {
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#startTransaction(java.lang. String)
+   */
+  public void startTransaction(String name) {}
 
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#endTransaction(java.lang.String )
+   */
+  public void endTransaction(String name) {}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#endTransaction(java.lang.String )
-	 */
-	public void endTransaction(String name) {
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#executeAction(freemind.controller
-	 * .actions.ActionPair)
-	 */
-	public void executeAction(XmlAction action) {
-		String s = c.marshall(action);
-		logger.info(s);
-		// Tools.printStackTrace();
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#executeAction(freemind.controller
+   * .actions.ActionPair)
+   */
+  public void executeAction(XmlAction action) {
+    String s = c.marshall(action);
+    logger.info(s);
+    // Tools.printStackTrace();
+  }
 }

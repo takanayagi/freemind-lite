@@ -29,52 +29,46 @@ import java.util.logging.Formatter;
 
 public class StdFormatter extends Formatter {
 
-	private static class StdOutErrLevel extends Level {
-		public StdOutErrLevel(String name, int value) {
-			super(name, value);
-		}
-	}
+  private static class StdOutErrLevel extends Level {
+    public StdOutErrLevel(String name, int value) {
+      super(name, value);
+    }
+  }
 
-	/**
-	 * Level for STDOUT activity.
-	 */
-	final static Level STDOUT = new StdOutErrLevel("STDOUT", Level.WARNING.intValue() + 53);
+  /** Level for STDOUT activity. */
+  static final Level STDOUT = new StdOutErrLevel("STDOUT", Level.WARNING.intValue() + 53);
 
-	/**
-	 * Level for STDERR activity
-	 */
-	final static Level STDERR = new StdOutErrLevel("STDERR", Level.SEVERE.intValue() + 53);
+  /** Level for STDERR activity */
+  static final Level STDERR = new StdOutErrLevel("STDERR", Level.SEVERE.intValue() + 53);
 
-	private static final DateTimeFormatter DATE_FORMAT =
-			DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
+  private static final DateTimeFormatter DATE_FORMAT =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
 
-	/**
-	 * Custom formatter to include thread id in log messages.
-	 */
-	@Override
-	public String format(LogRecord record) {
-		// The format is <date> <time> [<thread id>] <level> - <message> <stacktrace>
-		String timestamp = DATE_FORMAT.format(Instant.ofEpochMilli(record.getMillis()));
-		long threadId = record.getLongThreadID();
-		String level = record.getLevel().getName();
-		String loggerName = record.getLoggerName();
-		String message = formatMessage(record);
-		StringBuilder sb = new StringBuilder();
-		sb.append(timestamp);
-		sb.append(String.format(" [%2d] ", threadId));
-		sb.append(String.format("%-7s", level));
-		sb.append(" ");
-		sb.append(loggerName != null ? loggerName : "(unknown)");
-		sb.append(" - ");
-		sb.append(message);
-		sb.append(System.lineSeparator());
-		if (record.getThrown() != null) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			record.getThrown().printStackTrace(pw);
-			pw.close();
-			sb.append(sw.toString());
-		}
-		return sb.toString();
-	}
+  /** Custom formatter to include thread id in log messages. */
+  @Override
+  public String format(LogRecord record) {
+    // The format is <date> <time> [<thread id>] <level> - <message> <stacktrace>
+    String timestamp = DATE_FORMAT.format(Instant.ofEpochMilli(record.getMillis()));
+    long threadId = record.getLongThreadID();
+    String level = record.getLevel().getName();
+    String loggerName = record.getLoggerName();
+    String message = formatMessage(record);
+    StringBuilder sb = new StringBuilder();
+    sb.append(timestamp);
+    sb.append(String.format(" [%2d] ", threadId));
+    sb.append(String.format("%-7s", level));
+    sb.append(" ");
+    sb.append(loggerName != null ? loggerName : "(unknown)");
+    sb.append(" - ");
+    sb.append(message);
+    sb.append(System.lineSeparator());
+    if (record.getThrown() != null) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      record.getThrown().printStackTrace(pw);
+      pw.close();
+      sb.append(sw.toString());
+    }
+    return sb.toString();
+  }
 }

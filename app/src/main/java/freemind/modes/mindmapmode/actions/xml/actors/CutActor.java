@@ -37,68 +37,65 @@ import freemind.modes.mindmapmode.actions.xml.actors.PasteActor.NodeCoordinate;
  */
 public class CutActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public CutActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public CutActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public CutNodeAction getCutNodeAction(MindMapNode node) {
-		CutNodeAction cutAction = new CutNodeAction();
-		cutAction.setNode(getNodeID(node));
-		return cutAction;
-	}
+  public CutNodeAction getCutNodeAction(MindMapNode node) {
+    CutNodeAction cutAction = new CutNodeAction();
+    cutAction.setNode(getNodeID(node));
+    return cutAction;
+  }
 
-	public Transferable cut(List<MindMapNode> nodeList) {
-		getExMapFeedback().sortNodesByDepth(nodeList);
-		Transferable totalCopy = getExMapFeedback().copy(nodeList, true);
-		// Do-action
-		CompoundAction doAction = new CompoundAction();
-		// Undo-action
-		CompoundAction undo = new CompoundAction();
-		// sort selectedNodes list by depth, in order to guarantee that sons are
-		// deleted first:
-		for (MindMapNode node : nodeList) {
-			if (node.getParentNode() == null)
-				continue;
-			CutNodeAction cutNodeAction = getCutNodeAction(node);
-			doAction.addChoice(cutNodeAction);
+  public Transferable cut(List<MindMapNode> nodeList) {
+    getExMapFeedback().sortNodesByDepth(nodeList);
+    Transferable totalCopy = getExMapFeedback().copy(nodeList, true);
+    // Do-action
+    CompoundAction doAction = new CompoundAction();
+    // Undo-action
+    CompoundAction undo = new CompoundAction();
+    // sort selectedNodes list by depth, in order to guarantee that sons are
+    // deleted first:
+    for (MindMapNode node : nodeList) {
+      if (node.getParentNode() == null) continue;
+      CutNodeAction cutNodeAction = getCutNodeAction(node);
+      doAction.addChoice(cutNodeAction);
 
-			NodeCoordinate coord = new NodeCoordinate(node, node.isLeft());
-			Transferable copy = getExMapFeedback().copy(node, true);
-			PasteNodeAction pasteNodeAction =
-					getXmlActorFactory().getPasteActor().getPasteNodeAction(copy, coord, null);
-			// The paste actions are reversed because of the strange
-			// coordinates.
-			undo.addAtChoice(0, pasteNodeAction);
+      NodeCoordinate coord = new NodeCoordinate(node, node.isLeft());
+      Transferable copy = getExMapFeedback().copy(node, true);
+      PasteNodeAction pasteNodeAction =
+          getXmlActorFactory().getPasteActor().getPasteNodeAction(copy, coord, null);
+      // The paste actions are reversed because of the strange
+      // coordinates.
+      undo.addAtChoice(0, pasteNodeAction);
+    }
+    if (doAction.sizeChoiceList() > 0) {
+      execute(new ActionPair(doAction, undo));
+    }
+    return totalCopy;
+  }
 
-		}
-		if (doAction.sizeChoiceList() > 0) {
-			execute(new ActionPair(doAction, undo));
-		}
-		return totalCopy;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
+   * generated.instance.XmlAction)
+   */
+  public void act(XmlAction action) {
+    CutNodeAction cutAction = (CutNodeAction) action;
+    MindMapNode selectedNode = getNodeFromID(cutAction.getNode());
+    getXmlActorFactory().getDeleteChildActor().deleteWithoutUndo(selectedNode);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
-	 * generated.instance.XmlAction)
-	 */
-	public void act(XmlAction action) {
-		CutNodeAction cutAction = (CutNodeAction) action;
-		MindMapNode selectedNode = getNodeFromID(cutAction.getNode());
-		getXmlActorFactory().getDeleteChildActor().deleteWithoutUndo(selectedNode);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#getDoActionClass()
-	 */
-	public Class<CutNodeAction> getDoActionClass() {
-		return CutNodeAction.class;
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#getDoActionClass()
+   */
+  public Class<CutNodeAction> getDoActionClass() {
+    return CutNodeAction.class;
+  }
 }

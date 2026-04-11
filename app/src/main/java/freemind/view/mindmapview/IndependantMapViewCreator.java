@@ -51,100 +51,108 @@ import freemind.modes.mindmapmode.MindMapMapModel;
  */
 public class IndependantMapViewCreator extends MapFeedbackAdapter {
 
-	private MindMapMapModel mMap;
+  private MindMapMapModel mMap;
 
-	public MapView createMapViewForFile(String inputFileName, JPanel parent,
-			FreeMindMain pFreeMindMain) throws IOException {
-		mMap = new MindMapMapModel(this);
-		Tools.FileReaderCreator readerCreator =
-				new Tools.FileReaderCreator(new File(inputFileName));
-		MindMapNode node = mMap.loadTree(readerCreator, MapAdapter.sDontAskInstance);
-		mMap.setRoot(node);
-		MapView mapView = new MapView(mMap, this);
-		parent.add(mapView, BorderLayout.CENTER);
-		mapView.setBounds(parent.getBounds());
-		Tools.waitForEventQueue();
-		mapView.addNotify();
-		return mapView;
-	}
+  public MapView createMapViewForFile(
+      String inputFileName, JPanel parent, FreeMindMain pFreeMindMain) throws IOException {
+    mMap = new MindMapMapModel(this);
+    Tools.FileReaderCreator readerCreator = new Tools.FileReaderCreator(new File(inputFileName));
+    MindMapNode node = mMap.loadTree(readerCreator, MapAdapter.sDontAskInstance);
+    mMap.setRoot(node);
+    MapView mapView = new MapView(mMap, this);
+    parent.add(mapView, BorderLayout.CENTER);
+    mapView.setBounds(parent.getBounds());
+    Tools.waitForEventQueue();
+    mapView.addNotify();
+    return mapView;
+  }
 
-	public void exportFileToPng(String inputFileName, String outputFileName,
-			FreeMindMain pFreeMindMain)
-			throws IOException, URISyntaxException {
-		JPanel parent = new JPanel();
-		Rectangle bounds = new Rectangle(0, 0, 400, 600);
-		parent.setBounds(bounds);
-		MapView mapView = createMapViewForFile(inputFileName, parent, pFreeMindMain);
-		// layout components:
-		mapView.getRoot().getMainView().doLayout();
-		parent.setOpaque(true);
-		parent.setDoubleBuffered(false); // for better performance
-		parent.doLayout();
-		parent.validate(); // this might not be necessary
-		mapView.preparePrinting();
-		parent.setBounds(mapView.getBounds());
-		printToFile(mapView, outputFileName, false, 0);
-	}
+  public void exportFileToPng(
+      String inputFileName, String outputFileName, FreeMindMain pFreeMindMain)
+      throws IOException, URISyntaxException {
+    JPanel parent = new JPanel();
+    Rectangle bounds = new Rectangle(0, 0, 400, 600);
+    parent.setBounds(bounds);
+    MapView mapView = createMapViewForFile(inputFileName, parent, pFreeMindMain);
+    // layout components:
+    mapView.getRoot().getMainView().doLayout();
+    parent.setOpaque(true);
+    parent.setDoubleBuffered(false); // for better performance
+    parent.doLayout();
+    parent.validate(); // this might not be necessary
+    mapView.preparePrinting();
+    parent.setBounds(mapView.getBounds());
+    printToFile(mapView, outputFileName, false, 0);
+  }
 
-	/**
-	 * @param mapView
-	 * @param outputFileName
-	 * @param scale
-	 * @param destSize
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public static void printToFile(MapView mapView, String outputFileName, boolean scale,
-			int destSize) throws FileNotFoundException, IOException {
-		Container parent = mapView.getParent();
-		Rectangle dimI = mapView.getInnerBounds();
-		Rectangle dim = mapView.getBounds();
-		// do print
-		BufferedImage backBuffer =
-				new BufferedImage(dimI.width, dimI.height, BufferedImage.TYPE_INT_ARGB);
-		Graphics g = backBuffer.createGraphics();
-		int newX = -dim.x - dimI.x;
-		int newY = -dim.y - dimI.y;
-		g.translate(newX, newY);
-		g.clipRect(-newX, -newY, dimI.width, dimI.height);
-		parent.print(g);
-		g.dispose();
-		if (scale) {
-			double maxDim = Math.max(dimI.getHeight(), dimI.getWidth());
-			int newWidth = (int) (dimI.getWidth() * destSize / maxDim);
-			int newHeight = (int) (dimI.getHeight() * destSize / maxDim);
-			BufferedImage resized = new BufferedImage(newWidth, newHeight, backBuffer.getType());
-			Graphics2D g2 = resized.createGraphics();
-			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-					RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			g2.drawImage(backBuffer, 0, 0, newWidth, newHeight, 0, 0, backBuffer.getWidth(),
-					backBuffer.getHeight(), null);
-			g2.dispose();
-			backBuffer = resized;
-		}
-		FileOutputStream out1 = new FileOutputStream(outputFileName);
-		ImageIO.write(backBuffer, "png", out1);
-		out1.close();
-	}
+  /**
+   * @param mapView
+   * @param outputFileName
+   * @param scale
+   * @param destSize
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public static void printToFile(
+      MapView mapView, String outputFileName, boolean scale, int destSize)
+      throws FileNotFoundException, IOException {
+    Container parent = mapView.getParent();
+    Rectangle dimI = mapView.getInnerBounds();
+    Rectangle dim = mapView.getBounds();
+    // do print
+    BufferedImage backBuffer =
+        new BufferedImage(dimI.width, dimI.height, BufferedImage.TYPE_INT_ARGB);
+    Graphics g = backBuffer.createGraphics();
+    int newX = -dim.x - dimI.x;
+    int newY = -dim.y - dimI.y;
+    g.translate(newX, newY);
+    g.clipRect(-newX, -newY, dimI.width, dimI.height);
+    parent.print(g);
+    g.dispose();
+    if (scale) {
+      double maxDim = Math.max(dimI.getHeight(), dimI.getWidth());
+      int newWidth = (int) (dimI.getWidth() * destSize / maxDim);
+      int newHeight = (int) (dimI.getHeight() * destSize / maxDim);
+      BufferedImage resized = new BufferedImage(newWidth, newHeight, backBuffer.getType());
+      Graphics2D g2 = resized.createGraphics();
+      g2.setRenderingHint(
+          RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      g2.drawImage(
+          backBuffer,
+          0,
+          0,
+          newWidth,
+          newHeight,
+          0,
+          0,
+          backBuffer.getWidth(),
+          backBuffer.getHeight(),
+          null);
+      g2.dispose();
+      backBuffer = resized;
+    }
+    FileOutputStream out1 = new FileOutputStream(outputFileName);
+    ImageIO.write(backBuffer, "png", out1);
+    out1.close();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MapFeedback#getMap()
-	 */
-	@Override
-	public MindMap getMap() {
-		return mMap;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MapFeedback#getMap()
+   */
+  @Override
+  public MindMap getMap() {
+    return mMap;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MapFeedback#createNodeHook(java.lang.String, freemind.modes.MindMapNode)
-	 */
-	@Override
-	public NodeHook createNodeHook(String pLoadName, MindMapNode pNode) {
-		return new PermanentNodeHookSubstituteUnknown(pLoadName);
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MapFeedback#createNodeHook(java.lang.String, freemind.modes.MindMapNode)
+   */
+  @Override
+  public NodeHook createNodeHook(String pLoadName, MindMapNode pNode) {
+    return new PermanentNodeHookSubstituteUnknown(pLoadName);
+  }
 }

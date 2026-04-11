@@ -25,12 +25,11 @@ import freemind.modes.MindMapNode;
 
 public class BrowseCloudModel extends CloudAdapter {
 
-	public BrowseCloudModel(MindMapNode node, MapFeedback pMapFeedback) {
-		super(node, pMapFeedback);
-	}
+  public BrowseCloudModel(MindMapNode node, MapFeedback pMapFeedback) {
+    super(node, pMapFeedback);
+  }
 
-	public XMLElement save() {
-		return null;
-	}
-
+  public XMLElement save() {
+    return null;
+  }
 }

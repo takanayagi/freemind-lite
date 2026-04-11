@@ -38,87 +38,84 @@ import freemind.view.MapModule;
  * format:"mode\:key",ie."Mindmap\:/home/joerg/freemind.mm"
  */
 public class LastOpenedList {
-	private Controller mController;
-	private int maxEntries = 25; // is rewritten from property anyway
-	/**
-	 * Contains Restore strings.
-	 */
-	private List<String> mlastOpenedList = new LinkedList<>();
-	/**
-	 * Contains Restore string => map name (map.toString()).
-	 */
-	private Map<String, String> mRestorableToMapName = new HashMap<>();
+  private Controller mController;
+  private int maxEntries = 25; // is rewritten from property anyway
 
-	public LastOpenedList(Controller c, String restored) {
-		this.mController = c;
-		try {
-			maxEntries = Integer.parseInt(c.getFrame().getProperty("last_opened_list_length"));
-		} catch (NumberFormatException e) {
-			freemind.main.Resources.getInstance().logException(e);
-		}
-		load(restored);
-	}
+  /** Contains Restore strings. */
+  private List<String> mlastOpenedList = new LinkedList<>();
 
-	public void mapOpened(MapModule mapModule) {
-		if (mapModule == null || mapModule.getModel() == null)
-			return;
-		String restoreString = mapModule.getModel().getRestorable();
-		String name = mapModule.toString();
-		add(restoreString, name);
-	}
+  /** Contains Restore string => map name (map.toString()). */
+  private Map<String, String> mRestorableToMapName = new HashMap<>();
 
-	/**
-	 * For testing purposes, this method is public
-	 */
-	public void add(String restoreString, String name) {
-		if (restoreString == null)
-			return;
-		mlastOpenedList.remove(restoreString);
-		mlastOpenedList.add(0, restoreString);
-		mRestorableToMapName.put(restoreString, name);
+  public LastOpenedList(Controller c, String restored) {
+    this.mController = c;
+    try {
+      maxEntries = Integer.parseInt(c.getFrame().getProperty("last_opened_list_length"));
+    } catch (NumberFormatException e) {
+      freemind.main.Resources.getInstance().logException(e);
+    }
+    load(restored);
+  }
 
-		while (mlastOpenedList.size() > maxEntries) {
-			mlastOpenedList.remove(mlastOpenedList.size() - 1); // remove last elt
-		}
-	}
+  public void mapOpened(MapModule mapModule) {
+    if (mapModule == null || mapModule.getModel() == null) return;
+    String restoreString = mapModule.getModel().getRestorable();
+    String name = mapModule.toString();
+    add(restoreString, name);
+  }
 
-	/** fc, 8.8.2004: This method returns a string representation of this class. */
-	public String save() {
-		StringBuilder str = new StringBuilder();
-		for (ListIterator<String> it = listIterator(); it.hasNext();) {
-			str.append(it.next()).append(';');
-		}
-		return str.toString();
-	}
+  /** For testing purposes, this method is public */
+  public void add(String restoreString, String name) {
+    if (restoreString == null) return;
+    mlastOpenedList.remove(restoreString);
+    mlastOpenedList.add(0, restoreString);
+    mRestorableToMapName.put(restoreString, name);
 
-	/**
-	 * 
-	 */
-	void load(String data) {
-		// Take care that there are no ";" in restorable names!
-		if (data != null) {
-			StringTokenizer token = new StringTokenizer(data, ";");
-			while (token.hasMoreTokens())
-				mlastOpenedList.add(token.nextToken());
-		}
-	}
+    while (mlastOpenedList.size() > maxEntries) {
+      mlastOpenedList.remove(mlastOpenedList.size() - 1); // remove last elt
+    }
+  }
 
-	public boolean open(String restoreable) throws FileNotFoundException, XMLParseException,
-			MalformedURLException, IOException, URISyntaxException {
-		boolean changedToMapModule = mController.getMapModuleManager()
-				.tryToChangeToMapModule(mRestorableToMapName.get(restoreable));
-		if ((restoreable != null) && !(changedToMapModule)) {
-			String mode = Tools.getModeFromRestorable(restoreable);
-			String fileName = Tools.getFileNameFromRestorable(restoreable);
-			if (mController.createNewMode(mode)) {
-				mController.getMode().restore(fileName);
-				return true;
-			}
-		}
-		return false;
-	}
+  /** fc, 8.8.2004: This method returns a string representation of this class. */
+  public String save() {
+    StringBuilder str = new StringBuilder();
+    for (ListIterator<String> it = listIterator(); it.hasNext(); ) {
+      str.append(it.next()).append(';');
+    }
+    return str.toString();
+  }
 
-	ListIterator<String> listIterator() {
-		return mlastOpenedList.listIterator();
-	}
+  /** */
+  void load(String data) {
+    // Take care that there are no ";" in restorable names!
+    if (data != null) {
+      StringTokenizer token = new StringTokenizer(data, ";");
+      while (token.hasMoreTokens()) mlastOpenedList.add(token.nextToken());
+    }
+  }
+
+  public boolean open(String restoreable)
+      throws FileNotFoundException,
+          XMLParseException,
+          MalformedURLException,
+          IOException,
+          URISyntaxException {
+    boolean changedToMapModule =
+        mController
+            .getMapModuleManager()
+            .tryToChangeToMapModule(mRestorableToMapName.get(restoreable));
+    if ((restoreable != null) && !(changedToMapModule)) {
+      String mode = Tools.getModeFromRestorable(restoreable);
+      String fileName = Tools.getFileNameFromRestorable(restoreable);
+      if (mController.createNewMode(mode)) {
+        mController.getMode().restore(fileName);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  ListIterator<String> listIterator() {
+    return mlastOpenedList.listIterator();
+  }
 }

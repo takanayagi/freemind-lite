@@ -40,80 +40,87 @@ import freemind.main.Tools;
  */
 public class FreeMindProgressMonitor extends JDialog {
 
-	/**
-	 * 
-	 */
-	private static final String PROGRESS_MONITOR_WINDOW_CONFIGURATION_STORAGE =
-			"progress_monitor_window_configuration_storage";
-	private JLabel mLabel;
-	private JProgressBar mProgressBar;
-	protected boolean mCanceled = false;
+  /** */
+  private static final String PROGRESS_MONITOR_WINDOW_CONFIGURATION_STORAGE =
+      "progress_monitor_window_configuration_storage";
 
-	/**
-	 * 
-	 */
-	public FreeMindProgressMonitor(String pTitle) {
-		setTitle(getString(pTitle));
-		mLabel = new JLabel("!");
-		mProgressBar = new JProgressBar();
-		JButton cancelButton = new JButton();
-		Tools.setLabelAndMnemonic(cancelButton, getString(("cancel")));
-		cancelButton.addActionListener(pE -> mCanceled = true);
-		setLayout(new GridBagLayout());
-		GridBagConstraints constraints = new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER,
-				1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-				new Insets(0, 5, 0, 5), 0, 0);
-		add(mLabel, constraints);
-		constraints.gridy = 1;
-		add(mProgressBar, constraints);
-		constraints.gridy = 2;
-		constraints.fill = GridBagConstraints.NONE;
-		constraints.anchor = GridBagConstraints.EAST;
-		add(cancelButton, constraints);
-		// Tools.addEscapeActionToDialog(this);
-		pack();
-		setSize(new Dimension(600, 200));
-		String marshaled =
-				Resources.getInstance().getProperty(PROGRESS_MONITOR_WINDOW_CONFIGURATION_STORAGE);
-		if (marshaled != null) {
-			XmlBindingTools.getInstance().decorateDialog(marshaled, this);
-		}
-	}
+  private JLabel mLabel;
+  private JProgressBar mProgressBar;
+  protected boolean mCanceled = false;
 
-	protected String getString(String resource) {
-		return Resources.getInstance().getResourceString(resource);
-	}
+  /** */
+  public FreeMindProgressMonitor(String pTitle) {
+    setTitle(getString(pTitle));
+    mLabel = new JLabel("!");
+    mProgressBar = new JProgressBar();
+    JButton cancelButton = new JButton();
+    Tools.setLabelAndMnemonic(cancelButton, getString(("cancel")));
+    cancelButton.addActionListener(pE -> mCanceled = true);
+    setLayout(new GridBagLayout());
+    GridBagConstraints constraints =
+        new GridBagConstraints(
+            0,
+            0,
+            GridBagConstraints.REMAINDER,
+            1,
+            1.0,
+            1.0,
+            GridBagConstraints.WEST,
+            GridBagConstraints.HORIZONTAL,
+            new Insets(0, 5, 0, 5),
+            0,
+            0);
+    add(mLabel, constraints);
+    constraints.gridy = 1;
+    add(mProgressBar, constraints);
+    constraints.gridy = 2;
+    constraints.fill = GridBagConstraints.NONE;
+    constraints.anchor = GridBagConstraints.EAST;
+    add(cancelButton, constraints);
+    // Tools.addEscapeActionToDialog(this);
+    pack();
+    setSize(new Dimension(600, 200));
+    String marshaled =
+        Resources.getInstance().getProperty(PROGRESS_MONITOR_WINDOW_CONFIGURATION_STORAGE);
+    if (marshaled != null) {
+      XmlBindingTools.getInstance().decorateDialog(marshaled, this);
+    }
+  }
 
-	/**
-	 * @param pCurrent current
-	 * @param pMax max
-	 * @param pName resource string to be displayed as progress string (maybe with parameters
-	 *		pParameters)
-	 * @param pParameters objects to be put in the resource string for pName
-	 * @return progress
-	 */
-	public boolean showProgress(int pCurrent, final int pMax, String pName, Object[] pParameters) {
-		EventQueue.invokeLater(() -> mProgressBar.setMaximum(pMax));
-		return showProgress(pCurrent, pName, pParameters);
-	}
+  protected String getString(String resource) {
+    return Resources.getInstance().getResourceString(resource);
+  }
 
-	public boolean showProgress(int pCurrent, String pName, Object[] pParameters) {
-		final String format = Resources.getInstance().format(pName, pParameters);
-		EventQueue.invokeLater(() -> mLabel.setText(format));
-		return setProgress(pCurrent);
-	}
+  /**
+   * @param pCurrent current
+   * @param pMax max
+   * @param pName resource string to be displayed as progress string (maybe with parameters
+   *     pParameters)
+   * @param pParameters objects to be put in the resource string for pName
+   * @return progress
+   */
+  public boolean showProgress(int pCurrent, final int pMax, String pName, Object[] pParameters) {
+    EventQueue.invokeLater(() -> mProgressBar.setMaximum(pMax));
+    return showProgress(pCurrent, pName, pParameters);
+  }
 
-	public boolean setProgress(final int pCurrent) {
-		EventQueue.invokeLater(() -> mProgressBar.setValue(pCurrent));
-		return mCanceled;
-	}
+  public boolean showProgress(int pCurrent, String pName, Object[] pParameters) {
+    final String format = Resources.getInstance().format(pName, pParameters);
+    EventQueue.invokeLater(() -> mLabel.setText(format));
+    return setProgress(pCurrent);
+  }
 
-	public void dismiss() {
-		WindowConfigurationStorage storage = new WindowConfigurationStorage();
-		String marshalled = XmlBindingTools.getInstance().storeDialogPositions(storage, this);
-		Resources.getInstance().getProperties()
-				.setProperty(PROGRESS_MONITOR_WINDOW_CONFIGURATION_STORAGE, marshalled);
-		this.setVisible(false);
-	}
+  public boolean setProgress(final int pCurrent) {
+    EventQueue.invokeLater(() -> mProgressBar.setValue(pCurrent));
+    return mCanceled;
+  }
 
+  public void dismiss() {
+    WindowConfigurationStorage storage = new WindowConfigurationStorage();
+    String marshalled = XmlBindingTools.getInstance().storeDialogPositions(storage, this);
+    Resources.getInstance()
+        .getProperties()
+        .setProperty(PROGRESS_MONITOR_WINDOW_CONFIGURATION_STORAGE, marshalled);
+    this.setVisible(false);
+  }
 }

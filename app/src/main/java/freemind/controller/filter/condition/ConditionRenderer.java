@@ -38,34 +38,33 @@ import freemind.modes.MindIcon;
  */
 public class ConditionRenderer implements ListCellRenderer<Object> {
 
-	final public static Color SELECTED_BACKGROUND = new Color(207, 247, 202);
+  public static final Color SELECTED_BACKGROUND = new Color(207, 247, 202);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing .JList,
-	 * java.lang.Object, int, boolean, boolean)
-	 */
-	public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-			boolean isSelected, boolean cellHasFocus) {
-		if (value == null)
-			return new JLabel(Resources.getInstance().getResourceString("filter_no_filtering"));
-		JComponent component;
-		if (value instanceof MindIcon) {
-			component = new JLabel(((MindIcon) value).getIcon());
-		} else if (value instanceof Condition cond) {
-			component = cond.getListCellRendererComponent();
-		} else {
-			component = new JLabel(value.toString());
-		}
-		component.setOpaque(true);
-		if (isSelected) {
-			component.setBackground(SELECTED_BACKGROUND);
-		} else {
-			component.setBackground(Color.WHITE);
-		}
-		component.setAlignmentX(Component.LEFT_ALIGNMENT);
-		return component;
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing .JList,
+   * java.lang.Object, int, boolean, boolean)
+   */
+  public Component getListCellRendererComponent(
+      JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    if (value == null)
+      return new JLabel(Resources.getInstance().getResourceString("filter_no_filtering"));
+    JComponent component;
+    if (value instanceof MindIcon) {
+      component = new JLabel(((MindIcon) value).getIcon());
+    } else if (value instanceof Condition cond) {
+      component = cond.getListCellRendererComponent();
+    } else {
+      component = new JLabel(value.toString());
+    }
+    component.setOpaque(true);
+    if (isSelected) {
+      component.setBackground(SELECTED_BACKGROUND);
+    } else {
+      component.setBackground(Color.WHITE);
+    }
+    component.setAlignmentX(Component.LEFT_ALIGNMENT);
+    return component;
+  }
 }

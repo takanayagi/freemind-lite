@@ -31,34 +31,34 @@ import freemind.modes.mindmapmode.MindMapController;
 
 public class PasteAction extends AbstractAction {
 
-	private static Logger logger;
-	private final MindMapController mMindMapController;
+  private static Logger logger;
+  private final MindMapController mMindMapController;
 
-	public PasteAction(MindMapController pMindMapController) {
-		super(pMindMapController.getText("paste"), freemind.view.ImageFactory.getInstance()
-				.createIcon(pMindMapController.getResource("images/editpaste.png")));
-		this.mMindMapController = pMindMapController;
-		if (logger == null) {
-			logger = mMindMapController.getFrame().getLogger(this.getClass().getName());
-		}
+  public PasteAction(MindMapController pMindMapController) {
+    super(
+        pMindMapController.getText("paste"),
+        freemind.view.ImageFactory.getInstance()
+            .createIcon(pMindMapController.getResource("images/editpaste.png")));
+    this.mMindMapController = pMindMapController;
+    if (logger == null) {
+      logger = mMindMapController.getFrame().getLogger(this.getClass().getName());
+    }
 
-		setEnabled(false);
+    setEnabled(false);
+  }
 
-	}
+  public void actionPerformed(ActionEvent e) {
+    Transferable clipboardContents = this.mMindMapController.getClipboardContents();
+    MindMapNode selectedNode = this.mMindMapController.getSelected();
+    this.mMindMapController.paste(clipboardContents, selectedNode);
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		Transferable clipboardContents = this.mMindMapController.getClipboardContents();
-		MindMapNode selectedNode = this.mMindMapController.getSelected();
-		this.mMindMapController.paste(clipboardContents, selectedNode);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#getDoActionClass()
-	 */
-	public Class<PasteNodeAction> getDoActionClass() {
-		return PasteNodeAction.class;
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#getDoActionClass()
+   */
+  public Class<PasteNodeAction> getDoActionClass() {
+    return PasteNodeAction.class;
+  }
 }

@@ -15,7 +15,6 @@
  * 02111-1307, USA.
  */
 
-
 package freemind.modes;
 
 import java.io.File;
@@ -50,568 +49,572 @@ import freemind.main.Tools;
 import freemind.main.XMLParseException;
 
 public abstract class MapAdapter extends DefaultTreeModel implements MindMap {
-	public static final String MAP_INITIAL_START = "<map version=\"";
-	public static final String FREEMIND_VERSION_UPDATER_XSLT =
-			"freemind/modes/mindmapmode/freemind_version_updater.xslt";
-	/**
-	 * The current version and all other version that don't need XML update for sure.
-	 */
-	public static final String[] EXPECTED_START_STRINGS =
-			{MAP_INITIAL_START + FreeMind.XML_VERSION + "\"", MAP_INITIAL_START + "0.7.1\""};
+  public static final String MAP_INITIAL_START = "<map version=\"";
+  public static final String FREEMIND_VERSION_UPDATER_XSLT =
+      "freemind/modes/mindmapmode/freemind_version_updater.xslt";
 
-	private static final int INTERVAL_BETWEEN_FILE_MODIFICATION_TIME_CHECKS = 5000;
-	/**
-	 * denotes the amount of changes since the last save. The initial value is zero, such that new
-	 * models are not to be saved.
-	 */
-	protected int changesPerformedSinceLastSave = 0;
-	protected boolean readOnly = true;
-	private File file;
-	private long mFileTime = 0;
-	static protected Logger logger;
-	private Filter filter = null;
-	private HashSet<MapSourceChangedObserver> mMapSourceChangedObserverSet = new HashSet<>();
-	private Timer mTimerForFileChangeObservation;
-	protected MapFeedback mMapFeedback;
+  /** The current version and all other version that don't need XML update for sure. */
+  public static final String[] EXPECTED_START_STRINGS = {
+    MAP_INITIAL_START + FreeMind.XML_VERSION + "\"", MAP_INITIAL_START + "0.7.1\""
+  };
 
-	public MapAdapter(MapFeedback mapFeedback) {
-		super(null);
-		this.mMapFeedback = mapFeedback;
-		if (logger == null) {
-			logger = Resources.getInstance().getLogger(this.getClass().getName());
-		}
-		filter = new DefaultFilter(NoFilteringCondition.createCondition(), true, false);
-		mTimerForFileChangeObservation = new Timer();
-		mTimerForFileChangeObservation.schedule(new FileChangeInspectorTimerTask(),
-				INTERVAL_BETWEEN_FILE_MODIFICATION_TIME_CHECKS,
-				INTERVAL_BETWEEN_FILE_MODIFICATION_TIME_CHECKS);
-	}
+  private static final int INTERVAL_BETWEEN_FILE_MODIFICATION_TIME_CHECKS = 5000;
 
-	protected class FileChangeInspectorTimerTask extends TimerTask {
+  /**
+   * denotes the amount of changes since the last save. The initial value is zero, such that new
+   * models are not to be saved.
+   */
+  protected int changesPerformedSinceLastSave = 0;
 
-		public void run() {
-			boolean shouldFire = false;
-			long lastModified = 0;
-			// minimal synchronized block:
-			synchronized (MapAdapter.this) {
-				lastModified = getFileTime();
-				if (lastModified > mFileTime) {
-					shouldFire = true;
-					// don't change the file time here. Only, after the user has been asked.
-				}
-			}
-			if (shouldFire) {
-				for (MapSourceChangedObserver observer : mMapSourceChangedObserverSet) {
-					logger.info("File " + getFile() + " changed on disk as it was last modified at "
-							+ new Date(lastModified));
-					try {
-						boolean changeAccepted = observer.mapSourceChanged(MapAdapter.this);
-						if (!changeAccepted) {
-							// this is a trick: at the next save/load the correct value is set
-							// again.
-							mFileTime = Long.MAX_VALUE;
-						} else {
-							mFileTime = lastModified;
-						}
-					} catch (Exception e) {
-						freemind.main.Resources.getInstance().logException(e);
-					}
-				}
-			}
-		}
-	}
+  protected boolean readOnly = true;
+  private File file;
+  private long mFileTime = 0;
+  protected static Logger logger;
+  private Filter filter = null;
+  private HashSet<MapSourceChangedObserver> mMapSourceChangedObserverSet = new HashSet<>();
+  private Timer mTimerForFileChangeObservation;
+  protected MapFeedback mMapFeedback;
 
-	/**
-	 * Instantiations of this class must call this, when a map was loaded or saved.
-	 */
-	public void setFileTime() {
-		mFileTime = getFileTime();
-	}
+  public MapAdapter(MapFeedback mapFeedback) {
+    super(null);
+    this.mMapFeedback = mapFeedback;
+    if (logger == null) {
+      logger = Resources.getInstance().getLogger(this.getClass().getName());
+    }
+    filter = new DefaultFilter(NoFilteringCondition.createCondition(), true, false);
+    mTimerForFileChangeObservation = new Timer();
+    mTimerForFileChangeObservation.schedule(
+        new FileChangeInspectorTimerTask(),
+        INTERVAL_BETWEEN_FILE_MODIFICATION_TIME_CHECKS,
+        INTERVAL_BETWEEN_FILE_MODIFICATION_TIME_CHECKS);
+  }
 
-	private long getFileTime() {
-		long lastModified;
-		File fileName;
-		fileName = getFile();
-		if (fileName != null) {
-			lastModified = fileName.lastModified();
-		} else {
-			lastModified = 0;
-		}
-		return lastModified;
-	}
+  protected class FileChangeInspectorTimerTask extends TimerTask {
 
-	/**
-	 * Attempts to lock the map using semaphore file.
-	 * 
-	 * @return If the map is locked, return the name of the locking user, return null otherwise.
-	 * @throws Exception
-	 */
-	public String tryToLock(File file) throws Exception {
-		return null;
-	}
+    public void run() {
+      boolean shouldFire = false;
+      long lastModified = 0;
+      // minimal synchronized block:
+      synchronized (MapAdapter.this) {
+        lastModified = getFileTime();
+        if (lastModified > mFileTime) {
+          shouldFire = true;
+          // don't change the file time here. Only, after the user has been asked.
+        }
+      }
+      if (shouldFire) {
+        for (MapSourceChangedObserver observer : mMapSourceChangedObserverSet) {
+          logger.info(
+              "File "
+                  + getFile()
+                  + " changed on disk as it was last modified at "
+                  + new Date(lastModified));
+          try {
+            boolean changeAccepted = observer.mapSourceChanged(MapAdapter.this);
+            if (!changeAccepted) {
+              // this is a trick: at the next save/load the correct value is set
+              // again.
+              mFileTime = Long.MAX_VALUE;
+            } else {
+              mFileTime = lastModified;
+            }
+          } catch (Exception e) {
+            freemind.main.Resources.getInstance().logException(e);
+          }
+        }
+      }
+    }
+  }
 
-	public void destroy() {
-		cancelFileChangeObservationTimer();
-		// Do all the necessary destructions in your model,
-		// e.g. remove file locks.
-		// and remove all hooks:
-		removeNodes(getRootNode());
-	}
+  /** Instantiations of this class must call this, when a map was loaded or saved. */
+  public void setFileTime() {
+    mFileTime = getFileTime();
+  }
 
-	protected void cancelFileChangeObservationTimer() {
-		mTimerForFileChangeObservation.cancel();
-	}
+  private long getFileTime() {
+    long lastModified;
+    File fileName;
+    fileName = getFile();
+    if (fileName != null) {
+      lastModified = fileName.lastModified();
+    } else {
+      lastModified = 0;
+    }
+    return lastModified;
+  }
 
-	// (PN)
-	// public void close() {
-	// }
+  /**
+   * Attempts to lock the map using semaphore file.
+   *
+   * @return If the map is locked, return the name of the locking user, return null otherwise.
+   * @throws Exception
+   */
+  public String tryToLock(File file) throws Exception {
+    return null;
+  }
 
-	/**
-	 */
-	private void removeNodes(MindMapNode node) {
-		node.removeAllHooks();
-		mMapFeedback.fireNodePreDeleteEvent(node);
-		// and all children:
-		for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-			MindMapNode child = i.next();
-			removeNodes(child);
-		}
-	}
+  public void destroy() {
+    cancelFileChangeObservationTimer();
+    // Do all the necessary destructions in your model,
+    // e.g. remove file locks.
+    // and remove all hooks:
+    removeNodes(getRootNode());
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.MindMap#removeNodeFromParent(freemind.modes.MindMapNode)
-	 */
-	@Override
-	public void removeNodeFromParent(MindMapNode pNode) {
-		super.removeNodeFromParent(pNode);
-	}
+  protected void cancelFileChangeObservationTimer() {
+    mTimerForFileChangeObservation.cancel();
+  }
 
-	//
-	// Attributes
-	//
+  // (PN)
+  // public void close() {
+  // }
 
-	public boolean isSaved() {
-		return (changesPerformedSinceLastSave == 0);
-	}
+  /** */
+  private void removeNodes(MindMapNode node) {
+    node.removeAllHooks();
+    mMapFeedback.fireNodePreDeleteEvent(node);
+    // and all children:
+    for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+      MindMapNode child = i.next();
+      removeNodes(child);
+    }
+  }
 
-	public boolean isReadOnly() {
-		return readOnly;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.MindMap#removeNodeFromParent(freemind.modes.MindMapNode)
+   */
+  @Override
+  public void removeNodeFromParent(MindMapNode pNode) {
+    super.removeNodeFromParent(pNode);
+  }
 
-	public void setReadOnly(boolean pIsReadOnly) {
-		readOnly = pIsReadOnly;
-	}
+  //
+  // Attributes
+  //
 
-	/**
-	 * Counts the amount of actions performed.
-	 * 
-	 * @param saved true if the file was saved recently. False otherwise.
-	 */
-	public boolean setSaved(boolean saved) {
-		boolean setTitle = false;
-		if (saved) {
-			changesPerformedSinceLastSave = 0;
-			setTitle = true;
-		} else {
-			if (changesPerformedSinceLastSave == 0) {
-				setTitle = true;
-			}
-			++changesPerformedSinceLastSave;
-			logger.finest("Changes performed since last save: " + changesPerformedSinceLastSave);
-		}
-		return setTitle;
-	}
+  public boolean isSaved() {
+    return (changesPerformedSinceLastSave == 0);
+  }
 
-	protected int getNumberOfChangesSinceLastSave() {
-		return changesPerformedSinceLastSave;
-	}
+  public boolean isReadOnly() {
+    return readOnly;
+  }
 
-	public MindMapNode getRootNode() {
-		return (MindMapNode) getRoot();
-	}
+  public void setReadOnly(boolean pIsReadOnly) {
+    readOnly = pIsReadOnly;
+  }
 
-	public void setRoot(MindMapNode root) {
-		super.setRoot(root);
-	}
+  /**
+   * Counts the amount of actions performed.
+   *
+   * @param saved true if the file was saved recently. False otherwise.
+   */
+  public boolean setSaved(boolean saved) {
+    boolean setTitle = false;
+    if (saved) {
+      changesPerformedSinceLastSave = 0;
+      setTitle = true;
+    } else {
+      if (changesPerformedSinceLastSave == 0) {
+        setTitle = true;
+      }
+      ++changesPerformedSinceLastSave;
+      logger.finest("Changes performed since last save: " + changesPerformedSinceLastSave);
+    }
+    return setTitle;
+  }
 
-	/**
-	 * @param newRoot one of the nodes, that is now root. The others are grouped around.
-	 */
-	public void changeRoot(MindMapNode newRoot) {
-		if (newRoot == getRootNode()) {
-			return;
-		}
-		boolean left = newRoot.isLeft();
-		MindMapNode node = newRoot;
-		// collect parents (as we remove them from their parents...)
-		Vector<MindMapNode> parents = new Vector<>();
-		while (node.getParentNode() != null) {
-			MindMapNode parent = node.getParentNode();
-			parents.add(0, node);
-			node = parent;
-		}
-		// bind all parents to a new chain:
-		for (MindMapNode mindMapNode : parents) {
-			node = mindMapNode;
-			MindMapNode parent = node.getParentNode();
-			// remove parent
-			node.removeFromParent();
-			// special treatment for left/right
-			if (node == newRoot) {
-				for (MindMapNode child : node.getChildren()) {
-					child.setLeft(left);
-				}
-				parent.setLeft(!left);
-			}
-			// and put it as a child
-			node.insert(parent, node.getChildCount());
-		}
-		// and set root
-		setRoot(newRoot);
-	}
+  protected int getNumberOfChangesSinceLastSave() {
+    return changesPerformedSinceLastSave;
+  }
 
-	/**
-	 * Change this to always return null if your model doesn't support files.
-	 */
-	public File getFile() {
-		return file;
-	}
+  public MindMapNode getRootNode() {
+    return (MindMapNode) getRoot();
+  }
 
-	/**
-	 * Return URL of the map (whether as local file or a web location)
-	 */
-	public URL getURL() throws MalformedURLException {
-		return getFile() != null ? Tools.fileToUrl(getFile()) : null;
-	}
+  public void setRoot(MindMapNode root) {
+    super.setRoot(root);
+  }
 
-	public void setFile(File file) {
-		this.file = file;
-	}
+  /**
+   * @param newRoot one of the nodes, that is now root. The others are grouped around.
+   */
+  public void changeRoot(MindMapNode newRoot) {
+    if (newRoot == getRootNode()) {
+      return;
+    }
+    boolean left = newRoot.isLeft();
+    MindMapNode node = newRoot;
+    // collect parents (as we remove them from their parents...)
+    Vector<MindMapNode> parents = new Vector<>();
+    while (node.getParentNode() != null) {
+      MindMapNode parent = node.getParentNode();
+      parents.add(0, node);
+      node = parent;
+    }
+    // bind all parents to a new chain:
+    for (MindMapNode mindMapNode : parents) {
+      node = mindMapNode;
+      MindMapNode parent = node.getParentNode();
+      // remove parent
+      node.removeFromParent();
+      // special treatment for left/right
+      if (node == newRoot) {
+        for (MindMapNode child : node.getChildren()) {
+          child.setLeft(left);
+        }
+        parent.setLeft(!left);
+      }
+      // and put it as a child
+      node.insert(parent, node.getChildCount());
+    }
+    // and set root
+    setRoot(newRoot);
+  }
 
-	protected String getText(String textId) {
-		return getMapFeedback().getResourceString(textId);
-	}
+  /** Change this to always return null if your model doesn't support files. */
+  public File getFile() {
+    return file;
+  }
 
-	//
-	// Node editing
-	//
+  /** Return URL of the map (whether as local file or a web location) */
+  public URL getURL() throws MalformedURLException {
+    return getFile() != null ? Tools.fileToUrl(getFile()) : null;
+  }
 
-	@Override
-	public String getAsPlainText(List<? extends MindMapNode> mindMapNodes) {
-		return "";
-	}
+  public void setFile(File file) {
+    this.file = file;
+  }
 
-	@Override
-	public String getAsRTF(List<? extends MindMapNode> mindMapNodes) {
-		return "";
-	}
+  protected String getText(String textId) {
+    return getMapFeedback().getResourceString(textId);
+  }
 
-	@Override
-	public String getAsHTML(List<? extends MindMapNode> mindMapNodes) {
-		return null;
-	}
+  //
+  // Node editing
+  //
 
-	public String getRestorable() {
-		return null;
-	}
+  @Override
+  public String getAsPlainText(List<? extends MindMapNode> mindMapNodes) {
+    return "";
+  }
 
-	public MindMapLinkRegistry getLinkRegistry() {
-		return null;
-	}
+  @Override
+  public String getAsRTF(List<? extends MindMapNode> mindMapNodes) {
+    return "";
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.tree.DefaultTreeModel#insertNodeInto(javax.swing.tree.MutableTreeNode,
-	 * javax.swing.tree.MutableTreeNode, int)
-	 */
-	@Override
-	public void insertNodeInto(MindMapNode pNewChild, MindMapNode pParent, int pIndex) {
-		super.insertNodeInto(pNewChild, pParent, pIndex);
-		// call hooks
-		mMapFeedback.fireRecursiveNodeCreateEvent(pNewChild);
+  @Override
+  public String getAsHTML(List<? extends MindMapNode> mindMapNodes) {
+    return null;
+  }
 
-	}
+  public String getRestorable() {
+    return null;
+  }
 
-	/**
-	 * This method should not be called directly!
-	 */
-	public void nodeChanged(TreeNode node) {
-		mMapFeedback.nodeChanged((MindMapNode) node);
-	}
+  public MindMapLinkRegistry getLinkRegistry() {
+    return null;
+  }
 
-	public void nodeRefresh(TreeNode node) {
-		mMapFeedback.nodeRefresh((MindMapNode) node);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.tree.DefaultTreeModel#insertNodeInto(javax.swing.tree.MutableTreeNode,
+   * javax.swing.tree.MutableTreeNode, int)
+   */
+  @Override
+  public void insertNodeInto(MindMapNode pNewChild, MindMapNode pParent, int pIndex) {
+    super.insertNodeInto(pNewChild, pParent, pIndex);
+    // call hooks
+    mMapFeedback.fireRecursiveNodeCreateEvent(pNewChild);
+  }
 
-	/**
-	 * Invoke this method if you've totally changed the children of node and its childrens
-	 * children... This will post a treeStructureChanged event.
-	 */
-	void nodeChangedInternal(TreeNode node) {
-		if (node != null) {
-			fireTreeNodesChanged(this, getPathToRoot(node), null, null);
-		}
-	}
+  /** This method should not be called directly! */
+  public void nodeChanged(TreeNode node) {
+    mMapFeedback.nodeChanged((MindMapNode) node);
+  }
 
-	/**
-	 * Notifies all listeners that have registered interest for notification on this event type. The
-	 * event instance is lazily created using the parameters passed into the fire method.
-	 * 
-	 * @param source the node being changed
-	 * @param path the path to the root node
-	 * @param childIndices the indices of the changed elements
-	 * @param children the changed elements
-	 * @see EventListenerList
-	 */
-	protected void fireTreeNodesInserted(Object source, Object[] path, int[] childIndices,
-			Object[] children) {
-		// Guaranteed to return a non-null array
-		Object[] listeners = listenerList.getListenerList();
-		TreeModelEvent e = null;
-		// Process the listeners last to first, notifying
-		// those that are interested in this event
-		e = fireTreeNodesInserted(source, path, childIndices, children, listeners, e);
-		MindMapNode node = (MindMapNode) path[path.length - 1];
-		fireTreeNodesInserted(source, path, childIndices, children,
-				node.getListeners().getListenerList(), e);
-	}
+  public void nodeRefresh(TreeNode node) {
+    mMapFeedback.nodeRefresh((MindMapNode) node);
+  }
 
-	private TreeModelEvent fireTreeNodesInserted(Object source, Object[] path, int[] childIndices,
-			Object[] children, Object[] listeners, TreeModelEvent e) {
-		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == TreeModelListener.class) {
-				// Lazily create the event:
-				if (e == null)
-					e = new TreeModelEvent(source, path, childIndices, children);
-				((TreeModelListener) listeners[i + 1]).treeNodesInserted(e);
-			}
-		}
-		return e;
-	}
+  /**
+   * Invoke this method if you've totally changed the children of node and its childrens children...
+   * This will post a treeStructureChanged event.
+   */
+  void nodeChangedInternal(TreeNode node) {
+    if (node != null) {
+      fireTreeNodesChanged(this, getPathToRoot(node), null, null);
+    }
+  }
 
-	protected void fireTreeNodesRemoved(Object source, Object[] path, int[] childIndices,
-			Object[] children) {
-		// Guaranteed to return a non-null array
-		Object[] listeners = listenerList.getListenerList();
-		TreeModelEvent e = null;
-		// Process the listeners last to first, notifying
-		// those that are interested in this event
-		e = fireTreeNodesRemoved(source, path, childIndices, children, listeners, e);
-		MindMapNode node = (MindMapNode) path[path.length - 1];
-		fireTreeNodesRemoved(source, path, childIndices, children,
-				node.getListeners().getListenerList(), e);
-	}
+  /**
+   * Notifies all listeners that have registered interest for notification on this event type. The
+   * event instance is lazily created using the parameters passed into the fire method.
+   *
+   * @param source the node being changed
+   * @param path the path to the root node
+   * @param childIndices the indices of the changed elements
+   * @param children the changed elements
+   * @see EventListenerList
+   */
+  protected void fireTreeNodesInserted(
+      Object source, Object[] path, int[] childIndices, Object[] children) {
+    // Guaranteed to return a non-null array
+    Object[] listeners = listenerList.getListenerList();
+    TreeModelEvent e = null;
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    e = fireTreeNodesInserted(source, path, childIndices, children, listeners, e);
+    MindMapNode node = (MindMapNode) path[path.length - 1];
+    fireTreeNodesInserted(
+        source, path, childIndices, children, node.getListeners().getListenerList(), e);
+  }
 
-	private TreeModelEvent fireTreeNodesRemoved(Object source, Object[] path, int[] childIndices,
-			Object[] children, Object[] listeners, TreeModelEvent e) {
-		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == TreeModelListener.class) {
-				// Lazily create the event:
-				if (e == null)
-					e = new TreeModelEvent(source, path, childIndices, children);
-				((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
-			}
-		}
-		return e;
-	}
+  private TreeModelEvent fireTreeNodesInserted(
+      Object source,
+      Object[] path,
+      int[] childIndices,
+      Object[] children,
+      Object[] listeners,
+      TreeModelEvent e) {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class) {
+        // Lazily create the event:
+        if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
+        ((TreeModelListener) listeners[i + 1]).treeNodesInserted(e);
+      }
+    }
+    return e;
+  }
 
-	protected void fireTreeStructureChanged(Object source, Object[] path, int[] childIndices,
-			Object[] children) {
-		// Guaranteed to return a non-null array
-		Object[] listeners = listenerList.getListenerList();
-		TreeModelEvent e = null;
-		// Process the listeners last to first, notifying
-		// those that are interested in this event
-		e = fireTreeStructureChanged(source, path, childIndices, children, listeners, e);
-		MindMapNode node = (MindMapNode) path[path.length - 1];
-		fireTreeStructureChanged(source, path, childIndices, children,
-				node.getListeners().getListenerList(), e);
-	}
+  protected void fireTreeNodesRemoved(
+      Object source, Object[] path, int[] childIndices, Object[] children) {
+    // Guaranteed to return a non-null array
+    Object[] listeners = listenerList.getListenerList();
+    TreeModelEvent e = null;
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    e = fireTreeNodesRemoved(source, path, childIndices, children, listeners, e);
+    MindMapNode node = (MindMapNode) path[path.length - 1];
+    fireTreeNodesRemoved(
+        source, path, childIndices, children, node.getListeners().getListenerList(), e);
+  }
 
-	private TreeModelEvent fireTreeStructureChanged(Object source, Object[] path,
-			int[] childIndices, Object[] children, Object[] listeners, TreeModelEvent e) {
-		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == TreeModelListener.class) {
-				// Lazily create the event:
-				if (e == null)
-					e = new TreeModelEvent(source, path, childIndices, children);
-				((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
-			}
-		}
-		return e;
-	}
+  private TreeModelEvent fireTreeNodesRemoved(
+      Object source,
+      Object[] path,
+      int[] childIndices,
+      Object[] children,
+      Object[] listeners,
+      TreeModelEvent e) {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class) {
+        // Lazily create the event:
+        if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
+        ((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
+      }
+    }
+    return e;
+  }
 
-	protected void fireTreeNodesChanged(Object source, Object[] path, int[] childIndices,
-			Object[] children) {
-		// Guaranteed to return a non-null array
-		Object[] listeners = listenerList.getListenerList();
-		TreeModelEvent e = null;
-		// Process the listeners last to first, notifying
-		// those that are interested in this event
-		e = fireTreeNodesChanged(source, path, childIndices, children, listeners, e);
-		MindMapNode node = (MindMapNode) path[path.length - 1];
-		fireTreeNodesChanged(source, path, childIndices, children,
-				node.getListeners().getListenerList(), e);
-	}
+  protected void fireTreeStructureChanged(
+      Object source, Object[] path, int[] childIndices, Object[] children) {
+    // Guaranteed to return a non-null array
+    Object[] listeners = listenerList.getListenerList();
+    TreeModelEvent e = null;
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    e = fireTreeStructureChanged(source, path, childIndices, children, listeners, e);
+    MindMapNode node = (MindMapNode) path[path.length - 1];
+    fireTreeStructureChanged(
+        source, path, childIndices, children, node.getListeners().getListenerList(), e);
+  }
 
-	private TreeModelEvent fireTreeNodesChanged(Object source, Object[] path, int[] childIndices,
-			Object[] children, Object[] listeners, TreeModelEvent e) {
-		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == TreeModelListener.class) {
-				// Lazily create the event:
-				if (e == null)
-					e = new TreeModelEvent(source, path, childIndices, children);
-				((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
-			}
-		}
-		return e;
-	}
+  private TreeModelEvent fireTreeStructureChanged(
+      Object source,
+      Object[] path,
+      int[] childIndices,
+      Object[] children,
+      Object[] listeners,
+      TreeModelEvent e) {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class) {
+        // Lazily create the event:
+        if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
+        ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
+      }
+    }
+    return e;
+  }
 
-	public Filter getFilter() {
-		return filter;
-	}
+  protected void fireTreeNodesChanged(
+      Object source, Object[] path, int[] childIndices, Object[] children) {
+    // Guaranteed to return a non-null array
+    Object[] listeners = listenerList.getListenerList();
+    TreeModelEvent e = null;
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    e = fireTreeNodesChanged(source, path, childIndices, children, listeners, e);
+    MindMapNode node = (MindMapNode) path[path.length - 1];
+    fireTreeNodesChanged(
+        source, path, childIndices, children, node.getListeners().getListenerList(), e);
+  }
 
-	public void setFilter(Filter filter) {
-		this.filter = filter;
-	}
+  private TreeModelEvent fireTreeNodesChanged(
+      Object source,
+      Object[] path,
+      int[] childIndices,
+      Object[] children,
+      Object[] listeners,
+      TreeModelEvent e) {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class) {
+        // Lazily create the event:
+        if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
+        ((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
+      }
+    }
+    return e;
+  }
 
-	public void registerMapSourceChangedObserver(MapSourceChangedObserver pMapSourceChangedObserver,
-			long pGetEventIfChangedAfterThisTimeInMillies) {
-		if (pGetEventIfChangedAfterThisTimeInMillies != 0
-				&& mFileTime > pGetEventIfChangedAfterThisTimeInMillies) {
-			try {
-				// Issue event here.
-				pMapSourceChangedObserver.mapSourceChanged(this);
-			} catch (Exception e) {
-				freemind.main.Resources.getInstance().logException(e);
-			}
-		}
-		mMapSourceChangedObserverSet.add(pMapSourceChangedObserver);
-	}
+  public Filter getFilter() {
+    return filter;
+  }
 
-	public long deregisterMapSourceChangedObserver(
-			MapSourceChangedObserver pMapSourceChangedObserver) {
-		mMapSourceChangedObserverSet.remove(pMapSourceChangedObserver);
-		return mFileTime;
-	}
+  public void setFilter(Filter filter) {
+    this.filter = filter;
+  }
 
-	public MapFeedback getMapFeedback() {
-		return mMapFeedback;
-	}
+  public void registerMapSourceChangedObserver(
+      MapSourceChangedObserver pMapSourceChangedObserver,
+      long pGetEventIfChangedAfterThisTimeInMillies) {
+    if (pGetEventIfChangedAfterThisTimeInMillies != 0
+        && mFileTime > pGetEventIfChangedAfterThisTimeInMillies) {
+      try {
+        // Issue event here.
+        pMapSourceChangedObserver.mapSourceChanged(this);
+      } catch (Exception e) {
+        freemind.main.Resources.getInstance().logException(e);
+      }
+    }
+    mMapSourceChangedObserverSet.add(pMapSourceChangedObserver);
+  }
 
-	/**
-	 */
-	public SortedMapListModel getIcons() {
-		SortedMapListModel mapIcons;
-		mapIcons = new SortedMapListModel();
-		addIcons(mapIcons, getRootNode());
-		return mapIcons;
-	}
+  public long deregisterMapSourceChangedObserver(
+      MapSourceChangedObserver pMapSourceChangedObserver) {
+    mMapSourceChangedObserverSet.remove(pMapSourceChangedObserver);
+    return mFileTime;
+  }
 
-	/**
-	 * @param pMapIcons
-	 * @param pNode
-	 */
-	private void addIcons(SortedMapListModel pMapIcons, MindMapNode pNode) {
-		pMapIcons.addAll(pNode.getIcons());
-		ListIterator<? extends MindMapNode> iterator = pNode.childrenUnfolded();
-		while (iterator.hasNext()) {
-			MindMapNode node = iterator.next();
-			addIcons(pMapIcons, node);
-		}
-	}
+  public MapFeedback getMapFeedback() {
+    return mMapFeedback;
+  }
 
-	/**
-	 * Given a valid Xml parameterization of a node (tree), this method returns freshly created
-	 * nodes.
-	 */
-	@Override
-	public MindMapNode createNodeTreeFromXml(Reader pReader,
-			HashMap<String, NodeAdapter> pIDToTarget) throws XMLParseException, IOException {
-		XMLElementAdapter xmlAdapter =
-				new XMLElementAdapter(mMapFeedback, new Vector<>(), pIDToTarget);
-		xmlAdapter.parseFromReader(pReader);
-		xmlAdapter.processUnfinishedLinks(getLinkRegistry());
-		return xmlAdapter.getMapChild();
-	}
+  /** */
+  public SortedMapListModel getIcons() {
+    SortedMapListModel mapIcons;
+    mapIcons = new SortedMapListModel();
+    addIcons(mapIcons, getRootNode());
+    return mapIcons;
+  }
 
-	public static DontAskUserBeforeUpdateAdapter sDontAskInstance =
-			new DontAskUserBeforeUpdateAdapter();
+  /**
+   * @param pMapIcons
+   * @param pNode
+   */
+  private void addIcons(SortedMapListModel pMapIcons, MindMapNode pNode) {
+    pMapIcons.addAll(pNode.getIcons());
+    ListIterator<? extends MindMapNode> iterator = pNode.childrenUnfolded();
+    while (iterator.hasNext()) {
+      MindMapNode node = iterator.next();
+      addIcons(pMapIcons, node);
+    }
+  }
 
-	public static class DontAskUserBeforeUpdateAdapter implements AskUserBeforeUpdateCallback {
+  /**
+   * Given a valid Xml parameterization of a node (tree), this method returns freshly created nodes.
+   */
+  @Override
+  public MindMapNode createNodeTreeFromXml(Reader pReader, HashMap<String, NodeAdapter> pIDToTarget)
+      throws XMLParseException, IOException {
+    XMLElementAdapter xmlAdapter = new XMLElementAdapter(mMapFeedback, new Vector<>(), pIDToTarget);
+    xmlAdapter.parseFromReader(pReader);
+    xmlAdapter.processUnfinishedLinks(getLinkRegistry());
+    return xmlAdapter.getMapChild();
+  }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.modes.XMLElementAdapter.AskUserBeforeUpdateCallback#askUserForUpdate()
-		 */
-		@Override
-		public boolean askUserForUpdate() {
-			return true;
-		}
+  public static DontAskUserBeforeUpdateAdapter sDontAskInstance =
+      new DontAskUserBeforeUpdateAdapter();
 
-	}
+  public static class DontAskUserBeforeUpdateAdapter implements AskUserBeforeUpdateCallback {
 
-	@Override
-	public MindMapNode loadTree(Tools.ReaderCreator pReaderCreator,
-			AskUserBeforeUpdateCallback pAskUserBeforeUpdateCallback)
-			throws XMLParseException, IOException {
-		int versionInfoLength;
-		versionInfoLength = EXPECTED_START_STRINGS[0].length();
-		// reading the start of the file:
-		StringBuffer buffer = Tools.readFileStart(pReaderCreator.createReader(), versionInfoLength);
-		// the resulting file is accessed by the reader:
-		Reader reader = null;
-		for (String expectedStartString : EXPECTED_START_STRINGS) {
-			versionInfoLength = expectedStartString.length();
-			String mapStart = "";
-			if (buffer.length() >= versionInfoLength) {
-				mapStart = buffer.substring(0, versionInfoLength);
-			}
-			if (mapStart.startsWith(expectedStartString)) {
-				// actual version:
-				reader = Tools.getActualReader(pReaderCreator.createReader());
-				break;
-			}
-		}
-		if (reader == null) {
-			if (!Tools.isHeadless()) {
-				boolean showResult = pAskUserBeforeUpdateCallback.askUserForUpdate();
-				if (!showResult) {
-					throw new IllegalArgumentException(
-							"We should not open the reader " + pReaderCreator);
-				}
-			}
-			reader = Tools.getUpdateReader(pReaderCreator.createReader(),
-					FREEMIND_VERSION_UPDATER_XSLT);
-			if (reader == null) {
-				// something went wrong on update:
-				// FIXME: Translate me.
-				mMapFeedback.out(
-						"Error on conversion. Continue without conversion. Some elements may be lost!");
-				reader = Tools.getActualReader(pReaderCreator.createReader());
-			}
-		}
-		try {
-			HashMap<String, NodeAdapter> IDToTarget = new HashMap<>();
-			return createNodeTreeFromXml(reader, IDToTarget);
-		} catch (Exception ex) {
-			String errorMessage = "Error while parsing file:" + ex;
-			System.err.println(errorMessage);
-			freemind.main.Resources.getInstance().logException(ex);
-			NodeAdapter result = createNodeAdapter(this, null);
-			result.setText(errorMessage);
-			return result;
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.modes.XMLElementAdapter.AskUserBeforeUpdateCallback#askUserForUpdate()
+     */
+    @Override
+    public boolean askUserForUpdate() {
+      return true;
+    }
+  }
 
-
-
+  @Override
+  public MindMapNode loadTree(
+      Tools.ReaderCreator pReaderCreator, AskUserBeforeUpdateCallback pAskUserBeforeUpdateCallback)
+      throws XMLParseException, IOException {
+    int versionInfoLength;
+    versionInfoLength = EXPECTED_START_STRINGS[0].length();
+    // reading the start of the file:
+    StringBuffer buffer = Tools.readFileStart(pReaderCreator.createReader(), versionInfoLength);
+    // the resulting file is accessed by the reader:
+    Reader reader = null;
+    for (String expectedStartString : EXPECTED_START_STRINGS) {
+      versionInfoLength = expectedStartString.length();
+      String mapStart = "";
+      if (buffer.length() >= versionInfoLength) {
+        mapStart = buffer.substring(0, versionInfoLength);
+      }
+      if (mapStart.startsWith(expectedStartString)) {
+        // actual version:
+        reader = Tools.getActualReader(pReaderCreator.createReader());
+        break;
+      }
+    }
+    if (reader == null) {
+      if (!Tools.isHeadless()) {
+        boolean showResult = pAskUserBeforeUpdateCallback.askUserForUpdate();
+        if (!showResult) {
+          throw new IllegalArgumentException("We should not open the reader " + pReaderCreator);
+        }
+      }
+      reader = Tools.getUpdateReader(pReaderCreator.createReader(), FREEMIND_VERSION_UPDATER_XSLT);
+      if (reader == null) {
+        // something went wrong on update:
+        // FIXME: Translate me.
+        mMapFeedback.out(
+            "Error on conversion. Continue without conversion. Some elements may be lost!");
+        reader = Tools.getActualReader(pReaderCreator.createReader());
+      }
+    }
+    try {
+      HashMap<String, NodeAdapter> IDToTarget = new HashMap<>();
+      return createNodeTreeFromXml(reader, IDToTarget);
+    } catch (Exception ex) {
+      String errorMessage = "Error while parsing file:" + ex;
+      System.err.println(errorMessage);
+      freemind.main.Resources.getInstance().logException(ex);
+      NodeAdapter result = createNodeAdapter(this, null);
+      result.setText(errorMessage);
+      return result;
+    } finally {
+      if (reader != null) {
+        reader.close();
+      }
+    }
+  }
 }

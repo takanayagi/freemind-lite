@@ -36,69 +36,64 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class CloudActor extends NodeXmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public CloudActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public CloudActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public Class<AddCloudXmlAction> getDoActionClass() {
-		return AddCloudXmlAction.class;
-	}
+  public Class<AddCloudXmlAction> getDoActionClass() {
+    return AddCloudXmlAction.class;
+  }
 
-	public ActionPair apply(MindMap model, MindMapNode selected) {
-		return getActionPair(selected, selected.getCloud() == null);
-	}
+  public ActionPair apply(MindMap model, MindMapNode selected) {
+    return getActionPair(selected, selected.getCloud() == null);
+  }
 
-	public void setCloud(MindMapNode node, boolean enable) {
-		execute(getActionPair(node, enable));
+  public void setCloud(MindMapNode node, boolean enable) {
+    execute(getActionPair(node, enable));
+  }
 
-	}
+  private ActionPair getActionPair(MindMapNode selected, boolean enable) {
+    AddCloudXmlAction cloudAction = createAddCloudXmlAction(selected, enable, null);
+    AddCloudXmlAction undocloudAction = null;
+    if (selected.getCloud() != null) {
+      undocloudAction = createAddCloudXmlAction(selected, true, selected.getCloud().getColor());
+    } else {
+      undocloudAction = createAddCloudXmlAction(selected, false, null);
+    }
+    return new ActionPair(cloudAction, undocloudAction);
+  }
 
-	private ActionPair getActionPair(MindMapNode selected, boolean enable) {
-		AddCloudXmlAction cloudAction = createAddCloudXmlAction(selected, enable, null);
-		AddCloudXmlAction undocloudAction = null;
-		if (selected.getCloud() != null) {
-			undocloudAction =
-					createAddCloudXmlAction(selected, true, selected.getCloud().getColor());
-		} else {
-			undocloudAction = createAddCloudXmlAction(selected, false, null);
+  private AddCloudXmlAction createAddCloudXmlAction(
+      MindMapNode selected, boolean enable, Color color) {
+    AddCloudXmlAction nodecloudAction = new AddCloudXmlAction();
+    nodecloudAction.setNode(getNodeID(selected));
+    nodecloudAction.setEnabled(enable);
+    nodecloudAction.setColor(Tools.colorToXml(color));
+    return nodecloudAction;
+  }
 
-		}
-		return new ActionPair(cloudAction, undocloudAction);
-	}
-
-	private AddCloudXmlAction createAddCloudXmlAction(MindMapNode selected, boolean enable,
-			Color color) {
-		AddCloudXmlAction nodecloudAction = new AddCloudXmlAction();
-		nodecloudAction.setNode(getNodeID(selected));
-		nodecloudAction.setEnabled(enable);
-		nodecloudAction.setColor(Tools.colorToXml(color));
-		return nodecloudAction;
-	}
-
-	public void act(XmlAction action) {
-		if (action instanceof AddCloudXmlAction nodecloudAction) {
-			MindMapNode node = getNodeFromID(nodecloudAction.getNode());
-			if ((node.getCloud() == null) == nodecloudAction.getEnabled()) {
-				if (nodecloudAction.getEnabled()) {
-					if (node.isRoot()) {
-						return;
-					}
-					MindMapCloudModel cloudModel = new MindMapCloudModel(node, getExMapFeedback());
-					node.setCloud(cloudModel);
-					if (nodecloudAction.getColor() != null) {
-						Color color = Tools.xmlToColor(nodecloudAction.getColor());
-						cloudModel.setColor(color);
-					}
-				} else {
-					node.setCloud(null);
-				}
-				getExMapFeedback().nodeChanged(node);
-			}
-		}
-	}
-
-
+  public void act(XmlAction action) {
+    if (action instanceof AddCloudXmlAction nodecloudAction) {
+      MindMapNode node = getNodeFromID(nodecloudAction.getNode());
+      if ((node.getCloud() == null) == nodecloudAction.getEnabled()) {
+        if (nodecloudAction.getEnabled()) {
+          if (node.isRoot()) {
+            return;
+          }
+          MindMapCloudModel cloudModel = new MindMapCloudModel(node, getExMapFeedback());
+          node.setCloud(cloudModel);
+          if (nodecloudAction.getColor() != null) {
+            Color color = Tools.xmlToColor(nodecloudAction.getColor());
+            cloudModel.setColor(color);
+          }
+        } else {
+          node.setCloud(null);
+        }
+        getExMapFeedback().nodeChanged(node);
+      }
+    }
+  }
 }

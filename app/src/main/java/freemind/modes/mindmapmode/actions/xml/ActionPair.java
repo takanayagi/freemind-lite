@@ -19,49 +19,42 @@
  * Created on 25.04.2004
  */
 
-
 package freemind.modes.mindmapmode.actions.xml;
 
 import freemind.controller.actions.generated.instance.XmlAction;
 
 /**
  * @author foltin
- * 
  */
 public class ActionPair {
-	private XmlAction doAction;
-	private XmlAction undoAction;
+  private XmlAction doAction;
+  private XmlAction undoAction;
 
-	/**
-	 *
-	 */
-	public ActionPair(XmlAction doAction, XmlAction undoAction) {
-		this.doAction = doAction;
-		this.undoAction = undoAction;
-	}
+  /** */
+  public ActionPair(XmlAction doAction, XmlAction undoAction) {
+    this.doAction = doAction;
+    this.undoAction = undoAction;
+  }
 
-	/**
-	 */
-	public XmlAction getDoAction() {
-		return doAction;
-	}
+  /** */
+  public XmlAction getDoAction() {
+    return doAction;
+  }
 
-	/**
-	 */
-	public XmlAction getUndoAction() {
-		return undoAction;
-	}
+  /** */
+  public XmlAction getUndoAction() {
+    return undoAction;
+  }
 
-	public void setDoAction(XmlAction doAction) {
-		this.doAction = doAction;
-	}
+  public void setDoAction(XmlAction doAction) {
+    this.doAction = doAction;
+  }
 
-	public void setUndoAction(XmlAction undoAction) {
-		this.undoAction = undoAction;
-	}
+  public void setUndoAction(XmlAction undoAction) {
+    this.undoAction = undoAction;
+  }
 
-	public ActionPair reverse() {
-		return new ActionPair(getUndoAction(), getDoAction());
-	}
-
+  public ActionPair reverse() {
+    return new ActionPair(getUndoAction(), getDoAction());
+  }
 }

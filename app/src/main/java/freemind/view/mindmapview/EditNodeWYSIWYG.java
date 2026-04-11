@@ -47,250 +47,263 @@ import freemind.modes.ModeController;
 
 /**
  * @author Daniel Polansky
- * 
  */
 public class EditNodeWYSIWYG extends EditNodeBase {
 
-	private KeyEvent firstEvent;
+  private KeyEvent firstEvent;
 
-	private static HTMLDialog htmlEditorWindow;
+  private static HTMLDialog htmlEditorWindow;
 
-	private static class HTMLDialog extends EditDialog {
-		private static final long serialVersionUID = 2862979626489782521L;
-		private SHTMLPanel htmlEditorPanel;
+  private static class HTMLDialog extends EditDialog {
+    private static final long serialVersionUID = 2862979626489782521L;
+    private SHTMLPanel htmlEditorPanel;
 
-		HTMLDialog(EditNodeBase base) throws Exception {
-			super(base);
-			createEditorPanel();
-			getContentPane().add(htmlEditorPanel, BorderLayout.CENTER);
-			Tools.addEscapeActionToDialog(this, new CancelAction());
-			final JButton okButton = new JButton();
-			final JButton cancelButton = new JButton();
-			final JButton splitButton = new JButton();
+    HTMLDialog(EditNodeBase base) throws Exception {
+      super(base);
+      createEditorPanel();
+      getContentPane().add(htmlEditorPanel, BorderLayout.CENTER);
+      Tools.addEscapeActionToDialog(this, new CancelAction());
+      final JButton okButton = new JButton();
+      final JButton cancelButton = new JButton();
+      final JButton splitButton = new JButton();
 
-			Tools.setLabelAndMnemonic(okButton, base.getText("ok"));
-			Tools.setLabelAndMnemonic(cancelButton, base.getText("cancel"));
-			Tools.setLabelAndMnemonic(splitButton, base.getText("split"));
+      Tools.setLabelAndMnemonic(okButton, base.getText("ok"));
+      Tools.setLabelAndMnemonic(cancelButton, base.getText("cancel"));
+      Tools.setLabelAndMnemonic(splitButton, base.getText("split"));
 
-			okButton.addActionListener(e -> submit());
+      okButton.addActionListener(e -> submit());
 
-			cancelButton.addActionListener(e -> cancel());
+      cancelButton.addActionListener(e -> cancel());
 
-			splitButton.addActionListener(e -> split());
+      splitButton.addActionListener(e -> split());
 
-			Tools.addKeyActionToDialog(this, new SubmitAction(), "alt ENTER", "submit");
-			Tools.addKeyActionToDialog(this, new SubmitAction(), "control ENTER", "submit");
-			JPanel buttonPane = new JPanel();
-			buttonPane.add(okButton);
-			buttonPane.add(cancelButton);
-			buttonPane.add(splitButton);
-			buttonPane.setMaximumSize(new Dimension(1000, 20));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
-			htmlEditorPanel.setOpenHyperlinkHandler(pE -> {
-				try {
-					getBase().getController().getFrame()
-							.openDocument(new URI(pE.getActionCommand()).toURL());
-				} catch (Exception e) {
-					Resources.getInstance().logException(e);
-				}
-			});
+      Tools.addKeyActionToDialog(this, new SubmitAction(), "alt ENTER", "submit");
+      Tools.addKeyActionToDialog(this, new SubmitAction(), "control ENTER", "submit");
+      JPanel buttonPane = new JPanel();
+      buttonPane.add(okButton);
+      buttonPane.add(cancelButton);
+      buttonPane.add(splitButton);
+      buttonPane.setMaximumSize(new Dimension(1000, 20));
+      getContentPane().add(buttonPane, BorderLayout.SOUTH);
+      htmlEditorPanel.setOpenHyperlinkHandler(
+          pE -> {
+            try {
+              getBase()
+                  .getController()
+                  .getFrame()
+                  .openDocument(new URI(pE.getActionCommand()).toURL());
+            } catch (Exception e) {
+              Resources.getInstance().logException(e);
+            }
+          });
 
-			if (checkSpelling) {
-				SpellChecker.register(htmlEditorPanel.getEditorPane());
-			}
-		}
+      if (checkSpelling) {
+        SpellChecker.register(htmlEditorPanel.getEditorPane());
+      }
+    }
 
-		private SHTMLPanel createEditorPanel() {
-			if (htmlEditorPanel == null) {
-				SHTMLPanel.setResources(new SimplyHtmlResources());
-				htmlEditorPanel = SHTMLPanel.createSHTMLPanel();
-				// htmlEditorPanel.getEditorPane().addMouseListener(new MouseAdapter () {
-				// public void mousePressed(MouseEvent e) {
-				// conditionallyShowPopup(e);
-				// }
-				//
-				// public void mouseReleased(MouseEvent e) {
-				// conditionallyShowPopup(e);
-				// }
-				//
-				// private void conditionallyShowPopup(MouseEvent e) {
-				// if (e.isPopupTrigger()) {
-				// System.out.println("fooooooooooooooooooooo");
-				// JPopupMenu popupMenu =
-				// ((SHTMLEditorPane) e.getSource()).getPopup();
-				// if (checkSpelling && popupMenu != null) {
-				//// popupMenu.add(SpellChecker.createCheckerMenu(), 0);
-				//// popupMenu.add(SpellChecker.createLanguagesMenu(), 1);
-				//// popupMenu.addSeparator();
-				//// popupMenu.show(e.getComponent(), e.getX(), e.getY());
-				// }
-				//// e.consume();
-				// }
-				// }
-				// });
-			}
-			return htmlEditorPanel;
-		}
+    private SHTMLPanel createEditorPanel() {
+      if (htmlEditorPanel == null) {
+        SHTMLPanel.setResources(new SimplyHtmlResources());
+        htmlEditorPanel = SHTMLPanel.createSHTMLPanel();
+        // htmlEditorPanel.getEditorPane().addMouseListener(new MouseAdapter () {
+        // public void mousePressed(MouseEvent e) {
+        // conditionallyShowPopup(e);
+        // }
+        //
+        // public void mouseReleased(MouseEvent e) {
+        // conditionallyShowPopup(e);
+        // }
+        //
+        // private void conditionallyShowPopup(MouseEvent e) {
+        // if (e.isPopupTrigger()) {
+        // System.out.println("fooooooooooooooooooooo");
+        // JPopupMenu popupMenu =
+        // ((SHTMLEditorPane) e.getSource()).getPopup();
+        // if (checkSpelling && popupMenu != null) {
+        //// popupMenu.add(SpellChecker.createCheckerMenu(), 0);
+        //// popupMenu.add(SpellChecker.createLanguagesMenu(), 1);
+        //// popupMenu.addSeparator();
+        //// popupMenu.show(e.getComponent(), e.getX(), e.getY());
+        // }
+        //// e.consume();
+        // }
+        // }
+        // });
+      }
+      return htmlEditorPanel;
+    }
 
-		/**
-		 * @return Returns the htmlEditorPanel.
-		 */
-		public SHTMLPanel getHtmlEditorPanel() {
-			return htmlEditorPanel;
-		}
+    /**
+     * @return Returns the htmlEditorPanel.
+     */
+    public SHTMLPanel getHtmlEditorPanel() {
+      return htmlEditorPanel;
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.view.mindmapview.EditNodeBase.Dialog#close()
-		 */
-		protected void submit() {
-			removeBodyStyle();
-			if (htmlEditorPanel.needsSaving()) {
-				getBase().getEditControl()
-						.ok(HtmlTools.unescapeHTMLUnicodeEntity(htmlEditorPanel.getDocumentText()));
-			} else {
-				getBase().getEditControl().cancel();
-			}
-			super.submit();
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.view.mindmapview.EditNodeBase.Dialog#close()
+     */
+    protected void submit() {
+      removeBodyStyle();
+      if (htmlEditorPanel.needsSaving()) {
+        getBase()
+            .getEditControl()
+            .ok(HtmlTools.unescapeHTMLUnicodeEntity(htmlEditorPanel.getDocumentText()));
+      } else {
+        getBase().getEditControl().cancel();
+      }
+      super.submit();
+    }
 
-		private void removeBodyStyle() {
-			htmlEditorPanel.getDocument().getStyleSheet().removeStyle("body");
-		}
+    private void removeBodyStyle() {
+      htmlEditorPanel.getDocument().getStyleSheet().removeStyle("body");
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.view.mindmapview.EditNodeBase.Dialog#split()
-		 */
-		protected void split() {
-			removeBodyStyle();
-			getBase().getEditControl().split(
-					HtmlTools.unescapeHTMLUnicodeEntity(htmlEditorPanel.getDocumentText()),
-					htmlEditorPanel.getCaretPosition());
-			super.split();
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.view.mindmapview.EditNodeBase.Dialog#split()
+     */
+    protected void split() {
+      removeBodyStyle();
+      getBase()
+          .getEditControl()
+          .split(
+              HtmlTools.unescapeHTMLUnicodeEntity(htmlEditorPanel.getDocumentText()),
+              htmlEditorPanel.getCaretPosition());
+      super.split();
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.view.mindmapview.EditNodeBase.Dialog#close()
-		 */
-		protected void cancel() {
-			removeBodyStyle();
-			getBase().getEditControl().cancel();
-			super.cancel();
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.view.mindmapview.EditNodeBase.Dialog#close()
+     */
+    protected void cancel() {
+      removeBodyStyle();
+      getBase().getEditControl().cancel();
+      super.cancel();
+    }
 
-		protected boolean isChanged() {
-			return htmlEditorPanel.needsSaving();
-		}
+    protected boolean isChanged() {
+      return htmlEditorPanel.needsSaving();
+    }
 
-		public Component getMostRecentFocusOwner() {
-			if (isFocused()) {
-				return getFocusOwner();
-			} else {
-				return htmlEditorPanel.getMostRecentFocusOwner();
-			}
-		}
-	}
+    public Component getMostRecentFocusOwner() {
+      if (isFocused()) {
+        return getFocusOwner();
+      } else {
+        return htmlEditorPanel.getMostRecentFocusOwner();
+      }
+    }
+  }
 
-	public EditNodeWYSIWYG(final NodeView node, final String text, final KeyEvent firstEvent,
-			ModeController controller, EditControl editControl) {
-		super(node, text, controller, editControl);
-		this.firstEvent = firstEvent;
-	}
+  public EditNodeWYSIWYG(
+      final NodeView node,
+      final String text,
+      final KeyEvent firstEvent,
+      ModeController controller,
+      EditControl editControl) {
+    super(node, text, controller, editControl);
+    this.firstEvent = firstEvent;
+  }
 
-	public void show() {
-		// Return true if successful.
-		try {
-			final FreeMindMain frame = getFrame();
-			if (htmlEditorWindow == null) {
-				htmlEditorWindow = new HTMLDialog(this);
-			}
-			htmlEditorWindow.setBase(this);
-			final SHTMLPanel htmlEditorPanel = htmlEditorWindow.getHtmlEditorPanel();
-			String rule = "BODY {";
-			Font font = node.getTextFont();
-			if (Resources.getInstance()
-					.getBoolProperty("experimental_font_sizing_for_long_node_editors")) {
-				/*
-				 * This is a proposal of Dan, but it doesn't work as expected.
-				 * 
-				 * http://sourceforge.net/tracker/?func=detail&aid=2800933&group_id
-				 * =7118&atid=107118
-				 */
-				font = Tools.updateFontSize(font, this.getView().getZoom(), font.getSize());
-			}
-			final Color nodeTextBackground = node.getTextBackground();
-			rule += "font-family: " + font.getFamily() + ";";
-			rule += "font-size: " + font.getSize() + "pt;";
-			// Daniel said:, but no effect:
-			// rule += "font-size: "+node.getFont().getSize()+"pt;";
-			if (node.getModel().isItalic()) {
-				rule += "font-style: italic; ";
-			}
-			if (node.getModel().isBold()) {
-				rule += "font-weight: bold; ";
-			}
-			final Color nodeTextColor = node.getTextColor();
-			rule += "color: " + Tools.colorToXml(nodeTextColor) + ";";
-			rule += "}\n";
-			rule += "p {";
-			rule += "margin-top:0;";
-			rule += "}\n";
-			final HTMLDocument document = htmlEditorPanel.getDocument();
-			final JEditorPane editorPane = htmlEditorPanel.getEditorPane();
-			editorPane.setForeground(nodeTextColor);
-			editorPane.setBackground(nodeTextBackground);
-			editorPane.setCaretColor(nodeTextColor);
-			document.getStyleSheet().addRule(rule);
-			try {
-				document.setBase(node.getMap().getModel().getURL());
-			} catch (MalformedURLException ignore) {
-			}
+  public void show() {
+    // Return true if successful.
+    try {
+      final FreeMindMain frame = getFrame();
+      if (htmlEditorWindow == null) {
+        htmlEditorWindow = new HTMLDialog(this);
+      }
+      htmlEditorWindow.setBase(this);
+      final SHTMLPanel htmlEditorPanel = htmlEditorWindow.getHtmlEditorPanel();
+      String rule = "BODY {";
+      Font font = node.getTextFont();
+      if (Resources.getInstance()
+          .getBoolProperty("experimental_font_sizing_for_long_node_editors")) {
+        /*
+         * This is a proposal of Dan, but it doesn't work as expected.
+         *
+         * http://sourceforge.net/tracker/?func=detail&aid=2800933&group_id
+         * =7118&atid=107118
+         */
+        font = Tools.updateFontSize(font, this.getView().getZoom(), font.getSize());
+      }
+      final Color nodeTextBackground = node.getTextBackground();
+      rule += "font-family: " + font.getFamily() + ";";
+      rule += "font-size: " + font.getSize() + "pt;";
+      // Daniel said:, but no effect:
+      // rule += "font-size: "+node.getFont().getSize()+"pt;";
+      if (node.getModel().isItalic()) {
+        rule += "font-style: italic; ";
+      }
+      if (node.getModel().isBold()) {
+        rule += "font-weight: bold; ";
+      }
+      final Color nodeTextColor = node.getTextColor();
+      rule += "color: " + Tools.colorToXml(nodeTextColor) + ";";
+      rule += "}\n";
+      rule += "p {";
+      rule += "margin-top:0;";
+      rule += "}\n";
+      final HTMLDocument document = htmlEditorPanel.getDocument();
+      final JEditorPane editorPane = htmlEditorPanel.getEditorPane();
+      editorPane.setForeground(nodeTextColor);
+      editorPane.setBackground(nodeTextBackground);
+      editorPane.setCaretColor(nodeTextColor);
+      document.getStyleSheet().addRule(rule);
+      try {
+        document.setBase(node.getMap().getModel().getURL());
+      } catch (MalformedURLException ignore) {
+      }
 
-			// { -- Set size (can be refactored to share code with long node
-			// editor)
-			int preferredHeight = (int) (node.getMainView().getHeight() * 1.2);
-			preferredHeight = Math.max(preferredHeight,
-					Integer.parseInt(frame.getProperty("el__min_default_window_height")));
-			preferredHeight = Math.min(preferredHeight,
-					Integer.parseInt(frame.getProperty("el__max_default_window_height")));
-			int preferredWidth = (int) (node.getMainView().getWidth() * 1.2);
-			preferredWidth = Math.max(preferredWidth,
-					Integer.parseInt(frame.getProperty("el__min_default_window_width")));
-			preferredWidth = Math.min(preferredWidth,
-					Integer.parseInt(frame.getProperty("el__max_default_window_width")));
-			htmlEditorPanel
-					.setContentPanePreferredSize(new Dimension(preferredWidth, preferredHeight));
-			// }
+      // { -- Set size (can be refactored to share code with long node
+      // editor)
+      int preferredHeight = (int) (node.getMainView().getHeight() * 1.2);
+      preferredHeight =
+          Math.max(
+              preferredHeight,
+              Integer.parseInt(frame.getProperty("el__min_default_window_height")));
+      preferredHeight =
+          Math.min(
+              preferredHeight,
+              Integer.parseInt(frame.getProperty("el__max_default_window_height")));
+      int preferredWidth = (int) (node.getMainView().getWidth() * 1.2);
+      preferredWidth =
+          Math.max(
+              preferredWidth, Integer.parseInt(frame.getProperty("el__min_default_window_width")));
+      preferredWidth =
+          Math.min(
+              preferredWidth, Integer.parseInt(frame.getProperty("el__max_default_window_width")));
+      htmlEditorPanel.setContentPanePreferredSize(new Dimension(preferredWidth, preferredHeight));
+      // }
 
-			htmlEditorWindow.pack();
+      htmlEditorWindow.pack();
 
-			Tools.setDialogLocationRelativeTo(htmlEditorWindow, node);
+      Tools.setDialogLocationRelativeTo(htmlEditorWindow, node);
 
-			String content = node.getModel().toString();
-			if (!HtmlTools.isHtmlNode(content)) {
-				content = HtmlTools.plainToHTML(content);
-			}
-			htmlEditorPanel.setCurrentDocumentContent(content);
-			if (firstEvent != null) {
-				final JTextComponent currentPane = htmlEditorPanel.getEditorPane();
-				if (currentPane == htmlEditorPanel.getMostRecentFocusOwner()) {
-					redispatchKeyEvents(currentPane, firstEvent);
-				}
-			} // 1st key event defined
-			else {
-				editorPane.setCaretPosition(htmlEditorPanel.getDocument().getLength());
-			}
-			htmlEditorPanel.getMostRecentFocusOwner().requestFocus();
-			htmlEditorWindow.setVisible(true);
-		} catch (Exception ex) { // Probably class not found exception
-			freemind.main.Resources.getInstance().logException(ex);
-			System.err.println(
-					"Loading of WYSIWYG HTML editor failed. Use the other editors instead.");
-		}
-	}
+      String content = node.getModel().toString();
+      if (!HtmlTools.isHtmlNode(content)) {
+        content = HtmlTools.plainToHTML(content);
+      }
+      htmlEditorPanel.setCurrentDocumentContent(content);
+      if (firstEvent != null) {
+        final JTextComponent currentPane = htmlEditorPanel.getEditorPane();
+        if (currentPane == htmlEditorPanel.getMostRecentFocusOwner()) {
+          redispatchKeyEvents(currentPane, firstEvent);
+        }
+      } // 1st key event defined
+      else {
+        editorPane.setCaretPosition(htmlEditorPanel.getDocument().getLength());
+      }
+      htmlEditorPanel.getMostRecentFocusOwner().requestFocus();
+      htmlEditorWindow.setVisible(true);
+    } catch (Exception ex) { // Probably class not found exception
+      freemind.main.Resources.getInstance().logException(ex);
+      System.err.println("Loading of WYSIWYG HTML editor failed. Use the other editors instead.");
+    }
+  }
 }

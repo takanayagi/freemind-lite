@@ -34,46 +34,45 @@ import freemind.modes.mindmapmode.MindMapNodeModel;
  * @date 21.02.2014
  */
 public final class ExtendedMapFeedbackImpl extends ExtendedMapFeedbackAdapter {
-	private MindMap mMap;
+  private MindMap mMap;
 
-	@Override
-	public MindMap getMap() {
-		return mMap;
-	}
+  @Override
+  public MindMap getMap() {
+    return mMap;
+  }
 
-	@Override
-	public MindMapNode newNode(Object pUserObject, MindMap pMap) {
-		return new MindMapNodeModel(pUserObject, pMap);
-	}
+  @Override
+  public MindMapNode newNode(Object pUserObject, MindMap pMap) {
+    return new MindMapNodeModel(pUserObject, pMap);
+  }
 
-	@Override
-	public Font getDefaultFont() {
-		int fontSize = 12;
-		int fontStyle = 0;
-		String fontFamily = "SansSerif";
+  @Override
+  public Font getDefaultFont() {
+    int fontSize = 12;
+    int fontStyle = 0;
+    String fontFamily = "SansSerif";
 
-		return getFontThroughMap(new Font(fontFamily, fontStyle, fontSize));
-	}
+    return getFontThroughMap(new Font(fontFamily, fontStyle, fontSize));
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.ExtendedMapFeedbackAdapter#copy(freemind.modes.MindMapNode , boolean)
-	 */
-	@Override
-	public Transferable copy(MindMapNode pNode, boolean pSaveInvisible) {
-		StringWriter stringWriter = new StringWriter();
-		try {
-			pNode.save(stringWriter, getMap().getLinkRegistry(),
-					pSaveInvisible, true);
-		} catch (IOException e) {
-		}
-		Vector<String> nodeList = Tools.getVectorWithSingleElement(getNodeID(pNode));
-		return new MindMapNodesSelection(stringWriter.toString(), null, null, null, null, null,
-				null, nodeList);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.ExtendedMapFeedbackAdapter#copy(freemind.modes.MindMapNode , boolean)
+   */
+  @Override
+  public Transferable copy(MindMapNode pNode, boolean pSaveInvisible) {
+    StringWriter stringWriter = new StringWriter();
+    try {
+      pNode.save(stringWriter, getMap().getLinkRegistry(), pSaveInvisible, true);
+    } catch (IOException e) {
+    }
+    Vector<String> nodeList = Tools.getVectorWithSingleElement(getNodeID(pNode));
+    return new MindMapNodesSelection(
+        stringWriter.toString(), null, null, null, null, null, null, nodeList);
+  }
 
-	public void setMap(MindMap pMap) {
-		mMap = pMap;
-	}
+  public void setMap(MindMap pMap) {
+    mMap = pMap;
+  }
 }

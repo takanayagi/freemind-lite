@@ -44,94 +44,94 @@ import freemind.main.Tools;
 
 public class TransformTest extends FreeMindTestBase {
 
-	private static final String TESTMAP_MM = "tests/freemind/testmap.mm";
-	private static final String EXPORT_WITH_XSLT_XML = "accessories/plugins/ExportWithXSLT.xml";
-	private static final String EXPORT_TO_OOO = "accessories/plugins/ExportToOoWriter.xml";
+  private static final String TESTMAP_MM = "tests/freemind/testmap.mm";
+  private static final String EXPORT_WITH_XSLT_XML = "accessories/plugins/ExportWithXSLT.xml";
+  private static final String EXPORT_TO_OOO = "accessories/plugins/ExportToOoWriter.xml";
 
-	public TransformTest() throws IOException {}
+  public TransformTest() throws IOException {}
 
-	@Test
-	public void testExportHtml() throws Exception {
-		String mapFileToBeExported = TESTMAP_MM;
-		String destinationFileName = TMPDIR + "/test1.html";
-		Properties properties = getProperties(EXPORT_WITH_XSLT_XML,
-				"accessories/plugins/ExportWithXSLT_HTML.properties");
-		doExportWithExportPlugin(mapFileToBeExported, destinationFileName, properties);
-	}
+  @Test
+  public void testExportHtml() throws Exception {
+    String mapFileToBeExported = TESTMAP_MM;
+    String destinationFileName = TMPDIR + "/test1.html";
+    Properties properties =
+        getProperties(EXPORT_WITH_XSLT_XML, "accessories/plugins/ExportWithXSLT_HTML.properties");
+    doExportWithExportPlugin(mapFileToBeExported, destinationFileName, properties);
+  }
 
-	@Test
-	public void testExportHtmlWithImage() throws Exception {
-		String mapFileToBeExported = TESTMAP_MM;
-		String destinationFileName = TMPDIR + "/test2.html";
-		Properties properties = getProperties(EXPORT_WITH_XSLT_XML,
-				"accessories/plugins/ExportWithXSLT_HTML3.properties");
-		doExportWithExportPlugin(mapFileToBeExported, destinationFileName, properties);
-	}
+  @Test
+  public void testExportHtmlWithImage() throws Exception {
+    String mapFileToBeExported = TESTMAP_MM;
+    String destinationFileName = TMPDIR + "/test2.html";
+    Properties properties =
+        getProperties(EXPORT_WITH_XSLT_XML, "accessories/plugins/ExportWithXSLT_HTML3.properties");
+    doExportWithExportPlugin(mapFileToBeExported, destinationFileName, properties);
+  }
 
-	@Test
-	public void testExportOoo() throws Exception {
-		String mapFileToBeExported = TESTMAP_MM;
-		String destinationFileName = TMPDIR + "/test_ooo.odt";
-		Properties properties =
-				getProperties(EXPORT_TO_OOO, "accessories/plugins/ExportToOoWriter.properties");
+  @Test
+  public void testExportOoo() throws Exception {
+    String mapFileToBeExported = TESTMAP_MM;
+    String destinationFileName = TMPDIR + "/test_ooo.odt";
+    Properties properties =
+        getProperties(EXPORT_TO_OOO, "accessories/plugins/ExportToOoWriter.properties");
 
-		doExportWithOooPlugin(mapFileToBeExported, destinationFileName, properties);
-	}
+    doExportWithOooPlugin(mapFileToBeExported, destinationFileName, properties);
+  }
 
-	private Properties getProperties(String xmlPluginFile, String pluginLabel) throws Exception {
-		Properties properties = new Properties();
-		IUnmarshallingContext unmarshaller = XmlBindingTools.getInstance().createUnmarshaller();
+  private Properties getProperties(String xmlPluginFile, String pluginLabel) throws Exception {
+    Properties properties = new Properties();
+    IUnmarshallingContext unmarshaller = XmlBindingTools.getInstance().createUnmarshaller();
 
-		URL pluginURL = ClassLoader.getSystemResource(xmlPluginFile);
-		assertNotNull(pluginURL, "file " + xmlPluginFile + " NOT found");
-		// unmarshal xml:
-		Plugin plugin = null;
-		InputStream in = pluginURL.openStream();
-		plugin = (Plugin) unmarshaller.unmarshalDocument(in, null);
-		for (Object p : plugin.getListChoiceList()) {
+    URL pluginURL = ClassLoader.getSystemResource(xmlPluginFile);
+    assertNotNull(pluginURL, "file " + xmlPluginFile + " NOT found");
+    // unmarshal xml:
+    Plugin plugin = null;
+    InputStream in = pluginURL.openStream();
+    plugin = (Plugin) unmarshaller.unmarshalDocument(in, null);
+    for (Object p : plugin.getListChoiceList()) {
 
-			if (p instanceof PluginAction pl) {
-				if (!pluginLabel.equals(pl.getLabel()))
-					continue;
-				for (Object plObject : pl.getListChoiceList()) {
-					if (plObject instanceof PluginProperty property) {
-						properties.put(property.getName(), property.getValue());
-					}
-				}
-				break;
-			}
-		}
-		return properties;
-	}
+      if (p instanceof PluginAction pl) {
+        if (!pluginLabel.equals(pl.getLabel())) continue;
+        for (Object plObject : pl.getListChoiceList()) {
+          if (plObject instanceof PluginProperty property) {
+            properties.put(property.getName(), property.getValue());
+          }
+        }
+        break;
+      }
+    }
+    return properties;
+  }
 
-	private void doExportWithExportPlugin(String mapFileToBeExported, String destinationFileName,
-			Properties properties) throws Exception {
-		InputStream xmlSource = ClassLoader.getSystemResource(mapFileToBeExported).openStream();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		Tools.copyStream(xmlSource, out, true);
-		ExportWithXSLT exportHook = new ExportWithXSLT();
-		MindMapControllerMock controller = new MindMapControllerMock(mFreeMindMain, out.toString());
-		exportHook.setController(controller);
+  private void doExportWithExportPlugin(
+      String mapFileToBeExported, String destinationFileName, Properties properties)
+      throws Exception {
+    InputStream xmlSource = ClassLoader.getSystemResource(mapFileToBeExported).openStream();
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    Tools.copyStream(xmlSource, out, true);
+    ExportWithXSLT exportHook = new ExportWithXSLT();
+    MindMapControllerMock controller = new MindMapControllerMock(mFreeMindMain, out.toString());
+    exportHook.setController(controller);
 
-		exportHook.setProperties(properties);
-		File destinationFile = new File(destinationFileName);
-		exportHook.transform(destinationFile);
-		assertTrue(destinationFile.exists(), "File " + destinationFile + " exists?");
-	}
+    exportHook.setProperties(properties);
+    File destinationFile = new File(destinationFileName);
+    exportHook.transform(destinationFile);
+    assertTrue(destinationFile.exists(), "File " + destinationFile + " exists?");
+  }
 
-	private void doExportWithOooPlugin(String mapFileToBeExported, String destinationFileName,
-			Properties properties) throws IOException {
-		InputStream xmlSource = ClassLoader.getSystemResource(mapFileToBeExported).openStream();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		Tools.copyStream(xmlSource, out, true);
-		ExportToOoWriter exportHook = new ExportToOoWriter();
-		exportHook.setController(new MindMapControllerMock(mFreeMindMain, out.toString()));
+  private void doExportWithOooPlugin(
+      String mapFileToBeExported, String destinationFileName, Properties properties)
+      throws IOException {
+    InputStream xmlSource = ClassLoader.getSystemResource(mapFileToBeExported).openStream();
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    Tools.copyStream(xmlSource, out, true);
+    ExportToOoWriter exportHook = new ExportToOoWriter();
+    exportHook.setController(new MindMapControllerMock(mFreeMindMain, out.toString()));
 
-		exportHook.setProperties(properties);
-		File destinationFile = new File(destinationFileName);
-		boolean result = exportHook.exportToOoWriter(destinationFile);
-		assertTrue(destinationFile.exists(), "File " + destinationFile + " exists?");
-		assertTrue(result, "Error during export");
-	}
-
+    exportHook.setProperties(properties);
+    File destinationFile = new File(destinationFileName);
+    boolean result = exportHook.exportToOoWriter(destinationFile);
+    assertTrue(destinationFile.exists(), "File " + destinationFile + " exists?");
+    assertTrue(result, "Error during export");
+  }
 }

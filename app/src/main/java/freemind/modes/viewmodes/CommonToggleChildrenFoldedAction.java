@@ -29,22 +29,20 @@ import freemind.view.mindmapview.NodeView;
 
 /**
  * @author foltin
- * 
  */
 public class CommonToggleChildrenFoldedAction extends AbstractAction {
 
-	private ViewControllerAdapter modeController;
+  private ViewControllerAdapter modeController;
 
-	public CommonToggleChildrenFoldedAction(ViewControllerAdapter controller) {
-		super(controller.getText("toggle_children_folded"));
-		this.modeController = controller;
-	}
+  public CommonToggleChildrenFoldedAction(ViewControllerAdapter controller) {
+    super(controller.getText("toggle_children_folded"));
+    this.modeController = controller;
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		NodeView selected = modeController.getSelectedView();
-		modeController.toggleFolded.toggleFolded(selected.getModel().childrenUnfolded());
-		modeController.getView().selectAsTheOnlyOneSelected(selected);
-		modeController.getController().obtainFocusForSelected();
-	}
-
+  public void actionPerformed(ActionEvent e) {
+    NodeView selected = modeController.getSelectedView();
+    modeController.toggleFolded.toggleFolded(selected.getModel().childrenUnfolded());
+    modeController.getView().selectAsTheOnlyOneSelected(selected);
+    modeController.getController().obtainFocusForSelected();
+  }
 }

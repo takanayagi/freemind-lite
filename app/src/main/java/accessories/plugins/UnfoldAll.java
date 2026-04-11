@@ -37,196 +37,181 @@ import freemind.view.mindmapview.ViewFeedback.MouseWheelEventHandler;
 
 /**
  * @author foltin
- * 
  */
 public class UnfoldAll extends MindMapNodeHookAdapter {
 
-	public static class Registration implements HookRegistration, MouseWheelEventHandler {
+  public static class Registration implements HookRegistration, MouseWheelEventHandler {
 
-		private final MindMapController controller;
-		private final MindMap mMap;
-		private final Logger logger;
-		private UnfoldAll hookInstance;
+    private final MindMapController controller;
+    private final MindMap mMap;
+    private final Logger logger;
+    private UnfoldAll hookInstance;
 
-		public Registration(ModeController controller, MindMap map) {
-			this.controller = (MindMapController) controller;
-			mMap = map;
-			logger = controller.getFrame().getLogger(this.getClass().getName());
-			// fc, 12.8.2004: this is a bad hack, but when time lacks...
-			hookInstance = new UnfoldAll();
-			hookInstance.setController(controller);
-			hookInstance.setMap(mMap);
-		}
+    public Registration(ModeController controller, MindMap map) {
+      this.controller = (MindMapController) controller;
+      mMap = map;
+      logger = controller.getFrame().getLogger(this.getClass().getName());
+      // fc, 12.8.2004: this is a bad hack, but when time lacks...
+      hookInstance = new UnfoldAll();
+      hookInstance.setController(controller);
+      hookInstance.setMap(mMap);
+    }
 
-		public void register() {
-			controller.registerMouseWheelEventHandler(this);
-		}
+    public void register() {
+      controller.registerMouseWheelEventHandler(this);
+    }
 
-		public void deRegister() {
-			controller.deRegisterMouseWheelEventHandler(this);
-		}
+    public void deRegister() {
+      controller.deRegisterMouseWheelEventHandler(this);
+    }
 
-		public boolean handleMouseWheelEvent(MouseWheelEvent e) {
-			if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
-				logger.info("handleMouseWheelEvent entered.");
-				MindMapNode rootNode = mMap.getRootNode();
-				if (e.getWheelRotation() > 0) {
-					hookInstance.unfoldOneStage(rootNode);
-				} else {
-					// this is to avoid having selected nodes getting folded.
-					controller.select(controller.getView().getRoot());
-					hookInstance.foldOneStage(rootNode);
-				}
-				return true;
-			}
-			return false;
-		}
-	}
+    public boolean handleMouseWheelEvent(MouseWheelEvent e) {
+      if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
+        logger.info("handleMouseWheelEvent entered.");
+        MindMapNode rootNode = mMap.getRootNode();
+        if (e.getWheelRotation() > 0) {
+          hookInstance.unfoldOneStage(rootNode);
+        } else {
+          // this is to avoid having selected nodes getting folded.
+          controller.select(controller.getView().getRoot());
+          hookInstance.foldOneStage(rootNode);
+        }
+        return true;
+      }
+      return false;
+    }
+  }
 
-	/**
-	 * 
-	 */
-	public UnfoldAll() {
-		super();
-	}
+  /** */
+  public UnfoldAll() {
+    super();
+  }
 
-	public void invoke(MindMapNode node) {
-		super.invoke(node);
-		boolean foldState = Tools.xmlToBoolean(getResourceString("foldingState"));
-		String foldingType = getResourceString("foldingType");
-		String applyTo = getResourceString("applyTo");
-		if ("root".equals(applyTo)) {
-			node = getMindMapController().getRootNode();
-		}
-		if (foldingType.equals("All")) {
-			if (foldState) {
-				foldAll(node);
-			} else {
-				unfoldAll(node);
-			}
-		} else {
-			if (foldState) {
-				foldOneStage(node);
-			} else {
-				unfoldOneStage(node);
-			}
-		}
-	}
+  public void invoke(MindMapNode node) {
+    super.invoke(node);
+    boolean foldState = Tools.xmlToBoolean(getResourceString("foldingState"));
+    String foldingType = getResourceString("foldingType");
+    String applyTo = getResourceString("applyTo");
+    if ("root".equals(applyTo)) {
+      node = getMindMapController().getRootNode();
+    }
+    if (foldingType.equals("All")) {
+      if (foldState) {
+        foldAll(node);
+      } else {
+        unfoldAll(node);
+      }
+    } else {
+      if (foldState) {
+        foldOneStage(node);
+      } else {
+        unfoldOneStage(node);
+      }
+    }
+  }
 
-	/**
-	 */
-	protected void unfoldOneStage(MindMapNode node) {
-		int minDepth = getMinDepth(node);
-		if (minDepth < Integer.MAX_VALUE)
-			minDepth++;
-		unfoldStageN(node, minDepth);
-	}
+  /** */
+  protected void unfoldOneStage(MindMapNode node) {
+    int minDepth = getMinDepth(node);
+    if (minDepth < Integer.MAX_VALUE) minDepth++;
+    unfoldStageN(node, minDepth);
+  }
 
-	/**
-	 */
-	protected void foldOneStage(MindMapNode node) {
-		foldStageN(node, getMaxDepth(node) - 1);
-	}
+  /** */
+  protected void foldOneStage(MindMapNode node) {
+    foldStageN(node, getMaxDepth(node) - 1);
+  }
 
-	/**
-	 */
-	protected void foldAll(MindMapNode node) {
-		for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-			foldAll(i.next());
-		}
-		setFolded(node, true);
-	}
+  /** */
+  protected void foldAll(MindMapNode node) {
+    for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+      foldAll(i.next());
+    }
+    setFolded(node, true);
+  }
 
-	public void unfoldAll(MindMapNode node) {
-		setFolded(node, false);
-		for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-			unfoldAll(i.next());
-		}
-	}
+  public void unfoldAll(MindMapNode node) {
+    setFolded(node, false);
+    for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+      unfoldAll(i.next());
+    }
+  }
 
-	/**
-	 * Unfolds every node that has only children which themselves have children. As this function is
-	 * a bit difficult to describe and perhaps not so useful, it is currently not introduced into
-	 * the menus.
-	 * 
-	 * @param node node to start from.
-	 */
-	public void foldLastBranches(MindMapNode node) {
-		boolean nodeHasChildWhichIsLeave = false;
-		for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-			MindMapNode child = i.next();
-			if (child.getChildCount() == 0) {
-				nodeHasChildWhichIsLeave = true;
-			}
-		}
-		setFolded(node, nodeHasChildWhichIsLeave);
-		for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-			foldLastBranches(i.next());
-		}
-	}
+  /**
+   * Unfolds every node that has only children which themselves have children. As this function is a
+   * bit difficult to describe and perhaps not so useful, it is currently not introduced into the
+   * menus.
+   *
+   * @param node node to start from.
+   */
+  public void foldLastBranches(MindMapNode node) {
+    boolean nodeHasChildWhichIsLeave = false;
+    for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+      MindMapNode child = i.next();
+      if (child.getChildCount() == 0) {
+        nodeHasChildWhichIsLeave = true;
+      }
+    }
+    setFolded(node, nodeHasChildWhichIsLeave);
+    for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+      foldLastBranches(i.next());
+    }
+  }
 
-	protected void setFolded(MindMapNode node, boolean state) {
-		if (node.hasChildren() && (node.isFolded() != state)) {
-			getMindMapController().setFolded(node, state);
-		}
-	}
+  protected void setFolded(MindMapNode node, boolean state) {
+    if (node.hasChildren() && (node.isFolded() != state)) {
+      getMindMapController().setFolded(node, state);
+    }
+  }
 
-	public void unfoldStageN(MindMapNode node, int stage) {
-		int k = depth(node);
-		if (k < stage) {
-			setFolded(node, false);
-			for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-				unfoldStageN(i.next(), stage);
-			}
-		} else {
-			foldAll(node);
-		}
-	}
+  public void unfoldStageN(MindMapNode node, int stage) {
+    int k = depth(node);
+    if (k < stage) {
+      setFolded(node, false);
+      for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+        unfoldStageN(i.next(), stage);
+      }
+    } else {
+      foldAll(node);
+    }
+  }
 
-	public void foldStageN(MindMapNode node, int stage) {
-		int k = depth(node);
-		if (k < stage) {
-			setFolded(node, false);
-			for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-				foldStageN(i.next(), stage);
-			}
-		} else {
-			foldAll(node);
-		}
-	}
+  public void foldStageN(MindMapNode node, int stage) {
+    int k = depth(node);
+    if (k < stage) {
+      setFolded(node, false);
+      for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+        foldStageN(i.next(), stage);
+      }
+    } else {
+      foldAll(node);
+    }
+  }
 
-	public int getMinDepth(MindMapNode node) {
-		if (node.isFolded())
-			return depth(node);
-		if (!node.hasChildren())
-			return Integer.MAX_VALUE;
-		int k = Integer.MAX_VALUE;
-		for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-			int l = getMinDepth(i.next());
-			if (l < k)
-				k = l;
-		}
-		return k;
-	}
+  public int getMinDepth(MindMapNode node) {
+    if (node.isFolded()) return depth(node);
+    if (!node.hasChildren()) return Integer.MAX_VALUE;
+    int k = Integer.MAX_VALUE;
+    for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+      int l = getMinDepth(i.next());
+      if (l < k) k = l;
+    }
+    return k;
+  }
 
-	/**
-	 */
-	protected int getMaxDepth(MindMapNode node) {
-		if (node.isFolded() || !node.hasChildren())
-			return depth(node);
-		int k = 0;
-		for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext();) {
-			int l = getMaxDepth(i.next());
-			if (l > k)
-				k = l;
-		}
-		return k;
-	}
+  /** */
+  protected int getMaxDepth(MindMapNode node) {
+    if (node.isFolded() || !node.hasChildren()) return depth(node);
+    int k = 0;
+    for (Iterator<? extends MindMapNode> i = node.childrenUnfolded(); i.hasNext(); ) {
+      int l = getMaxDepth(i.next());
+      if (l > k) k = l;
+    }
+    return k;
+  }
 
-	protected int depth(MindMapNode node) {
-		if (node.isRoot())
-			return 0;
-		return depth((MindMapNode) node.getParent()) + 1;
-	}
-
+  protected int depth(MindMapNode node) {
+    if (node.isRoot()) return 0;
+    return depth((MindMapNode) node.getParent()) + 1;
+  }
 }

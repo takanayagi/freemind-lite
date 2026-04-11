@@ -26,8 +26,7 @@ import freemind.modes.MindMapNode;
 
 public class MindMapCloudModel extends CloudAdapter {
 
-	public MindMapCloudModel(MindMapNode node, MapFeedback pMapFeedback) {
-		super(node, pMapFeedback);
-	}
-
+  public MindMapCloudModel(MindMapNode node, MapFeedback pMapFeedback) {
+    super(node, pMapFeedback);
+  }
 }

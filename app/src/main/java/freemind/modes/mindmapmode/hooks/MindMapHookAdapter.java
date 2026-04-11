@@ -17,7 +17,6 @@
  *Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-
 package freemind.modes.mindmapmode.hooks;
 
 import javax.swing.Action;
@@ -30,29 +29,23 @@ import freemind.modes.mindmapmode.MindMapController;
 /** */
 public class MindMapHookAdapter extends ModeControllerHookAdapter {
 
-	/**
-     *
-     */
-	public MindMapHookAdapter() {
-		super();
+  /** */
+  public MindMapHookAdapter() {
+    super();
+  }
 
-	}
+  public MindMapController getMindMapController() {
+    return (MindMapController) getController();
+  }
 
-	public MindMapController getMindMapController() {
-		return (MindMapController) getController();
-	}
-	
-	public JMenuItem addAccelerator(JMenuItem menuItem, String key) {
-		String keyProp = getMindMapController().getFrame().getProperty(key);
-		if(keyProp == null) {
-			logger.warning("Keystroke to " + key + " not found.");
-		}
-		KeyStroke keyStroke = KeyStroke.getKeyStroke(keyProp);
-		menuItem.setAccelerator(keyStroke);
-		menuItem.getAction().putValue(Action.ACCELERATOR_KEY, keyStroke);
-		return menuItem;
-	}
-
-
-
+  public JMenuItem addAccelerator(JMenuItem menuItem, String key) {
+    String keyProp = getMindMapController().getFrame().getProperty(key);
+    if (keyProp == null) {
+      logger.warning("Keystroke to " + key + " not found.");
+    }
+    KeyStroke keyStroke = KeyStroke.getKeyStroke(keyProp);
+    menuItem.setAccelerator(keyStroke);
+    menuItem.getAction().putValue(Action.ACCELERATOR_KEY, keyStroke);
+    return menuItem;
+  }
 }

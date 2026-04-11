@@ -34,43 +34,42 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class NodeColorActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public NodeColorActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public NodeColorActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void setNodeColor(MindMapNode node, Color color) {
-		if (Tools.safeEquals(color, node.getColor())) {
-			return;
-		}
-		NodeColorFormatAction doAction = createNodeColorFormatAction(node, color);
-		NodeColorFormatAction undoAction = createNodeColorFormatAction(node, node.getColor());
-		execute(new ActionPair(doAction, undoAction));
-	}
+  public void setNodeColor(MindMapNode node, Color color) {
+    if (Tools.safeEquals(color, node.getColor())) {
+      return;
+    }
+    NodeColorFormatAction doAction = createNodeColorFormatAction(node, color);
+    NodeColorFormatAction undoAction = createNodeColorFormatAction(node, node.getColor());
+    execute(new ActionPair(doAction, undoAction));
+  }
 
-	public NodeColorFormatAction createNodeColorFormatAction(MindMapNode node, Color color) {
-		NodeColorFormatAction nodeAction = new NodeColorFormatAction();
-		nodeAction.setNode(getNodeID(node));
-		nodeAction.setColor(Tools.colorToXml(color));
-		return nodeAction;
-	}
+  public NodeColorFormatAction createNodeColorFormatAction(MindMapNode node, Color color) {
+    NodeColorFormatAction nodeAction = new NodeColorFormatAction();
+    nodeAction.setNode(getNodeID(node));
+    nodeAction.setColor(Tools.colorToXml(color));
+    return nodeAction;
+  }
 
-	public void act(XmlAction action) {
-		if (action instanceof NodeColorFormatAction nodeColorAction) {
-			Color color = Tools.xmlToColor(nodeColorAction.getColor());
-			MindMapNode node = getNodeFromID(nodeColorAction.getNode());
-			Color oldColor = node.getColor();
-			if (!Tools.safeEquals(color, oldColor)) {
-				node.setColor(color); // null
-				getExMapFeedback().nodeChanged(node);
-			}
-		}
-	}
+  public void act(XmlAction action) {
+    if (action instanceof NodeColorFormatAction nodeColorAction) {
+      Color color = Tools.xmlToColor(nodeColorAction.getColor());
+      MindMapNode node = getNodeFromID(nodeColorAction.getNode());
+      Color oldColor = node.getColor();
+      if (!Tools.safeEquals(color, oldColor)) {
+        node.setColor(color); // null
+        getExMapFeedback().nodeChanged(node);
+      }
+    }
+  }
 
-	public Class<NodeColorFormatAction> getDoActionClass() {
-		return NodeColorFormatAction.class;
-	}
-
+  public Class<NodeColorFormatAction> getDoActionClass() {
+    return NodeColorFormatAction.class;
+  }
 }

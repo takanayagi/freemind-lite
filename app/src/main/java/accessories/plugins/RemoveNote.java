@@ -37,65 +37,67 @@ import freemind.modes.mindmapmode.hooks.MindMapNodeHookAdapter;
 
 /**
  * @author foltin
- * 
  */
 public class RemoveNote extends MindMapNodeHookAdapter {
-	public RemoveNote() {
-		super();
-	}
+  public RemoveNote() {
+    super();
+  }
 
-	public void invoke(MindMapNode rootNode) {
-		super.invoke(rootNode);
-		int showResult =
-				new OptionalDontShowMeAgainDialog(getMindMapController().getFrame().getJFrame(),
-						getMindMapController().getSelectedView(), "really_remove_notes",
-						"confirmation", getMindMapController(),
-						new OptionalDontShowMeAgainDialog.StandardPropertyHandler(
-								getMindMapController().getController(),
-								FreeMind.RESOURCES_REMOVE_NOTES_WITHOUT_QUESTION),
-						OptionalDontShowMeAgainDialog.ONLY_OK_SELECTION_IS_STORED).show()
-								.getResult();
-		if (showResult != JOptionPane.OK_OPTION) {
-			return;
-		}
+  public void invoke(MindMapNode rootNode) {
+    super.invoke(rootNode);
+    int showResult =
+        new OptionalDontShowMeAgainDialog(
+                getMindMapController().getFrame().getJFrame(),
+                getMindMapController().getSelectedView(),
+                "really_remove_notes",
+                "confirmation",
+                getMindMapController(),
+                new OptionalDontShowMeAgainDialog.StandardPropertyHandler(
+                    getMindMapController().getController(),
+                    FreeMind.RESOURCES_REMOVE_NOTES_WITHOUT_QUESTION),
+                OptionalDontShowMeAgainDialog.ONLY_OK_SELECTION_IS_STORED)
+            .show()
+            .getResult();
+    if (showResult != JOptionPane.OK_OPTION) {
+      return;
+    }
 
-		for (MindMapNode node : getMindMapController().getSelecteds()) {
-			if (node.getNoteText() != null) {
-				removeNote(node);
-			}
-		}
-	}
+    for (MindMapNode node : getMindMapController().getSelecteds()) {
+      if (node.getNoteText() != null) {
+        removeNote(node);
+      }
+    }
+  }
 
-	private void removeNote(MindMapNode node) {
-		if (getMindMapController().getSelected() == node) {
-			NodeNoteRegistration.getHtmlEditorPanel().setCurrentDocumentContent("");
-		}
-		getMindMapController().setNoteText(node, null);
-	}
+  private void removeNote(MindMapNode node) {
+    if (getMindMapController().getSelected() == node) {
+      NodeNoteRegistration.getHtmlEditorPanel().setCurrentDocumentContent("");
+    }
+    getMindMapController().setNoteText(node, null);
+  }
 
-	public static class Registration implements HookRegistration, MenuItemEnabledListener {
+  public static class Registration implements HookRegistration, MenuItemEnabledListener {
 
-		private final MindMapController controller;
+    private final MindMapController controller;
 
-		public Registration(ModeController controller, MindMap map) {
-			this.controller = (MindMapController) controller;
-		}
+    public Registration(ModeController controller, MindMap map) {
+      this.controller = (MindMapController) controller;
+    }
 
-		public boolean isEnabled(JMenuItem pItem, Action pAction) {
-			if (controller == null)
-				return false;
-			boolean foundNote = false;
-			for (MindMapNode node : controller.getSelecteds()) {
-				if (node.getNoteText() != null) {
-					foundNote = true;
-					break;
-				}
-			}
-			return foundNote;
-		}
+    public boolean isEnabled(JMenuItem pItem, Action pAction) {
+      if (controller == null) return false;
+      boolean foundNote = false;
+      for (MindMapNode node : controller.getSelecteds()) {
+        if (node.getNoteText() != null) {
+          foundNote = true;
+          break;
+        }
+      }
+      return foundNote;
+    }
 
-		public void deRegister() {}
+    public void deRegister() {}
 
-		public void register() {}
-	}
+    public void register() {}
+  }
 }

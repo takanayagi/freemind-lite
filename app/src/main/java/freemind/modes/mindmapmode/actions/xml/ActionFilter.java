@@ -23,31 +23,23 @@ package freemind.modes.mindmapmode.actions.xml;
 
 /**
  * @author foltin
- * 
- *         Filter serve for the intersection of commands to be executed.
- * 
- *         The most useful scenario for these classes is the intersection of the command flow, eg.
- *         for collaboration or for storage of the map creation procedure ("map's story").
- * 
+ *     <p>Filter serve for the intersection of commands to be executed.
+ *     <p>The most useful scenario for these classes is the intersection of the command flow, eg.
+ *     for collaboration or for storage of the map creation procedure ("map's story").
  */
 public interface ActionFilter {
-	/**
-	 * Each filter receives the action pair and its result is taken as the new action pair.
-	 */
-	ActionPair filterAction(ActionPair pair);
+  /** Each filter receives the action pair and its result is taken as the new action pair. */
+  ActionPair filterAction(ActionPair pair);
 
-	/**
-	 * @author foltin This is a marker interface. Final Action Filter are always called last and
-	 *         *should* not alter the action pair.
-	 */
-	interface FinalActionFilter extends ActionFilter {
+  /**
+   * @author foltin This is a marker interface. Final Action Filter are always called last and
+   *     *should* not alter the action pair.
+   */
+  interface FinalActionFilter extends ActionFilter {}
 
-	}
-	/**
-	 * @author foltin This is a marker interface. FirstActionFilter are always called first and
-	 *         *should* not alter the action pair.
-	 */
-	interface FirstActionFilter extends ActionFilter {
-
-	}
+  /**
+   * @author foltin This is a marker interface. FirstActionFilter are always called first and
+   *     *should* not alter the action pair.
+   */
+  interface FirstActionFilter extends ActionFilter {}
 }

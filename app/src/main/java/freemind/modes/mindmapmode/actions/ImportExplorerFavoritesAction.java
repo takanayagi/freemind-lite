@@ -31,91 +31,86 @@ import freemind.modes.MindMapNode;
 import freemind.modes.mindmapmode.MindMapController;
 
 public class ImportExplorerFavoritesAction extends MindmapAction {
-	private final MindMapController controller;
+  private final MindMapController controller;
 
-	public ImportExplorerFavoritesAction(MindMapController controller) {
-		super("import_explorer_favorites", controller);
-		this.controller = controller;
-	}
+  public ImportExplorerFavoritesAction(MindMapController controller) {
+    super("import_explorer_favorites", controller);
+    this.controller = controller;
+  }
 
-	public void actionPerformed(ActionEvent e) {
-		FreeMindFileDialog chooser = controller.getFileChooser(null);
-		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		chooser.setDialogTitle(controller.getText("select_favorites_folder"));
-		int returnVal = chooser.showOpenDialog(controller.getFrame().getContentPane());
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File folder = chooser.getSelectedFile();
-			controller.getFrame().out("Importing Favorites ...");
-			// getFrame().repaint(); // Refresh the frame, namely hide dialog
-			// and show status
-			// getView().updateUI();
-			// Problem: the frame should be refreshed here, but I don't know how
-			// to do it
-			importExplorerFavorites(folder, controller.getSelected(), /*
+  public void actionPerformed(ActionEvent e) {
+    FreeMindFileDialog chooser = controller.getFileChooser(null);
+    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    chooser.setDialogTitle(controller.getText("select_favorites_folder"));
+    int returnVal = chooser.showOpenDialog(controller.getFrame().getContentPane());
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+      File folder = chooser.getSelectedFile();
+      controller.getFrame().out("Importing Favorites ...");
+      // getFrame().repaint(); // Refresh the frame, namely hide dialog
+      // and show status
+      // getView().updateUI();
+      // Problem: the frame should be refreshed here, but I don't know how
+      // to do it
+      importExplorerFavorites(folder, controller.getSelected(), /*
 																		 * redisplay=
-																		 */
-					true);
-			controller.getFrame().out("Favorites imported.");
-		}
-	}
+																		 */ true);
+      controller.getFrame().out("Favorites imported.");
+    }
+  }
 
-	public boolean importExplorerFavorites(File folder, MindMapNode target, boolean redisplay) {
-		// Returns true iff any favorites found
-		boolean favoritesFound = false;
-		if (folder.isDirectory()) {
-			File[] list = folder.listFiles();
-			// Go recursively to subfolders
-			for (File file : list) {
-				if (file.isDirectory()) {
-					// Insert a new node
-					String nodeContent = file.getName();
-					MindMapNode node = addNode(target, nodeContent);
-					//
-					boolean favoritesFoundInSubfolder =
-							importExplorerFavorites(file, node, false);
-					if (favoritesFoundInSubfolder) {
-						favoritesFound = true;
-					} else {
-						controller.deleteNode(node);
-					}
-				}
-			}
+  public boolean importExplorerFavorites(File folder, MindMapNode target, boolean redisplay) {
+    // Returns true iff any favorites found
+    boolean favoritesFound = false;
+    if (folder.isDirectory()) {
+      File[] list = folder.listFiles();
+      // Go recursively to subfolders
+      for (File file : list) {
+        if (file.isDirectory()) {
+          // Insert a new node
+          String nodeContent = file.getName();
+          MindMapNode node = addNode(target, nodeContent);
+          //
+          boolean favoritesFoundInSubfolder = importExplorerFavorites(file, node, false);
+          if (favoritesFoundInSubfolder) {
+            favoritesFound = true;
+          } else {
+            controller.deleteNode(node);
+          }
+        }
+      }
 
-			// For each .url file: add it
-			for (File file : list) {
-				if (!file.isDirectory() && Tools.getExtension(file).equals("url")) {
-					favoritesFound = true;
-					try (BufferedReader in = new BufferedReader(new FileReader(file))) {
-						MindMapNode node =
-								addNode(target, Tools.removeExtension(file.getName()));
-						// For each line: Is it URL? => Set it as link
-						while (in.ready()) {
-							String line = in.readLine();
-							if (line.startsWith("URL=")) {
-								node.setLink(line.substring(4));
-								break;
-							}
-						}
+      // For each .url file: add it
+      for (File file : list) {
+        if (!file.isDirectory() && Tools.getExtension(file).equals("url")) {
+          favoritesFound = true;
+          try (BufferedReader in = new BufferedReader(new FileReader(file))) {
+            MindMapNode node = addNode(target, Tools.removeExtension(file.getName()));
+            // For each line: Is it URL? => Set it as link
+            while (in.ready()) {
+              String line = in.readLine();
+              if (line.startsWith("URL=")) {
+                node.setLink(line.substring(4));
+                break;
+              }
+            }
 
-					} catch (Exception e) {
-						freemind.main.Resources.getInstance().logException(e);
-					}
-				}
-			}
-		}
-		if (redisplay) {
-			controller.nodeChanged(target);
-		}
-		return favoritesFound;
-	}
+          } catch (Exception e) {
+            freemind.main.Resources.getInstance().logException(e);
+          }
+        }
+      }
+    }
+    if (redisplay) {
+      controller.nodeChanged(target);
+    }
+    return favoritesFound;
+  }
 
-	/**
-	 */
-	private MindMapNode addNode(MindMapNode target, String nodeContent) {
-		MindMapNode node =
-				controller.addNewNode(target, target.getChildCount(), target.isNewChildLeft());
-		controller.setNodeText(node, nodeContent);
-		return node;
-	}
-
+  /** */
+  private MindMapNode addNode(MindMapNode target, String nodeContent) {
+    MindMapNode node =
+        controller.addNewNode(target, target.getChildCount(), target.isNewChildLeft());
+    controller.setNodeText(node, nodeContent);
+    return node;
+  }
 }

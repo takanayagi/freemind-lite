@@ -23,14 +23,14 @@ import javax.swing.JToolBar;
 
 public class FileToolBar extends JToolBar {
 
-	public FileToolBar(FileController controller) {
-		this.setRollover(true);
+  public FileToolBar(FileController controller) {
+    this.setRollover(true);
 
-		JButton button;
+    JButton button;
 
-		button = add(controller.newMap);
-		button.setText("");
+    button = add(controller.newMap);
+    button.setText("");
 
-		button = add(controller.center);
-	}
+    button = add(controller.center);
+  }
 }

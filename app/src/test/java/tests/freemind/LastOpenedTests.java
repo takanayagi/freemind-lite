@@ -33,14 +33,14 @@ import freemind.controller.LastOpenedList;
  * @date 27.08.2013
  */
 public class LastOpenedTests extends FreeMindTestBase {
-	@Test
-	public void testStrangeCharsInList() throws Exception {
-		LastOpenedList list = new LastOpenedList(new Controller(getFrame()), null);
-		String name = "test.mm";
-		String file = "/home/user/tmp&tmp/" + name;
-		System.out.println(new File(file).getAbsoluteFile());
-		String restorable = "MindMap:";
-		list.add(restorable + file, name);
-		assertEquals(restorable + file + ";", list.save());
-	}
+  @Test
+  public void testStrangeCharsInList() throws Exception {
+    LastOpenedList list = new LastOpenedList(new Controller(getFrame()), null);
+    String name = "test.mm";
+    String file = "/home/user/tmp&tmp/" + name;
+    System.out.println(new File(file).getAbsoluteFile());
+    String restorable = "MindMap:";
+    list.add(restorable + file, name);
+    assertEquals(restorable + file + ";", list.save());
+  }
 }

@@ -22,64 +22,55 @@ import freemind.modes.MindMapNode;
 
 /**
  * Straight forward implementation with some helpers.
- * 
+ *
  * @author foltin
- * 
  */
 public abstract class NodeHookAdapter extends HookAdapter implements NodeHook {
 
-	private MindMap map;
+  private MindMap map;
 
-	private MindMapNode node;
+  private MindMapNode node;
 
-	/**
-	 * 
-	 */
-	public NodeHookAdapter() {
-		super();
-	}
+  /** */
+  public NodeHookAdapter() {
+    super();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.modes.NodeHook#invoke()
-	 */
-	public void invoke(MindMapNode node) {
-		logger.finest("invoke(node) called.");
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.modes.NodeHook#invoke()
+   */
+  public void invoke(MindMapNode node) {
+    logger.finest("invoke(node) called.");
+  }
 
-	/**
-	 */
-	public MindMapNode getNode() {
-		return node;
-	}
+  /** */
+  public MindMapNode getNode() {
+    return node;
+  }
 
-	/**
-	 */
-	public void setNode(MindMapNode node) {
-		this.node = node;
-	}
+  /** */
+  public void setNode(MindMapNode node) {
+    this.node = node;
+  }
 
-	/**
-	 */
-	protected MindMap getMap() {
-		return map;
-	}
+  /** */
+  protected MindMap getMap() {
+    return map;
+  }
 
-	/**
-	 */
-	protected void nodeChanged(MindMapNode node) {
-		getController().nodeChanged(node);
-	}
+  /** */
+  protected void nodeChanged(MindMapNode node) {
+    getController().nodeChanged(node);
+  }
 
-	/**
-	 */
-	public void setMap(MindMap map) {
-		this.map = map;
-	}
+  /** */
+  public void setMap(MindMap map) {
+    this.map = map;
+  }
 
-	public String getNodeId() {
-		return getController().getNodeID(getNode());
-	}
-
+  public String getNodeId() {
+    return getController().getNodeID(getNode());
+  }
 }

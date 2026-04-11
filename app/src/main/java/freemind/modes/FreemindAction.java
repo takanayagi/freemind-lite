@@ -29,62 +29,66 @@ import freemind.controller.MenuItemEnabledListener;
 
 /**
  * Common class for all actions that are disabled, when no map is open.
- * 
+ *
  * @author foltin
  * @date 22.10.2013
  */
 public abstract class FreemindAction extends AbstractAction implements MenuItemEnabledListener {
 
-	private final ControllerAdapter pControllerAdapter;
-	protected static Logger logger = null;
+  private final ControllerAdapter pControllerAdapter;
+  protected static Logger logger = null;
 
-	/**
-	 * @param title is a fixed title (no translation is done via resources)
-	 */
-	public FreemindAction(String title, Icon icon, ControllerAdapter controllerAdapter) {
-		super(title, icon);
-		this.pControllerAdapter = controllerAdapter;
-		if (logger == null) {
-			logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
-		}
+  /**
+   * @param title is a fixed title (no translation is done via resources)
+   */
+  public FreemindAction(String title, Icon icon, ControllerAdapter controllerAdapter) {
+    super(title, icon);
+    this.pControllerAdapter = controllerAdapter;
+    if (logger == null) {
+      logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
+    }
+  }
 
-	}
+  /**
+   * @param title Title is a resource.
+   */
+  public FreemindAction(String title, ControllerAdapter controllerAdapter) {
+    this(title, (String) null, controllerAdapter);
+  }
 
-	/**
-	 * @param title Title is a resource.
-	 */
-	public FreemindAction(String title, ControllerAdapter controllerAdapter) {
-		this(title, (String) null, controllerAdapter);
-	}
+  /**
+   * @param title Title is a resource.
+   * @param iconPath is a path to an icon.
+   */
+  public FreemindAction(String title, String iconPath, final ControllerAdapter controllerAdapter) {
+    this(
+        controllerAdapter.getText(title),
+        (iconPath == null)
+            ? null
+            : freemind.view.ImageFactory.getInstance()
+                .createIcon(controllerAdapter.getResource(iconPath)),
+        controllerAdapter);
+  }
 
-	/**
-	 * @param title Title is a resource.
-	 * @param iconPath is a path to an icon.
-	 */
-	public FreemindAction(String title, String iconPath,
-			final ControllerAdapter controllerAdapter) {
-		this(controllerAdapter.getText(title),
-				(iconPath == null) ? null
-						: freemind.view.ImageFactory.getInstance()
-								.createIcon(controllerAdapter.getResource(iconPath)),
-				controllerAdapter);
-	}
+  public ControllerAdapter getControllerAdapter() {
+    return pControllerAdapter;
+  }
 
-	public ControllerAdapter getControllerAdapter() {
-		return pControllerAdapter;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.MenuItemEnabledListener#isEnabled(javax.swing.JMenuItem,
-	 * javax.swing.Action)
-	 */
-	public boolean isEnabled(JMenuItem pItem, Action pAction) {
-		boolean result = pControllerAdapter != null && pControllerAdapter.getMap() != null;
-		logger.finest("isEnabled " + pAction.getValue(AbstractAction.NAME) + "=" + result + " from "
-				+ pControllerAdapter);
-		return result;
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.MenuItemEnabledListener#isEnabled(javax.swing.JMenuItem,
+   * javax.swing.Action)
+   */
+  public boolean isEnabled(JMenuItem pItem, Action pAction) {
+    boolean result = pControllerAdapter != null && pControllerAdapter.getMap() != null;
+    logger.finest(
+        "isEnabled "
+            + pAction.getValue(AbstractAction.NAME)
+            + "="
+            + result
+            + " from "
+            + pControllerAdapter);
+    return result;
+  }
 }

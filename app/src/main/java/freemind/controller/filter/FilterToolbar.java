@@ -49,259 +49,258 @@ import freemind.modes.MindMap;
 import freemind.modes.MindMapNode;
 
 class FilterToolbar extends FreeMindToolBar {
-	private FilterController mFilterController;
-	private FilterComposerDialog filterDialog = null;
-	private JComboBox<Condition> activeFilterConditionComboBox;
-	private JCheckBox showAncestors;
-	private JCheckBox showDescendants;
-	private Filter activeFilter;
-	private Controller c;
-	private String pathToFilterFile;
-	private FilterChangeListener filterChangeListener;
+  private FilterController mFilterController;
+  private FilterComposerDialog filterDialog = null;
+  private JComboBox<Condition> activeFilterConditionComboBox;
+  private JCheckBox showAncestors;
+  private JCheckBox showDescendants;
+  private Filter activeFilter;
+  private Controller c;
+  private String pathToFilterFile;
+  private FilterChangeListener filterChangeListener;
 
-	private class FilterChangeListener extends AbstractAction
-			implements ItemListener, PropertyChangeListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent )
-		 */
-		public FilterChangeListener() {}
+  private class FilterChangeListener extends AbstractAction
+      implements ItemListener, PropertyChangeListener {
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent )
+     */
+    public FilterChangeListener() {}
 
-		public void actionPerformed(ActionEvent arg0) {
-			resetFilter();
-			setMapFilter();
-			refreshMap();
-			DefaultFilter.selectVisibleNode(c.getView());
-		}
+    public void actionPerformed(ActionEvent arg0) {
+      resetFilter();
+      setMapFilter();
+      refreshMap();
+      DefaultFilter.selectVisibleNode(c.getView());
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent )
-		 */
-		public void itemStateChanged(ItemEvent e) {
-			if (e.getStateChange() == ItemEvent.SELECTED)
-				filterChanged();
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent )
+     */
+    public void itemStateChanged(ItemEvent e) {
+      if (e.getStateChange() == ItemEvent.SELECTED) filterChanged();
+    }
 
-		private void filterChanged() {
-			resetFilter();
-			setMapFilter();
-			final MindMap map = mFilterController.getMap();
-			if (map != null) {
-				activeFilter.applyFilter(c);
-				refreshMap();
-				DefaultFilter.selectVisibleNode(c.getView());
-			}
-		}
+    private void filterChanged() {
+      resetFilter();
+      setMapFilter();
+      final MindMap map = mFilterController.getMap();
+      if (map != null) {
+        activeFilter.applyFilter(c);
+        refreshMap();
+        DefaultFilter.selectVisibleNode(c.getView());
+      }
+    }
 
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName().equals("model")) {
-				addStandardConditions();
-				filterChanged();
-			}
-		}
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (evt.getPropertyName().equals("model")) {
+        addStandardConditions();
+        filterChanged();
+      }
+    }
+  }
 
-	}
+  private class EditFilterAction extends AbstractAction {
+    EditFilterAction() {
+      super(
+          "",
+          freemind.view.ImageFactory.getInstance()
+              .createIcon(Resources.getInstance().getResource("images/Btn_edit.gif")));
+      putValue(
+          SHORT_DESCRIPTION, Resources.getInstance().getResourceString("filter_edit_description"));
+    }
 
-	private class EditFilterAction extends AbstractAction {
-		EditFilterAction() {
-			super("", freemind.view.ImageFactory.getInstance()
-					.createIcon(Resources.getInstance().getResource("images/Btn_edit.gif")));
-			putValue(SHORT_DESCRIPTION,
-					Resources.getInstance().getResourceString("filter_edit_description"));
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent )
+     */
+    private FilterComposerDialog getFilterDialog() {
+      if (filterDialog == null) {
+        filterDialog = new FilterComposerDialog(c, FilterToolbar.this);
+        filterDialog.setLocationRelativeTo(FilterToolbar.this);
+      }
+      return filterDialog;
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent )
-		 */
-		private FilterComposerDialog getFilterDialog() {
-			if (filterDialog == null) {
-				filterDialog = new FilterComposerDialog(c, FilterToolbar.this);
-				filterDialog.setLocationRelativeTo(FilterToolbar.this);
-			}
-			return filterDialog;
-		}
+    public void actionPerformed(ActionEvent arg0) {
+      Object selectedItem = getFilterConditionModel().getSelectedItem();
+      if (selectedItem != null) {
+        getFilterDialog().setSelectedItem(selectedItem);
+      }
+      getFilterDialog().showDialog();
+    }
+  }
 
-		public void actionPerformed(ActionEvent arg0) {
-			Object selectedItem = getFilterConditionModel().getSelectedItem();
-			if (selectedItem != null) {
-				getFilterDialog().setSelectedItem(selectedItem);
-			}
-			getFilterDialog().showDialog();
-		}
+  private class UnfoldAncestorsAction extends AbstractAction {
+    /** */
+    UnfoldAncestorsAction() {
+      super(
+          "",
+          freemind.view.ImageFactory.getInstance()
+              .createIcon(Resources.getInstance().getResource("images/unfold.png")));
+    }
 
-	}
+    private void unfoldAncestors(MindMapNode parent) {
+      for (Iterator<? extends MindMapNode> i = parent.childrenUnfolded(); i.hasNext(); ) {
+        MindMapNode node = i.next();
+        if (showDescendants.isSelected() || node.getFilterInfo().isAncestor()) {
+          setFolded(node, false);
+          unfoldAncestors(node);
+        }
+      }
+    }
 
-	private class UnfoldAncestorsAction extends AbstractAction {
-		/**
-		 *
-		 */
-		UnfoldAncestorsAction() {
-			super("", freemind.view.ImageFactory.getInstance()
-					.createIcon(Resources.getInstance().getResource("images/unfold.png")));
-		}
+    private void setFolded(MindMapNode node, boolean state) {
+      if (node.hasChildren() && (node.isFolded() != state)) {
+        c.getModeController().setFolded(node, state);
+      }
+    }
 
-		private void unfoldAncestors(MindMapNode parent) {
-			for (Iterator<? extends MindMapNode> i = parent.childrenUnfolded(); i.hasNext();) {
-				MindMapNode node = i.next();
-				if (showDescendants.isSelected() || node.getFilterInfo().isAncestor()) {
-					setFolded(node, false);
-					unfoldAncestors(node);
-				}
-			}
-		}
+    public void actionPerformed(ActionEvent e) {
+      if (getSelectedCondition() != null) {
+        unfoldAncestors(c.getModel().getRootNode());
+      }
+    }
+  }
 
-		private void setFolded(MindMapNode node, boolean state) {
-			if (node.hasChildren() && (node.isFolded() != state)) {
-				c.getModeController().setFolded(node, state);
-			}
-		}
+  FilterToolbar(final Controller c) {
+    super();
+    this.mFilterController = c.getFilterController();
+    this.c = c;
+    setVisible(false);
+    setFocusable(false);
+    setRollover(true);
+    filterChangeListener = new FilterChangeListener();
+    add(new JLabel(Resources.getInstance().getResourceString("filter_toolbar") + " "));
 
-		public void actionPerformed(ActionEvent e) {
-			if (getSelectedCondition() != null) {
-				unfoldAncestors(c.getModel().getRootNode());
-			}
-		}
-	}
+    activeFilter = null;
+    activeFilterConditionComboBox =
+        new JComboBox<>() {
+          public Dimension getMaximumSize() {
+            return getPreferredSize();
+          }
+        };
+    activeFilterConditionComboBox.setFocusable(false);
+    pathToFilterFile =
+        c.getFrame().getFreemindDirectory()
+            + File.separator
+            + "auto."
+            + FilterController.FREEMIND_FILTER_EXTENSION_WITHOUT_DOT;
 
-	FilterToolbar(final Controller c) {
-		super();
-		this.mFilterController = c.getFilterController();
-		this.c = c;
-		setVisible(false);
-		setFocusable(false);
-		setRollover(true);
-		filterChangeListener = new FilterChangeListener();
-		add(new JLabel(Resources.getInstance().getResourceString("filter_toolbar") + " "));
+    JButton btnEdit = add(new EditFilterAction());
+    add(btnEdit);
 
-		activeFilter = null;
-		activeFilterConditionComboBox = new JComboBox<>() {
-			public Dimension getMaximumSize() {
-				return getPreferredSize();
-			}
-		};
-		activeFilterConditionComboBox.setFocusable(false);
-		pathToFilterFile = c.getFrame().getFreemindDirectory() + File.separator + "auto."
-				+ FilterController.FREEMIND_FILTER_EXTENSION_WITHOUT_DOT;
+    JButton btnUnfoldAncestors = add(new UnfoldAncestorsAction());
+    btnUnfoldAncestors.setToolTipText(
+        Resources.getInstance().getResourceString("filter_unfold_ancestors"));
+    add(btnUnfoldAncestors);
 
-		JButton btnEdit = add(new EditFilterAction());
-		add(btnEdit);
+    showAncestors =
+        new JCheckBox(Resources.getInstance().getResourceString("filter_show_ancestors"), true);
+    add(showAncestors);
+    showAncestors.getModel().addActionListener(filterChangeListener);
 
-		JButton btnUnfoldAncestors = add(new UnfoldAncestorsAction());
-		btnUnfoldAncestors.setToolTipText(
-				Resources.getInstance().getResourceString("filter_unfold_ancestors"));
-		add(btnUnfoldAncestors);
+    showDescendants =
+        new JCheckBox(Resources.getInstance().getResourceString("filter_show_descendants"), false);
+    add(showDescendants);
+    showDescendants.getModel().addActionListener(filterChangeListener);
+  }
 
-		showAncestors = new JCheckBox(
-				Resources.getInstance().getResourceString("filter_show_ancestors"), true);
-		add(showAncestors);
-		showAncestors.getModel().addActionListener(filterChangeListener);
+  void addStandardConditions() {
+    DefaultComboBoxModel<Condition> filterConditionModel =
+        mFilterController.getFilterConditionModel();
+    final Condition noFiltering = NoFilteringCondition.createCondition();
+    filterConditionModel.insertElementAt(noFiltering, 0);
+    filterConditionModel.insertElementAt(SelectedViewCondition.CreateCondition(), 1);
+    if (filterConditionModel.getSelectedItem() == null) {
+      filterConditionModel.setSelectedItem(noFiltering);
+    }
+  }
 
-		showDescendants = new JCheckBox(
-				Resources.getInstance().getResourceString("filter_show_descendants"), false);
-		add(showDescendants);
-		showDescendants.getModel().addActionListener(filterChangeListener);
+  void initConditions() {
+    try {
+      mFilterController.loadConditions(
+          mFilterController.getFilterConditionModel(), pathToFilterFile);
 
-	}
+    } catch (Exception ignore) {
+    }
+    addStandardConditions();
+    activeFilterConditionComboBox.setSelectedIndex(0);
+    activeFilterConditionComboBox.setRenderer(mFilterController.getConditionRenderer());
 
-	void addStandardConditions() {
-		DefaultComboBoxModel<Condition> filterConditionModel =
-				mFilterController.getFilterConditionModel();
-		final Condition noFiltering = NoFilteringCondition.createCondition();
-		filterConditionModel.insertElementAt(noFiltering, 0);
-		filterConditionModel.insertElementAt(SelectedViewCondition.CreateCondition(), 1);
-		if (filterConditionModel.getSelectedItem() == null) {
-			filterConditionModel.setSelectedItem(noFiltering);
-		}
-	}
+    add(activeFilterConditionComboBox);
+    add(Box.createHorizontalGlue());
 
-	void initConditions() {
-		try {
-			mFilterController.loadConditions(mFilterController.getFilterConditionModel(),
-					pathToFilterFile);
+    activeFilterConditionComboBox.addItemListener(filterChangeListener);
+    activeFilterConditionComboBox.addPropertyChangeListener(filterChangeListener);
+  }
 
-		} catch (Exception ignore) {
-		}
-		addStandardConditions();
-		activeFilterConditionComboBox.setSelectedIndex(0);
-		activeFilterConditionComboBox.setRenderer(mFilterController.getConditionRenderer());
+  /** */
+  public void resetFilter() {
+    activeFilter = null;
+  }
 
-		add(activeFilterConditionComboBox);
-		add(Box.createHorizontalGlue());
+  private Condition getSelectedCondition() {
+    return (Condition) activeFilterConditionComboBox.getSelectedItem();
+  }
 
-		activeFilterConditionComboBox.addItemListener(filterChangeListener);
-		activeFilterConditionComboBox.addPropertyChangeListener(filterChangeListener);
-	}
+  void setMapFilter() {
+    if (activeFilter == null)
+      activeFilter =
+          new DefaultFilter(
+              getSelectedCondition(),
+              showAncestors.getModel().isSelected(),
+              showDescendants.getModel().isSelected());
+    final MindMap map = mFilterController.getMap();
+    if (map != null) {
+      map.setFilter(activeFilter);
+    }
+  }
 
-	/**
-	 *
-	 */
-	public void resetFilter() {
-		activeFilter = null;
+  /** */
+  FilterComposerDialog getFilterDialog() {
+    return filterDialog;
+  }
 
-	}
+  /** */
+  void mapChanged(MindMap newMap) {
+    if (!isVisible()) return;
+    Filter filter;
+    if (newMap != null) {
+      filter = newMap.getFilter();
+      if (filter != activeFilter) {
+        activeFilter = filter;
+        activeFilterConditionComboBox.setSelectedItem(filter.getCondition());
+        showAncestors.setSelected(filter.areAncestorsShown());
+        showDescendants.setSelected(filter.areDescendantsShown());
+      }
+    } else {
+      filter = null;
+      activeFilterConditionComboBox.setSelectedIndex(0);
+    }
+  }
 
-	private Condition getSelectedCondition() {
-		return (Condition) activeFilterConditionComboBox.getSelectedItem();
-	}
+  private void refreshMap() {
+    mFilterController.refreshMap();
+  }
 
-	void setMapFilter() {
-		if (activeFilter == null)
-			activeFilter = new DefaultFilter(getSelectedCondition(),
-					showAncestors.getModel().isSelected(), showDescendants.getModel().isSelected());
-		final MindMap map = mFilterController.getMap();
-		if (map != null) {
-			map.setFilter(activeFilter);
-		}
-	}
+  void saveConditions() {
+    try {
+      mFilterController.saveConditions(
+          mFilterController.getFilterConditionModel(), pathToFilterFile);
+    } catch (Exception ignore) {
+    }
+  }
 
-	/**
-	 */
-	FilterComposerDialog getFilterDialog() {
-		return filterDialog;
-	}
+  ComboBoxModel<Condition> getFilterConditionModel() {
+    return activeFilterConditionComboBox.getModel();
+  }
 
-	/**
-	 */
-	void mapChanged(MindMap newMap) {
-		if (!isVisible())
-			return;
-		Filter filter;
-		if (newMap != null) {
-			filter = newMap.getFilter();
-			if (filter != activeFilter) {
-				activeFilter = filter;
-				activeFilterConditionComboBox.setSelectedItem(filter.getCondition());
-				showAncestors.setSelected(filter.areAncestorsShown());
-				showDescendants.setSelected(filter.areDescendantsShown());
-			}
-		} else {
-			filter = null;
-			activeFilterConditionComboBox.setSelectedIndex(0);
-		}
-	}
-
-	private void refreshMap() {
-		mFilterController.refreshMap();
-	}
-
-	void saveConditions() {
-		try {
-			mFilterController.saveConditions(mFilterController.getFilterConditionModel(),
-					pathToFilterFile);
-		} catch (Exception ignore) {
-		}
-	}
-
-	ComboBoxModel<Condition> getFilterConditionModel() {
-		return activeFilterConditionComboBox.getModel();
-	}
-
-	void setFilterConditionModel(ComboBoxModel<Condition> filterConditionModel) {
-		activeFilterConditionComboBox.setModel(filterConditionModel);
-	}
+  void setFilterConditionModel(ComboBoxModel<Condition> filterConditionModel) {
+    activeFilterConditionComboBox.setModel(filterConditionModel);
+  }
 }

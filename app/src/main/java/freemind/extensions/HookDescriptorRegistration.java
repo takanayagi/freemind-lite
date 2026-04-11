@@ -29,28 +29,26 @@ import freemind.controller.actions.generated.instance.PluginRegistration;
 
 /**
  * @author foltin
- * 
  */
 public class HookDescriptorRegistration extends HookDescriptorBase {
 
-	private final PluginRegistration mRegistration;
+  private final PluginRegistration mRegistration;
 
-	public HookDescriptorRegistration(String xmlPluginFile, Plugin pluginBase,
-			PluginRegistration pRegistration) {
-		super(pluginBase, xmlPluginFile);
-		mRegistration = pRegistration;
-	}
+  public HookDescriptorRegistration(
+      String xmlPluginFile, Plugin pluginBase, PluginRegistration pRegistration) {
+    super(pluginBase, xmlPluginFile);
+    mRegistration = pRegistration;
+  }
 
-	public String getClassName() {
-		return mRegistration.getClassName();
-	}
+  public String getClassName() {
+    return mRegistration.getClassName();
+  }
 
-	public boolean getIsPluginBase() {
-		return mRegistration.getIsPluginBase();
-	}
+  public boolean getIsPluginBase() {
+    return mRegistration.getIsPluginBase();
+  }
 
-	public List<PluginMode> getListPluginModeList() {
-		return mRegistration.getListPluginModeList();
-	}
-
+  public List<PluginMode> getListPluginModeList() {
+    return mRegistration.getListPluginModeList();
+  }
 }

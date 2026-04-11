@@ -13,9 +13,9 @@ import com.inet.jortho.SpellChecker;
  *  Copyright (C) 2005-2008 by i-net software
  *
  *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License as 
+ *  modify it under the terms of the GNU General Public License as
  *  published by the Free Software Foundation; either version 2 of the
- *  License, or (at your option) any later version. 
+ *  License, or (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,35 +26,37 @@ import com.inet.jortho.SpellChecker;
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  *  USA.
- *  
+ *
  *  Created on 13.02.2008
  */
 
-public class SampleApplication extends JFrame{
+public class SampleApplication extends JFrame {
 
-    public static void main(String[] args){
-        new SampleApplication().setVisible( true );
-    }
-    
-    private SampleApplication(){
-        // Build the test frame for the sample
-        super("JOrtho Sample");
-        JEditorPane text = new JTextPane();
-        text.setText( "This is a simppler textt with spellingg errors.\n\nPressing the F7 key will display the spell check dialog." );
-        add( text );
-        setSize(200, 160);
-        setDefaultCloseOperation( EXIT_ON_CLOSE );
-        setLocationRelativeTo( null );
+  public static void main(String[] args) {
+    new SampleApplication().setVisible(true);
+  }
 
-        // Create user dictionary in the current working directory of your application
-        SpellChecker.setUserDictionaryProvider( new FileUserDictionary() );
-        
-        // Load the configuration from the file dictionaries.cnf and 
-        // use the current locale or the first language as default
-        // You can download the dictionary files from http://sourceforge.net/projects/jortho/files/Dictionaries/
-        SpellChecker.registerDictionaries( null, null );
+  private SampleApplication() {
+    // Build the test frame for the sample
+    super("JOrtho Sample");
+    JEditorPane text = new JTextPane();
+    text.setText(
+        "This is a simppler textt with spellingg errors.\n\nPressing the F7 key will display the spell check dialog.");
+    add(text);
+    setSize(200, 160);
+    setDefaultCloseOperation(EXIT_ON_CLOSE);
+    setLocationRelativeTo(null);
 
-        // enable the spell checking on the text component with all features
-        SpellChecker.register( text );
-    }
+    // Create user dictionary in the current working directory of your application
+    SpellChecker.setUserDictionaryProvider(new FileUserDictionary());
+
+    // Load the configuration from the file dictionaries.cnf and
+    // use the current locale or the first language as default
+    // You can download the dictionary files from
+    // http://sourceforge.net/projects/jortho/files/Dictionaries/
+    SpellChecker.registerDictionaries(null, null);
+
+    // enable the spell checking on the text component with all features
+    SpellChecker.register(text);
+  }
 }

@@ -36,70 +36,65 @@ import freemind.modes.mindmapmode.hooks.MindMapNodeHookAdapter;
  */
 public class SortNodes extends MindMapNodeHookAdapter {
 
-	private static final class NodeTextComparator implements Comparator<MindMapNode> {
-		private boolean mNegative = false;
+  private static final class NodeTextComparator implements Comparator<MindMapNode> {
+    private boolean mNegative = false;
 
-		public int compare(MindMapNode node1, MindMapNode node2) {
+    public int compare(MindMapNode node1, MindMapNode node2) {
 
-			String nodeText1 = node1.getPlainTextContent();
-			String nodeText2 = node2.getPlainTextContent();
-			int retValue = nodeText1.compareToIgnoreCase(nodeText2);
-			if (mNegative) {
-				return -retValue;
-			}
-			return retValue;
+      String nodeText1 = node1.getPlainTextContent();
+      String nodeText2 = node2.getPlainTextContent();
+      int retValue = nodeText1.compareToIgnoreCase(nodeText2);
+      if (mNegative) {
+        return -retValue;
+      }
+      return retValue;
+    }
 
-		}
+    public void setNegative() {
+      mNegative = true;
+    }
+  }
 
-		public void setNegative() {
-			mNegative = true;
-		}
-	}
+  /** */
+  public SortNodes() {
+    super();
+  }
 
-	/**
-	 * 
-	 */
-	public SortNodes() {
-		super();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.NodeHook#invoke(freemind.modes.MindMapNode, java.util.List)
-	 */
-	public void invoke(MindMapNode node) {
-		// we want to sort the children of the node:
-		Vector<MindMapNode> sortVector = new Vector<>();
-		// put in all children of the node
-		sortVector.addAll(node.getChildren());
-		NodeTextComparator comparator = new NodeTextComparator();
-		MindMapNode last = null;
-		boolean isOrdered = true;
-		for (MindMapNode listNode : sortVector) {
-			if (last != null) {
-				if (comparator.compare(listNode, last) < 0) {
-					isOrdered = false;
-					break;
-				}
-			}
-			last = listNode;
-		}
-		if (isOrdered) {
-			comparator.setNegative();
-		}
-		Collections.sort(sortVector, comparator);
-		// now, as it is sorted. we cut the children
-		for (MindMapNode child : sortVector) {
-			Vector<MindMapNode> childList = Tools.getVectorWithSingleElement(child);
-			Transferable cut = getMindMapController().cut(childList);
-			// paste directly again causes that the node is added as the last
-			// one.
-			getMindMapController().paste(cut, node);
-		}
-		getController().select(node, Tools.getVectorWithSingleElement(node));
-		obtainFocusForSelected();
-
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.NodeHook#invoke(freemind.modes.MindMapNode, java.util.List)
+   */
+  public void invoke(MindMapNode node) {
+    // we want to sort the children of the node:
+    Vector<MindMapNode> sortVector = new Vector<>();
+    // put in all children of the node
+    sortVector.addAll(node.getChildren());
+    NodeTextComparator comparator = new NodeTextComparator();
+    MindMapNode last = null;
+    boolean isOrdered = true;
+    for (MindMapNode listNode : sortVector) {
+      if (last != null) {
+        if (comparator.compare(listNode, last) < 0) {
+          isOrdered = false;
+          break;
+        }
+      }
+      last = listNode;
+    }
+    if (isOrdered) {
+      comparator.setNegative();
+    }
+    Collections.sort(sortVector, comparator);
+    // now, as it is sorted. we cut the children
+    for (MindMapNode child : sortVector) {
+      Vector<MindMapNode> childList = Tools.getVectorWithSingleElement(child);
+      Transferable cut = getMindMapController().cut(childList);
+      // paste directly again causes that the node is added as the last
+      // one.
+      getMindMapController().paste(cut, node);
+    }
+    getController().select(node, Tools.getVectorWithSingleElement(node));
+    obtainFocusForSelected();
+  }
 }

@@ -17,30 +17,23 @@
  *Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-
 package freemind.modes.mindmapmode.hooks;
 
 import freemind.extensions.NodeHookAdapter;
 import freemind.modes.mindmapmode.MindMapController;
 
-/** 
- * This is a specialization adapted to the mindmap mode.
- * As currently, nearly all hooks belong to the mindmap mode, 
- * all derive from this class.
- * */
+/**
+ * This is a specialization adapted to the mindmap mode. As currently, nearly all hooks belong to
+ * the mindmap mode, all derive from this class.
+ */
 public class MindMapNodeHookAdapter extends NodeHookAdapter {
 
-	/**
-     *
-     */
-	public MindMapNodeHookAdapter() {
-		super();
+  /** */
+  public MindMapNodeHookAdapter() {
+    super();
+  }
 
-	}
-
-	public MindMapController getMindMapController() {
-		return (MindMapController) getController();
-
-	}
-
+  public MindMapController getMindMapController() {
+    return (MindMapController) getController();
+  }
 }

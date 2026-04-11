@@ -31,63 +31,60 @@ import freemind.modes.attributes.Attribute;
  * @author Dimitri Polivaev 12.07.2005
  */
 public class AttributeCompareCondition extends CompareConditionAdapter {
-	static final String COMPARATION_RESULT = "comparation_result";
-	static final String ATTRIBUTE = "attribute";
-	static final String NAME = "attribute_compare_condition";
-	static final String SUCCEED = "succeed";
-	private String attribute;
-	private int comparationResult;
-	private boolean succeed;
+  static final String COMPARATION_RESULT = "comparation_result";
+  static final String ATTRIBUTE = "attribute";
+  static final String NAME = "attribute_compare_condition";
+  static final String SUCCEED = "succeed";
+  private String attribute;
+  private int comparationResult;
+  private boolean succeed;
 
-	/**
-	 */
-	public AttributeCompareCondition(String attribute, String value, boolean ignoreCase,
-			int comparationResult, boolean succeed) {
-		super(value, ignoreCase);
-		this.attribute = attribute;
-		this.comparationResult = comparationResult;
-		this.succeed = succeed;
-	}
+  /** */
+  public AttributeCompareCondition(
+      String attribute, String value, boolean ignoreCase, int comparationResult, boolean succeed) {
+    super(value, ignoreCase);
+    this.attribute = attribute;
+    this.comparationResult = comparationResult;
+    this.succeed = succeed;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.filter.condition.Condition#checkNode(freemind.modes .MindMapNode)
-	 */
-	public boolean checkNode(Controller c, MindMapNode node) {
-		for (int i = 0; i < node.getAttributeTableLength(); i++) {
-			try {
-				Attribute attribute2 = node.getAttribute(i);
-				if (attribute2.getName().equals(attribute) && succeed == (compareTo(
-						attribute2.getValue()) == comparationResult))
-					return true;
-			} catch (NumberFormatException ignore) {
-			}
-		}
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.filter.condition.Condition#checkNode(freemind.modes .MindMapNode)
+   */
+  public boolean checkNode(Controller c, MindMapNode node) {
+    for (int i = 0; i < node.getAttributeTableLength(); i++) {
+      try {
+        Attribute attribute2 = node.getAttribute(i);
+        if (attribute2.getName().equals(attribute)
+            && succeed == (compareTo(attribute2.getValue()) == comparationResult)) return true;
+      } catch (NumberFormatException ignore) {
+      }
+    }
+    return false;
+  }
 
-	public void save(XMLElement element) {
-		XMLElement child = new XMLElement();
-		child.setName(NAME);
-		super.saveAttributes(child);
-		child.setAttribute(ATTRIBUTE, attribute);
-		child.setIntAttribute(COMPARATION_RESULT, comparationResult);
-		child.setAttribute(SUCCEED, Tools.BooleanToXml(succeed));
-		element.addChild(child);
+  public void save(XMLElement element) {
+    XMLElement child = new XMLElement();
+    child.setName(NAME);
+    super.saveAttributes(child);
+    child.setAttribute(ATTRIBUTE, attribute);
+    child.setIntAttribute(COMPARATION_RESULT, comparationResult);
+    child.setAttribute(SUCCEED, Tools.BooleanToXml(succeed));
+    element.addChild(child);
+  }
 
-	}
+  static Condition load(XMLElement element) {
+    return new AttributeCompareCondition(
+        element.getStringAttribute(ATTRIBUTE),
+        element.getStringAttribute(AttributeCompareCondition.VALUE),
+        Tools.xmlToBoolean(element.getStringAttribute(AttributeCompareCondition.IGNORE_CASE)),
+        element.getIntAttribute(COMPARATION_RESULT),
+        Tools.xmlToBoolean(element.getStringAttribute(SUCCEED)));
+  }
 
-	static Condition load(XMLElement element) {
-		return new AttributeCompareCondition(element.getStringAttribute(ATTRIBUTE),
-				element.getStringAttribute(AttributeCompareCondition.VALUE),
-				Tools.xmlToBoolean(
-						element.getStringAttribute(AttributeCompareCondition.IGNORE_CASE)),
-				element.getIntAttribute(COMPARATION_RESULT),
-				Tools.xmlToBoolean(element.getStringAttribute(SUCCEED)));
-	}
-
-	protected String createDesctiption() {
-		return super.createDescription(attribute, comparationResult, succeed);
-	}
+  protected String createDesctiption() {
+    return super.createDescription(attribute, comparationResult, succeed);
+  }
 }

@@ -29,67 +29,63 @@ import javax.swing.JLabel;
 import freemind.swing.FreeMindFormBuilder;
 
 public class FontProperty extends PropertyBean implements PropertyControl {
-	String description;
+  String description;
 
-	String label;
+  String label;
 
-	JComboBox<String> mFontComboBox = new JComboBox<>();
+  JComboBox<String> mFontComboBox = new JComboBox<>();
 
-	private String[] mAvailableFontFamilyNames;
+  private String[] mAvailableFontFamilyNames;
 
-	/**
-	 * TODO TODO
-	 */
-	public FontProperty(String description, String label, TextTranslator pTranslator) {
-		super();
-		this.description = description;
-		this.label = label;
-		mAvailableFontFamilyNames =
-				GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-		mFontComboBox.setModel(new DefaultComboBoxModel<>(mAvailableFontFamilyNames));
-		mFontComboBox.addActionListener(pE -> firePropertyChangeEvent());
-	}
+  /** TODO TODO */
+  public FontProperty(String description, String label, TextTranslator pTranslator) {
+    super();
+    this.description = description;
+    this.label = label;
+    mAvailableFontFamilyNames =
+        GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+    mFontComboBox.setModel(new DefaultComboBoxModel<>(mAvailableFontFamilyNames));
+    mFontComboBox.addActionListener(pE -> firePropertyChangeEvent());
+  }
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+  @Override
+  public String getDescription() {
+    return description;
+  }
 
-	@Override
-	public String getLabel() {
-		return label;
-	}
+  @Override
+  public String getLabel() {
+    return label;
+  }
 
-	@Override
-	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
-		JLabel label = builder.append(pTranslator.getText(getLabel()), mFontComboBox);
-		label.setToolTipText(pTranslator.getText(getDescription()));
+  @Override
+  public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
+    JLabel label = builder.append(pTranslator.getText(getLabel()), mFontComboBox);
+    label.setToolTipText(pTranslator.getText(getDescription()));
+  }
 
-	}
+  @Override
+  public void setValue(String pValue) {
+    for (int i = 0; i < mAvailableFontFamilyNames.length; i++) {
+      String fontName = mAvailableFontFamilyNames[i];
+      if (fontName.equals(pValue)) {
+        mFontComboBox.setSelectedIndex(i);
+        return;
+      }
+    }
+    System.err.println("Unknown value:" + pValue);
+    if (mFontComboBox.getModel().getSize() > 0) {
+      mFontComboBox.setSelectedIndex(0);
+    }
+  }
 
-	@Override
-	public void setValue(String pValue) {
-		for (int i = 0; i < mAvailableFontFamilyNames.length; i++) {
-			String fontName = mAvailableFontFamilyNames[i];
-			if (fontName.equals(pValue)) {
-				mFontComboBox.setSelectedIndex(i);
-				return;
-			}
-		}
-		System.err.println("Unknown value:" + pValue);
-		if (mFontComboBox.getModel().getSize() > 0) {
-			mFontComboBox.setSelectedIndex(0);
-		}
-	}
+  @Override
+  public String getValue() {
+    return mAvailableFontFamilyNames[mFontComboBox.getSelectedIndex()];
+  }
 
-	@Override
-	public String getValue() {
-		return mAvailableFontFamilyNames[mFontComboBox.getSelectedIndex()];
-	}
-
-	@Override
-	public void setEnabled(boolean pEnabled) {
-		mFontComboBox.setEnabled(pEnabled);
-	}
-
+  @Override
+  public void setEnabled(boolean pEnabled) {
+    mFontComboBox.setEnabled(pEnabled);
+  }
 }

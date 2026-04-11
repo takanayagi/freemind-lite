@@ -15,7 +15,6 @@
  * 02111-1307, USA.
  */
 
-
 package freemind.modes;
 
 import java.io.IOException;
@@ -26,28 +25,24 @@ import freemind.main.XMLParseException;
 
 public abstract class Mode {
 
-	public abstract void init(Controller c);
+  public abstract void init(Controller c);
 
-	public abstract String toString();
+  public abstract String toString();
 
-	public abstract void activate();
+  public abstract void activate();
 
-	public abstract void restore(String restorable) throws XMLParseException,
-			IOException, URISyntaxException;
+  public abstract void restore(String restorable)
+      throws XMLParseException, IOException, URISyntaxException;
 
-	/**
-	 * Creates a new mode controller and returns it.
-	 */
-	public abstract ModeController createModeController();
+  /** Creates a new mode controller and returns it. */
+  public abstract ModeController createModeController();
 
-	/**
-	 * This modeController is only used, when no map is opened.
-	 */
-	public abstract ModeController getDefaultModeController();
+  /** This modeController is only used, when no map is opened. */
+  public abstract ModeController getDefaultModeController();
 
-	public abstract Controller getController();
+  public abstract Controller getController();
 
-	public String toLocalizedString() {
-		return getController().getResourceString("mode_" + toString());
-	}
+  public String toLocalizedString() {
+    return getController().getResourceString("mode_" + toString());
+  }
 }

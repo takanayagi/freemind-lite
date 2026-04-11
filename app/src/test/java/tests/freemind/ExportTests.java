@@ -42,53 +42,52 @@ import freemind.view.mindmapview.MapView;
  * @date 12.08.2011
  */
 public class ExportTests extends FreeMindTestBase {
-	private static final String TESTMAP_MM = "src/test/resources/tests/freemind/testmap.mm";
+  private static final String TESTMAP_MM = "src/test/resources/tests/freemind/testmap.mm";
 
-	@Test
-	public void testExportPng() throws Exception {
-		System.setProperty("java.awt.headless", "true");
-		IndependantMapViewCreator creator = new IndependantMapViewCreator();
-		creator.exportFileToPng(TESTMAP_MM, TMPDIR + "/test.png", mFreeMindMain);
+  @Test
+  public void testExportPng() throws Exception {
+    System.setProperty("java.awt.headless", "true");
+    IndependantMapViewCreator creator = new IndependantMapViewCreator();
+    creator.exportFileToPng(TESTMAP_MM, TMPDIR + "/test.png", mFreeMindMain);
 
-		System.out.println("Done.");
-	}
+    System.out.println("Done.");
+  }
 
-	// TODO
-	public static void main(String[] args)
-			throws XMLParseException, IOException, URISyntaxException {
-		FreeMindMainMock mFreeMindMain = new FreeMindMainMock();
-		JDialog fm = new JDialog();
-		fm.setTitle("Title");
-		fm.setModal(true);
-		final Rectangle dim = new Rectangle();
-		JPanel parent = new JPanel() {
-			protected void paintChildren(Graphics pG) {
-				pG.translate(0, -dim.y);
-				super.paintChildren(pG);
-				pG.translate(0, dim.y);
-			}
-		};
-		fm.add(parent, BorderLayout.CENTER);
-		IndependantMapViewCreator creator = new IndependantMapViewCreator();
-		MapView mapView = creator.createMapViewForFile(TESTMAP_MM, parent, mFreeMindMain);
-		parent.add(mapView, BorderLayout.CENTER);
-		mapView.doLayout();
-		Rectangle innerBounds = mapView.getInnerBounds();
-		Rectangle bounds = mapView.getBounds();
-		dim.y = bounds.y + innerBounds.y;
-		// System.out.println(bounds);
-		// System.out.println(innerBounds);
-		fm.setBounds(mapView.getInnerBounds());
+  // TODO
+  public static void main(String[] args) throws XMLParseException, IOException, URISyntaxException {
+    FreeMindMainMock mFreeMindMain = new FreeMindMainMock();
+    JDialog fm = new JDialog();
+    fm.setTitle("Title");
+    fm.setModal(true);
+    final Rectangle dim = new Rectangle();
+    JPanel parent =
+        new JPanel() {
+          protected void paintChildren(Graphics pG) {
+            pG.translate(0, -dim.y);
+            super.paintChildren(pG);
+            pG.translate(0, dim.y);
+          }
+        };
+    fm.add(parent, BorderLayout.CENTER);
+    IndependantMapViewCreator creator = new IndependantMapViewCreator();
+    MapView mapView = creator.createMapViewForFile(TESTMAP_MM, parent, mFreeMindMain);
+    parent.add(mapView, BorderLayout.CENTER);
+    mapView.doLayout();
+    Rectangle innerBounds = mapView.getInnerBounds();
+    Rectangle bounds = mapView.getBounds();
+    dim.y = bounds.y + innerBounds.y;
+    // System.out.println(bounds);
+    // System.out.println(innerBounds);
+    fm.setBounds(mapView.getInnerBounds());
 
-		fm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		fm.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent event) {
-				System.exit(0);
-			}
-		});
+    fm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    fm.addWindowListener(
+        new WindowAdapter() {
+          public void windowClosing(WindowEvent event) {
+            System.exit(0);
+          }
+        });
 
-		fm.setVisible(true);
-
-	}
-
+    fm.setVisible(true);
+  }
 }

@@ -29,24 +29,19 @@ import javax.swing.ListModel;
  */
 public interface SortedListModel extends ListModel<Object> {
 
-	/**
-	 * 
-	 */
-	void clear();
+  /** */
+  void clear();
 
-	/**
-	 */
-	boolean contains(Object o);
+  /** */
+  boolean contains(Object o);
 
-	/**
-	 */
-	void add(Object o);
+  /** */
+  void add(Object o);
 
-	void replace(Object oldO, Object newO);
+  void replace(Object oldO, Object newO);
 
-	void remove(Object o);
+  void remove(Object o);
 
-	/**
-	 */
-	int getIndexOf(Object o);
+  /** */
+  int getIndexOf(Object o);
 }

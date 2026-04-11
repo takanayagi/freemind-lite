@@ -33,69 +33,65 @@ import freemind.modes.mindmapmode.hooks.PermanentMindMapNodeHookAdapter;
 
 /**
  * @author foltin
- * 
  */
 public class RevisionPlugin extends PermanentMindMapNodeHookAdapter implements ActionHandler {
 
-	static boolean alreadyUsed = false;
+  static boolean alreadyUsed = false;
 
-	private Color color;
+  private Color color;
 
-	/**
-	 * 
-	 */
-	public RevisionPlugin() {
-		super();
-	}
+  /** */
+  public RevisionPlugin() {
+    super();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.NodeHook#invoke(freemind.modes.MindMapNode)
-	 */
-	public void invoke(MindMapNode node) {
-		super.invoke(node);
-		if (alreadyUsed == false) {
-			color = Color.YELLOW;
-			// new register:
-			getMindMapController().getActionRegistry().registerHandler(this);
-			alreadyUsed = true;
-		}
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.NodeHook#invoke(freemind.modes.MindMapNode)
+   */
+  public void invoke(MindMapNode node) {
+    super.invoke(node);
+    if (alreadyUsed == false) {
+      color = Color.YELLOW;
+      // new register:
+      getMindMapController().getActionRegistry().registerHandler(this);
+      alreadyUsed = true;
+    }
+  }
 
-	public void shutdownMapHook() {
-		getMindMapController().getActionRegistry().deregisterHandler(this);
-		super.shutdownMapHook();
-	}
+  public void shutdownMapHook() {
+    getMindMapController().getActionRegistry().deregisterHandler(this);
+    super.shutdownMapHook();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#executeAction(freemind.controller
-	 * .actions.ActionPair)
-	 */
-	public void executeAction(XmlAction action) {
-		if (action instanceof EditNodeAction) {
-			// there is an edit action.
-			EditNodeAction editAction = (EditNodeAction) action;
-			NodeAdapter node = getMindMapController().getNodeFromID(editAction.getNode());
-			node.setBackgroundColor(color);
-			nodeChanged(node);
-		}
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#executeAction(freemind.controller
+   * .actions.ActionPair)
+   */
+  public void executeAction(XmlAction action) {
+    if (action instanceof EditNodeAction) {
+      // there is an edit action.
+      EditNodeAction editAction = (EditNodeAction) action;
+      NodeAdapter node = getMindMapController().getNodeFromID(editAction.getNode());
+      node.setBackgroundColor(color);
+      nodeChanged(node);
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#startTransaction(java.lang. String)
-	 */
-	public void startTransaction(String name) {}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#startTransaction(java.lang. String)
+   */
+  public void startTransaction(String name) {}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActionHandler#endTransaction(java.lang.String )
-	 */
-	public void endTransaction(String name) {}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActionHandler#endTransaction(java.lang.String )
+   */
+  public void endTransaction(String name) {}
 }

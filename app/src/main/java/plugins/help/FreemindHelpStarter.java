@@ -30,32 +30,28 @@ import freemind.extensions.ModeControllerHookAdapter;
 
 /**
  * @author foltin
- * 
  */
 public class FreemindHelpStarter extends ModeControllerHookAdapter {
 
-	/**
-	 *
-	 */
-
-	public void startupMapHook() {
-		super.startupMapHook();
-		// Find the HelpSet file and create the HelpSet object:
-		String helpHS = "plugins/help/doc/freemind.hs";
-		try {
-			ClassLoader classLoader = this.getClass().getClassLoader();
-			URL hsURL = HelpSet.findHelpSet(classLoader, helpHS);
-			HelpSet hs = new HelpSet(classLoader, hsURL);
-			HelpBroker hb = hs.createHelpBroker();
-			hb.initPresentation();
-			hb.setDisplayed(true);
-			hb.setViewDisplayed(true);
-		} catch (Exception ee) {
-			// Say what the exception really is
-			freemind.main.Resources.getInstance().logException(ee);
-			logger.warning("HelpSet " + ee.getMessage() + ee);
-			logger.warning("HelpSet " + helpHS + " not found");
-			return;
-		}
-	}
+  /** */
+  public void startupMapHook() {
+    super.startupMapHook();
+    // Find the HelpSet file and create the HelpSet object:
+    String helpHS = "plugins/help/doc/freemind.hs";
+    try {
+      ClassLoader classLoader = this.getClass().getClassLoader();
+      URL hsURL = HelpSet.findHelpSet(classLoader, helpHS);
+      HelpSet hs = new HelpSet(classLoader, hsURL);
+      HelpBroker hb = hs.createHelpBroker();
+      hb.initPresentation();
+      hb.setDisplayed(true);
+      hb.setViewDisplayed(true);
+    } catch (Exception ee) {
+      // Say what the exception really is
+      freemind.main.Resources.getInstance().logException(ee);
+      logger.warning("HelpSet " + ee.getMessage() + ee);
+      logger.warning("HelpSet " + helpHS + " not found");
+      return;
+    }
+  }
 }

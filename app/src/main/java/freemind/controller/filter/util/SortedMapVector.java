@@ -28,130 +28,121 @@ import java.util.Vector;
  * @author Dimitri Polivaev 18.06.2005
  */
 public class SortedMapVector {
-	private static class MapElement {
-		private Comparable<Object> key;
-		private Object value;
+  private static class MapElement {
+    private Comparable<Object> key;
+    private Object value;
 
-		public MapElement(Comparable<Object> key, Object value) {
-			this.key = key;
-			this.value = value;
-		}
+    public MapElement(Comparable<Object> key, Object value) {
+      this.key = key;
+      this.value = value;
+    }
 
-		Object getValue() {
-			return value;
-		}
+    Object getValue() {
+      return value;
+    }
 
-		Comparable<Object> getKey() {
-			return key;
-		}
-	}
+    Comparable<Object> getKey() {
+      return key;
+    }
+  }
 
-	private Vector<MapElement> elements;
-	private static final int ELEMENT_NOT_FOUND_FLAG = 1 << 31;
-	private static final int CAPACITY_INCREMENT = 10;
+  private Vector<MapElement> elements;
+  private static final int ELEMENT_NOT_FOUND_FLAG = 1 << 31;
+  private static final int CAPACITY_INCREMENT = 10;
 
-	public SortedMapVector() {
-		elements = new Vector<>(0, CAPACITY_INCREMENT);
-	}
+  public SortedMapVector() {
+    elements = new Vector<>(0, CAPACITY_INCREMENT);
+  }
 
-	public int add(Comparable<Object> key, Object value) {
-		int index = findElement(key);
-		if ((index & ELEMENT_NOT_FOUND_FLAG) != 0) {
-			index &= ~ELEMENT_NOT_FOUND_FLAG;
-			elements.add(index, new MapElement(key, value));
-		}
-		return index;
-	}
+  public int add(Comparable<Object> key, Object value) {
+    int index = findElement(key);
+    if ((index & ELEMENT_NOT_FOUND_FLAG) != 0) {
+      index &= ~ELEMENT_NOT_FOUND_FLAG;
+      elements.add(index, new MapElement(key, value));
+    }
+    return index;
+  }
 
-	public int capacity() {
-		return elements.capacity();
-	}
+  public int capacity() {
+    return elements.capacity();
+  }
 
-	public void clear() {
-		elements.clear();
-	}
+  public void clear() {
+    elements.clear();
+  }
 
-	public Object getValue(int index) {
-		return elements.get(index).getValue();
-	}
+  public Object getValue(int index) {
+    return elements.get(index).getValue();
+  }
 
-	public Object getValue(Comparable<Object> key) {
-		int index = findElement(key);
-		if ((index & ELEMENT_NOT_FOUND_FLAG) == 0)
-			return elements.get(index).getValue();
-		throw new NoSuchElementException();
-	}
+  public Object getValue(Comparable<Object> key) {
+    int index = findElement(key);
+    if ((index & ELEMENT_NOT_FOUND_FLAG) == 0) return elements.get(index).getValue();
+    throw new NoSuchElementException();
+  }
 
-	public Comparable<Object> getKey(int index) {
-		return elements.get(index).getKey();
-	}
+  public Comparable<Object> getKey(int index) {
+    return elements.get(index).getKey();
+  }
 
-	public boolean containsKey(Comparable<Object> key) {
-		int index = findElement(key);
-		return (index & ELEMENT_NOT_FOUND_FLAG) == 0;
-	}
+  public boolean containsKey(Comparable<Object> key) {
+    int index = findElement(key);
+    return (index & ELEMENT_NOT_FOUND_FLAG) == 0;
+  }
 
-	public int indexOf(Comparable<Object> key) {
-		int index = findElement(key);
-		if ((index & ELEMENT_NOT_FOUND_FLAG) == 0)
-			return index;
-		return -1;
-	}
+  public int indexOf(Comparable<Object> key) {
+    int index = findElement(key);
+    if ((index & ELEMENT_NOT_FOUND_FLAG) == 0) return index;
+    return -1;
+  }
 
-	private int findElement(Comparable<Object> key) {
-		return findElement(key, 0, size());
-	}
+  private int findElement(Comparable<Object> key) {
+    return findElement(key, 0, size());
+  }
 
-	private int findElement(Comparable<Object> key, int first, int size) {
-		if (size == 0)
-			return first | ELEMENT_NOT_FOUND_FLAG;
-		int halfSize = size / 2;
-		int middle = first + halfSize;
-		MapElement middleElement = elements.get(middle);
-		int comparationResult = key.compareTo(middleElement.getKey());
-		int last = first + size - 1;
-		if (comparationResult < 0) {
-			if (halfSize <= 1) {
-				if (middle != first)
-					comparationResult = key.compareTo((elements.get(first)).getKey());
-				if (comparationResult < 0)
-					return first | ELEMENT_NOT_FOUND_FLAG;
-				if (comparationResult == 0)
-					return first;
-				return middle | ELEMENT_NOT_FOUND_FLAG;
-			}
-			return findElement(key, first, halfSize);
-		} else if (comparationResult == 0) {
-			return middle;
-		} else {
+  private int findElement(Comparable<Object> key, int first, int size) {
+    if (size == 0) return first | ELEMENT_NOT_FOUND_FLAG;
+    int halfSize = size / 2;
+    int middle = first + halfSize;
+    MapElement middleElement = elements.get(middle);
+    int comparationResult = key.compareTo(middleElement.getKey());
+    int last = first + size - 1;
+    if (comparationResult < 0) {
+      if (halfSize <= 1) {
+        if (middle != first) comparationResult = key.compareTo((elements.get(first)).getKey());
+        if (comparationResult < 0) return first | ELEMENT_NOT_FOUND_FLAG;
+        if (comparationResult == 0) return first;
+        return middle | ELEMENT_NOT_FOUND_FLAG;
+      }
+      return findElement(key, first, halfSize);
+    } else if (comparationResult == 0) {
+      return middle;
+    } else {
 
-			if (halfSize <= 1) {
-				if (middle != last)
-					comparationResult = key.compareTo((elements.get(last)).getKey());
-				if (comparationResult < 0)
-					return last | ELEMENT_NOT_FOUND_FLAG;
-				if (comparationResult == 0)
-					return last;
-				return last + 1 | ELEMENT_NOT_FOUND_FLAG;
-			}
-			return findElement(key, middle, size - halfSize);
-		}
-	}
+      if (halfSize <= 1) {
+        if (middle != last) comparationResult = key.compareTo((elements.get(last)).getKey());
+        if (comparationResult < 0) return last | ELEMENT_NOT_FOUND_FLAG;
+        if (comparationResult == 0) return last;
+        return last + 1 | ELEMENT_NOT_FOUND_FLAG;
+      }
+      return findElement(key, middle, size - halfSize);
+    }
+  }
 
-	public boolean remove(Comparable<Object> key) {
-		int index = findElement(key);
-		if ((index & ELEMENT_NOT_FOUND_FLAG) == 0) {
-			elements.remove(index);
-			return true;
-		}
-		return false;
-	}
+  public boolean remove(Comparable<Object> key) {
+    int index = findElement(key);
+    if ((index & ELEMENT_NOT_FOUND_FLAG) == 0) {
+      elements.remove(index);
+      return true;
+    }
+    return false;
+  }
 
-	public void remove(int index) {
-		elements.removeElementAt(index);
-	}
+  public void remove(int index) {
+    elements.removeElementAt(index);
+  }
 
-	public int size() {
-		return elements.size();
-	}
+  public int size() {
+    return elements.size();
+  }
 }

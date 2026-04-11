@@ -35,105 +35,101 @@ import freemind.modes.common.plugins.ReminderHookBase;
 
 /**
  * @author foltin
- * 
  */
 public class BrowseHookFactory extends HookFactoryAdapter {
 
-	/**
-	 *
-	 */
-	public BrowseHookFactory() {
-		super();
-	}
+  /** */
+  public BrowseHookFactory() {
+    super();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookFactory#getPossibleNodeHooks()
-	 */
-	public Vector<String> getPossibleNodeHooks() {
-		return new Vector<>();
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookFactory#getPossibleNodeHooks()
+   */
+  public Vector<String> getPossibleNodeHooks() {
+    return new Vector<>();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookFactory#getPossibleModeControllerHooks()
-	 */
-	public Vector<String> getPossibleModeControllerHooks() {
-		return new Vector<>();
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookFactory#getPossibleModeControllerHooks()
+   */
+  public Vector<String> getPossibleModeControllerHooks() {
+    return new Vector<>();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookFactory#createModeControllerHook(java.lang.String )
-	 */
-	public ModeControllerHook createModeControllerHook(String hookName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookFactory#createModeControllerHook(java.lang.String )
+   */
+  public ModeControllerHook createModeControllerHook(String hookName) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookFactory#createNodeHook(java.lang.String)
-	 */
-	public NodeHook createNodeHook(String hookName) {
-		// System.out.println("create node hook:"+hookName);
-		NodeHook hook;
-		if (hookName.equals(ReminderHookBase.PLUGIN_LABEL)) {
-			hook = new BrowseReminderHook();
-		} else if (hookName.equals(MapNodePositionHolderBase.NODE_MAP_HOOK_NAME)) {
-			hook = new MapNodePositionHolderBase();
-		} else {
-			hook = new PermanentNodeHookSubstituteUnknown(hookName);
-		}
-		// decorate hook.
-		hook.setProperties(new Properties());
-		hook.setName(hookName);
-		hook.setPluginBaseClass(null);
-		return hook;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookFactory#createNodeHook(java.lang.String)
+   */
+  public NodeHook createNodeHook(String hookName) {
+    // System.out.println("create node hook:"+hookName);
+    NodeHook hook;
+    if (hookName.equals(ReminderHookBase.PLUGIN_LABEL)) {
+      hook = new BrowseReminderHook();
+    } else if (hookName.equals(MapNodePositionHolderBase.NODE_MAP_HOOK_NAME)) {
+      hook = new MapNodePositionHolderBase();
+    } else {
+      hook = new PermanentNodeHookSubstituteUnknown(hookName);
+    }
+    // decorate hook.
+    hook.setProperties(new Properties());
+    hook.setName(hookName);
+    hook.setPluginBaseClass(null);
+    return hook;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookFactory#getHookMenuPositions(java.lang.String)
-	 */
-	public List<String> getHookMenuPositions(String hookName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookFactory#getHookMenuPositions(java.lang.String)
+   */
+  public List<String> getHookMenuPositions(String hookName) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookFactory#getInstanciationMethod(java.lang.String)
-	 */
-	public HookInstanciationMethod getInstanciationMethod(String hookName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookFactory#getInstanciationMethod(java.lang.String)
+   */
+  public HookInstanciationMethod getInstanciationMethod(String hookName) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookFactory#getRegistrations()
-	 */
-	public List<RegistrationContainer> getRegistrations() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookFactory#getRegistrations()
+   */
+  public List<RegistrationContainer> getRegistrations() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookFactory#getPluginBaseClass(java.lang.String)
-	 */
-	public Object getPluginBaseClass(String hookName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookFactory#getPluginBaseClass(java.lang.String)
+   */
+  public Object getPluginBaseClass(String hookName) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

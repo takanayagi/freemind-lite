@@ -25,11 +25,11 @@ import freemind.swing.FreeMindFormBuilder;
 
 public interface PropertyControl {
 
-	String getDescription();
+  String getDescription();
 
-	String getLabel();
+  String getLabel();
 
-	void layout(FreeMindFormBuilder builder, TextTranslator pTranslator);
+  void layout(FreeMindFormBuilder builder, TextTranslator pTranslator);
 
-	void setEnabled(boolean pEnabled);
+  void setEnabled(boolean pEnabled);
 }

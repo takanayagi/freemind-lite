@@ -34,59 +34,56 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
  */
 public class ChangeArrowLinkEndPointsActor extends XmlActorAdapter {
 
-	/**
-	 * @param pMapFeedback
-	 */
-	public ChangeArrowLinkEndPointsActor(ExtendedMapFeedback pMapFeedback) {
-		super(pMapFeedback);
-	}
+  /**
+   * @param pMapFeedback
+   */
+  public ChangeArrowLinkEndPointsActor(ExtendedMapFeedback pMapFeedback) {
+    super(pMapFeedback);
+  }
 
-	public void setArrowLinkEndPoints(MindMapArrowLink link, Point startPoint, Point endPoint) {
-		execute(getActionPair(link, startPoint, endPoint));
-	}
+  public void setArrowLinkEndPoints(MindMapArrowLink link, Point startPoint, Point endPoint) {
+    execute(getActionPair(link, startPoint, endPoint));
+  }
 
-	/**
-	 */
-	private ActionPair getActionPair(MindMapArrowLink link, Point startPoint, Point endPoint) {
-		return new ActionPair(createArrowLinkPointXmlAction(link, startPoint, endPoint),
-				createArrowLinkPointXmlAction(link, link.getStartInclination(),
-						link.getEndInclination()));
-	}
+  /** */
+  private ActionPair getActionPair(MindMapArrowLink link, Point startPoint, Point endPoint) {
+    return new ActionPair(
+        createArrowLinkPointXmlAction(link, startPoint, endPoint),
+        createArrowLinkPointXmlAction(link, link.getStartInclination(), link.getEndInclination()));
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
-	 * generated.instance.XmlAction)
-	 */
-	public void act(XmlAction action) {
-		if (action instanceof ArrowLinkPointXmlAction pointAction) {
-			MindMapArrowLink link =
-					(MindMapArrowLink) getLinkRegistry().getLinkForId(pointAction.getId());
-			link.setStartInclination(Tools.xmlToPoint(pointAction.getStartPoint()));
-			link.setEndInclination(Tools.xmlToPoint(pointAction.getEndPoint()));
-			getExMapFeedback().nodeChanged(link.getSource());
-			getExMapFeedback().nodeChanged(link.getTarget());
-		}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#act(freemind.controller.actions.
+   * generated.instance.XmlAction)
+   */
+  public void act(XmlAction action) {
+    if (action instanceof ArrowLinkPointXmlAction pointAction) {
+      MindMapArrowLink link =
+          (MindMapArrowLink) getLinkRegistry().getLinkForId(pointAction.getId());
+      link.setStartInclination(Tools.xmlToPoint(pointAction.getStartPoint()));
+      link.setEndInclination(Tools.xmlToPoint(pointAction.getEndPoint()));
+      getExMapFeedback().nodeChanged(link.getSource());
+      getExMapFeedback().nodeChanged(link.getTarget());
+    }
+  }
 
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.actions.ActorXml#getDoActionClass()
+   */
+  public Class<ArrowLinkPointXmlAction> getDoActionClass() {
+    return ArrowLinkPointXmlAction.class;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.actions.ActorXml#getDoActionClass()
-	 */
-	public Class<ArrowLinkPointXmlAction> getDoActionClass() {
-		return ArrowLinkPointXmlAction.class;
-	}
-
-	private ArrowLinkPointXmlAction createArrowLinkPointXmlAction(MindMapArrowLink arrowLink,
-			Point startPoint, Point endPoint) {
-		ArrowLinkPointXmlAction action = new ArrowLinkPointXmlAction();
-		action.setStartPoint(Tools.PointToXml(startPoint));
-		action.setEndPoint(Tools.PointToXml(endPoint));
-		action.setId(arrowLink.getUniqueId());
-		return action;
-	}
-
+  private ArrowLinkPointXmlAction createArrowLinkPointXmlAction(
+      MindMapArrowLink arrowLink, Point startPoint, Point endPoint) {
+    ArrowLinkPointXmlAction action = new ArrowLinkPointXmlAction();
+    action.setStartPoint(Tools.PointToXml(startPoint));
+    action.setEndPoint(Tools.PointToXml(endPoint));
+    action.setId(arrowLink.getUniqueId());
+    return action;
+  }
 }

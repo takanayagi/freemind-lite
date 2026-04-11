@@ -46,328 +46,296 @@ import freemind.view.mindmapview.ViewFeedback;
 
 public interface ModeController extends TextTranslator, MapFeedback, ViewFeedback {
 
-	String NODESEPARATOR = "<nodeseparator>";
+  String NODESEPARATOR = "<nodeseparator>";
 
-	/**
-	 * @param file Nowadays this is an URL to unify the behaviour of the browser and the other
-	 *        modes.
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws XMLParseException
-	 * @return returns the new mode controller created for this url.
-	 * @throws URISyntaxException
-	 */
-	MapFeedback load(URL file)
-			throws FileNotFoundException, IOException, XMLParseException, URISyntaxException;
-
-	/**
-	 * This is the same as load(URL) for those points where you have a file instead of an url
-	 * (conversion is difficult between them...).
-	 */
-	MapFeedback load(File file) throws IOException;
-
-	/**
-	 * Opens a link in * the opened map * another map * another file.
-	 */
-	void loadURL(String relative);
-
-	boolean save(File file);
-
-	ModeController newMap();
-
-	/**
-	 * @return true, if successfully saved. False, if canceled or exception.
-	 */
-	boolean save();
-
-	boolean saveAs();
-
-	void open();
-
-	boolean close(boolean force, MapModuleManager mapModuleManager);
-
-	// activation methods:
-	void startupController();
-
-	void shutdownController();
-
-	// end activation methods.
-
-	// listener -> controller handling
-	void doubleClick(MouseEvent e);
-
-	void plainClick(MouseEvent e);
-
-	/**
-	 * This method is used to hide the map "under" another opened map. In fact, should remove the
-	 * focus, stop plugins, if necessary, etc.
-	 */
-	void setVisible(boolean visible);
-
-	boolean isBlocked();
-
-	// node identifier (fc, 2.5.2004):
-	/**
-	 * Given a node identifier, this method returns the corresponding node.
-	 *
-	 * @throws IllegalArgumentException if the id is unknown.
-	 */
-	NodeAdapter getNodeFromID(String nodeID);
-
-	/**
-	 * Calling this method the map-unique identifier of the node is returned (and created before, if
-	 * not present)
-	 */
-	String getNodeID(MindMapNode selected);
-
-	/**
-	 * Single selection: the node is the only one selected after calling this method.
-	 */
-	void select(NodeView node);
-
-	/**
-	 * Multiple selection. All MindMapNode s from the selecteds list are selected, and the focused
-	 * is moreover focused.
-	 */
-	void select(MindMapNode focused, List<MindMapNode> selecteds);
-
-	void selectBranch(NodeView selected, boolean extend);
-
-	MindMapNode getSelected();
-
-	NodeView getSelectedView();
-
-	/**
-	 * @return a List of MindMapNode s.
-	 */
-	List<MindMapNode> getSelecteds();
-
-	/**
-	 * @return a LinkedList of MindMapNodes ordered by depth. nodes with greater depth occur first.
-	 */
-	List<MindMapNode> getSelectedsByDepth();
-
-	/**
-	 * nodes with greater depth occur first.
-	 *
-	 * @param inPlaceList the given list is sorted by reference.
-	 */
-	void sortNodesByDepth(List<MindMapNode> inPlaceList);
-
-	/**
-	 * This extends the currently selected nodes.
-	 *
-	 * @return true, if the method changed the selection.
-	 */
-	boolean extendSelection(MouseEvent e);
-
-	/**
-	 * Invoke this method after you've changed how a node is to be represented in the tree.
-	 */
-	void nodeChanged(MindMapNode n);
-
-	/**
-	 * @param pIsClean true: the map is saved, false: the map model has been changed, and the map
-	 *        must be saved.
-	 */
-	void setSaved(boolean pIsClean);
-
-	/**
-	 * Is called when a node is deselected.
-	 */
-	void onLostFocusNode(NodeView node);
-
-	/**
-	 * Is called when a node is selected.
-	 */
-	void onFocusNode(NodeView node);
-
-	void onViewCreatedHook(NodeView newView);
-
-	void onViewRemovedHook(NodeView newView);
-
-	/** */
-	interface NodeSelectionListener {
-
-		/**
-		 * Sent, if a node is changed
-		 */
-		void onUpdateNodeHook(MindMapNode node);
-
-		/**
-		 * Is sent when a node is focused (this means, that it is *the* selected node, there may
-		 * only be one!).
-		 */
-		void onFocusNode(NodeView node);
-
-		/**
-		 * Is sent when a node has lost its focus (see {@link #onSaveNode(MindMapNode)}).
-		 */
-		void onLostFocusNode(NodeView node);
-
-		/**
-		 * Is issued before a node is saved (eg. to save its notes, too, even if the notes is
-		 * currently edited).
-		 */
-		void onSaveNode(MindMapNode node);
-
-		/**
-		 * Informs whether or not the node belongs to the group of selected nodes (in contrast to
-		 * the focused node above). The nodes selection is already changed, when this method is
-		 * called.
-		 *
-		 * @param pNode
-		 * @param pIsSelected true, if the node is selected now.
-		 */
-		void onSelectionChange(NodeView pNode, boolean pIsSelected);
-	}
-
-	/**
-	 * @param listener
-	 * @param pCallWithCurrentSelection if true, the methods for focused and selected nodes are
-	 *        called directly with the current selection. Otherwise, the first selection change
-	 *        would provoke the first call to the given listener.
-	 */
-	void registerNodeSelectionListener(NodeSelectionListener listener,
-			boolean pCallWithCurrentSelection);
-
-	void deregisterNodeSelectionListener(NodeSelectionListener listener);
-
-	/**
-	 * Is issued before a node is saved (eg. to save its notes, too, even if the notes is currently
-	 * edited). It is issued via NodeSelectionListener.
-	 */
-	void firePreSaveEvent(MindMapNode node);
-
-	/** */
-	interface NodeLifetimeListener {
+  /**
+   * @param file Nowadays this is an URL to unify the behaviour of the browser and the other modes.
+   * @throws FileNotFoundException
+   * @throws IOException
+   * @throws XMLParseException
+   * @return returns the new mode controller created for this url.
+   * @throws URISyntaxException
+   */
+  MapFeedback load(URL file)
+      throws FileNotFoundException, IOException, XMLParseException, URISyntaxException;
 
-		/**
-		 * Sent, if a node is created (on map startup or during operations).
-		 */
-		void onCreateNodeHook(MindMapNode node);
+  /**
+   * This is the same as load(URL) for those points where you have a file instead of an url
+   * (conversion is difficult between them...).
+   */
+  MapFeedback load(File file) throws IOException;
+
+  /** Opens a link in * the opened map * another map * another file. */
+  void loadURL(String relative);
+
+  boolean save(File file);
 
-		/**
-		 * Is sent before a node is deleted (on map shutdown, too).
-		 */
-		void onPreDeleteNode(MindMapNode node);
+  ModeController newMap();
 
-		/**
-		 * Is sent before after a node is deleted (on map shutdown, this event is *not* send).
-		 */
-		void onPostDeleteNode(MindMapNode node, MindMapNode parent);
+  /**
+   * @return true, if successfully saved. False, if canceled or exception.
+   */
+  boolean save();
 
-	}
+  boolean saveAs();
 
-	/**
-	 * The onCreateNodeHook is called for every node (depest nodes first) after registration.
-	 *
-	 * @param pFireCreateEvent TODO
-	 */
-	void registerNodeLifetimeListener(NodeLifetimeListener listener, boolean pFireCreateEvent);
+  void open();
 
-	void deregisterNodeLifetimeListener(NodeLifetimeListener listener);
+  boolean close(boolean force, MapModuleManager mapModuleManager);
 
-	/**
-	 * Is issued before a node is deleted. It is issued via NodeLifetimeListener.
-	 */
-	void fireNodePreDeleteEvent(MindMapNode node);
+  // activation methods:
+  void startupController();
 
-	/**
-	 * The position of this method is an exception. Normally, every method that changes nodes must
-	 * be contained in the specific mode controllers but as this method is also used by the MapView
-	 * to switch to neighbours (private NodeView getNeighbour(int directionCode)), we make this
-	 * exception here (fc, 6.11.2005).
-	 */
-	void setFolded(MindMapNode node, boolean folded);
+  void shutdownController();
 
-	/**
-	 * Unfolds a node if necessary.
-	 */
-	void displayNode(MindMapNode node);
+  // end activation methods.
 
-	/**
-	 * Node is displayed and selected as the only one selected. It is moved to the center of the
-	 * screen.
-	 */
-	void centerNode(MindMapNode node);
+  // listener -> controller handling
+  void doubleClick(MouseEvent e);
 
-	String getLinkShortText(MindMapNode node);
+  void plainClick(MouseEvent e);
 
-	JToolBar getModeToolBar();
+  /**
+   * This method is used to hide the map "under" another opened map. In fact, should remove the
+   * focus, stop plugins, if necessary, etc.
+   */
+  void setVisible(boolean visible);
 
-	/** For the toolbar on the left hand side of the window. */
-	Component getLeftToolBar();
+  boolean isBlocked();
 
-	/** Use this method to get menus to the screen. */
-	void updateMenus(StructuredMenuHolder holder);
+  // node identifier (fc, 2.5.2004):
+  /**
+   * Given a node identifier, this method returns the corresponding node.
+   *
+   * @throws IllegalArgumentException if the id is unknown.
+   */
+  NodeAdapter getNodeFromID(String nodeID);
+
+  /**
+   * Calling this method the map-unique identifier of the node is returned (and created before, if
+   * not present)
+   */
+  String getNodeID(MindMapNode selected);
+
+  /** Single selection: the node is the only one selected after calling this method. */
+  void select(NodeView node);
+
+  /**
+   * Multiple selection. All MindMapNode s from the selecteds list are selected, and the focused is
+   * moreover focused.
+   */
+  void select(MindMapNode focused, List<MindMapNode> selecteds);
+
+  void selectBranch(NodeView selected, boolean extend);
+
+  MindMapNode getSelected();
+
+  NodeView getSelectedView();
+
+  /**
+   * @return a List of MindMapNode s.
+   */
+  List<MindMapNode> getSelecteds();
+
+  /**
+   * @return a LinkedList of MindMapNodes ordered by depth. nodes with greater depth occur first.
+   */
+  List<MindMapNode> getSelectedsByDepth();
+
+  /**
+   * nodes with greater depth occur first.
+   *
+   * @param inPlaceList the given list is sorted by reference.
+   */
+  void sortNodesByDepth(List<MindMapNode> inPlaceList);
+
+  /**
+   * This extends the currently selected nodes.
+   *
+   * @return true, if the method changed the selection.
+   */
+  boolean extendSelection(MouseEvent e);
+
+  /** Invoke this method after you've changed how a node is to be represented in the tree. */
+  void nodeChanged(MindMapNode n);
+
+  /**
+   * @param pIsClean true: the map is saved, false: the map model has been changed, and the map must
+   *     be saved.
+   */
+  void setSaved(boolean pIsClean);
+
+  /** Is called when a node is deselected. */
+  void onLostFocusNode(NodeView node);
+
+  /** Is called when a node is selected. */
+  void onFocusNode(NodeView node);
+
+  void onViewCreatedHook(NodeView newView);
+
+  void onViewRemovedHook(NodeView newView);
+
+  /** */
+  interface NodeSelectionListener {
+
+    /** Sent, if a node is changed */
+    void onUpdateNodeHook(MindMapNode node);
+
+    /**
+     * Is sent when a node is focused (this means, that it is *the* selected node, there may only be
+     * one!).
+     */
+    void onFocusNode(NodeView node);
 
-	void updatePopupMenu(StructuredMenuHolder holder);
+    /** Is sent when a node has lost its focus (see {@link #onSaveNode(MindMapNode)}). */
+    void onLostFocusNode(NodeView node);
 
-	JPopupMenu getPopupMenu();
+    /**
+     * Is issued before a node is saved (eg. to save its notes, too, even if the notes is currently
+     * edited).
+     */
+    void onSaveNode(MindMapNode node);
 
-	void showPopupMenu(MouseEvent e);
+    /**
+     * Informs whether or not the node belongs to the group of selected nodes (in contrast to the
+     * focused node above). The nodes selection is already changed, when this method is called.
+     *
+     * @param pNode
+     * @param pIsSelected true, if the node is selected now.
+     */
+    void onSelectionChange(NodeView pNode, boolean pIsSelected);
+  }
 
-	/** This returns a context menu for an object placed in the background pane. */
-	JPopupMenu getPopupForModel(Object obj);
+  /**
+   * @param listener
+   * @param pCallWithCurrentSelection if true, the methods for focused and selected nodes are called
+   *     directly with the current selection. Otherwise, the first selection change would provoke
+   *     the first call to the given listener.
+   */
+  void registerNodeSelectionListener(
+      NodeSelectionListener listener, boolean pCallWithCurrentSelection);
 
-	FreeMindMain getFrame();
+  void deregisterNodeSelectionListener(NodeSelectionListener listener);
 
-	MapView getView();
+  /**
+   * Is issued before a node is saved (eg. to save its notes, too, even if the notes is currently
+   * edited). It is issued via NodeSelectionListener.
+   */
+  void firePreSaveEvent(MindMapNode node);
 
-	MindMap getMap();
+  /** */
+  interface NodeLifetimeListener {
 
-	/**
-	 * This method must only be used by the model itself at creation time. Don't use this method.
-	 */
-	void setModel(MapAdapter model);
+    /** Sent, if a node is created (on map startup or during operations). */
+    void onCreateNodeHook(MindMapNode node);
 
-	Mode getMode();
+    /** Is sent before a node is deleted (on map shutdown, too). */
+    void onPreDeleteNode(MindMapNode node);
 
-	MapModule getMapModule();
+    /** Is sent before after a node is deleted (on map shutdown, this event is *not* send). */
+    void onPostDeleteNode(MindMapNode node, MindMapNode parent);
+  }
 
-	Controller getController();
+  /**
+   * The onCreateNodeHook is called for every node (depest nodes first) after registration.
+   *
+   * @param pFireCreateEvent TODO
+   */
+  void registerNodeLifetimeListener(NodeLifetimeListener listener, boolean pFireCreateEvent);
 
-	HookFactory getHookFactory();
+  void deregisterNodeLifetimeListener(NodeLifetimeListener listener);
 
-	Color getSelectionColor();
+  /** Is issued before a node is deleted. It is issued via NodeLifetimeListener. */
+  void fireNodePreDeleteEvent(MindMapNode node);
 
-	/**
-	 * Get text from resource file
-	 */
-	String getText(String textId);
+  /**
+   * The position of this method is an exception. Normally, every method that changes nodes must be
+   * contained in the specific mode controllers but as this method is also used by the MapView to
+   * switch to neighbours (private NodeView getNeighbour(int directionCode)), we make this exception
+   * here (fc, 6.11.2005).
+   */
+  void setFolded(MindMapNode node, boolean folded);
 
-	URL getResource(String path);
+  /** Unfolds a node if necessary. */
+  void displayNode(MindMapNode node);
 
-	void nodeRefresh(MindMapNode node);
+  /**
+   * Node is displayed and selected as the only one selected. It is moved to the center of the
+   * screen.
+   */
+  void centerNode(MindMapNode node);
 
-	NodeView getNodeView(MindMapNode node);
+  String getLinkShortText(MindMapNode node);
 
-	void refreshMap();
+  JToolBar getModeToolBar();
 
-	Transferable copy(MindMapNode node, boolean saveInvisible);
+  /** For the toolbar on the left hand side of the window. */
+  Component getLeftToolBar();
 
-	Transferable copy();
+  /** Use this method to get menus to the screen. */
+  void updateMenus(StructuredMenuHolder holder);
 
-	Transferable copySingle();
+  void updatePopupMenu(StructuredMenuHolder holder);
 
-	Transferable copy(List<? extends MindMapNode> selectedNodes, boolean copyInvisible);
+  JPopupMenu getPopupMenu();
 
-	FreeMindFileDialog getFileChooser(FileFilter filter);
+  void showPopupMenu(MouseEvent e);
 
-	void setView(MapView pView);
+  /** This returns a context menu for an object placed in the background pane. */
+  JPopupMenu getPopupForModel(Object obj);
 
-	/**
-	 * @see NodeSelectionListener
-	 * @param pNode
-	 * @param pIsSelected
-	 */
-	void changeSelection(NodeView pNode, boolean pIsSelected);
+  FreeMindMain getFrame();
 
-	/**
-	 * @param key key value patterns is used to ensure, that more than one tooltip can be displayed.
-	 * @param value null if you want to delete this tooltip.
-	 */
-	void setToolTip(MindMapNode node, String key, String value);
+  MapView getView();
 
+  MindMap getMap();
+
+  /** This method must only be used by the model itself at creation time. Don't use this method. */
+  void setModel(MapAdapter model);
+
+  Mode getMode();
+
+  MapModule getMapModule();
+
+  Controller getController();
+
+  HookFactory getHookFactory();
+
+  Color getSelectionColor();
+
+  /** Get text from resource file */
+  String getText(String textId);
+
+  URL getResource(String path);
+
+  void nodeRefresh(MindMapNode node);
+
+  NodeView getNodeView(MindMapNode node);
+
+  void refreshMap();
+
+  Transferable copy(MindMapNode node, boolean saveInvisible);
+
+  Transferable copy();
+
+  Transferable copySingle();
+
+  Transferable copy(List<? extends MindMapNode> selectedNodes, boolean copyInvisible);
+
+  FreeMindFileDialog getFileChooser(FileFilter filter);
+
+  void setView(MapView pView);
+
+  /**
+   * @see NodeSelectionListener
+   * @param pNode
+   * @param pIsSelected
+   */
+  void changeSelection(NodeView pNode, boolean pIsSelected);
+
+  /**
+   * @param key key value patterns is used to ensure, that more than one tooltip can be displayed.
+   * @param value null if you want to delete this tooltip.
+   */
+  void setToolTip(MindMapNode node, String key, String value);
 }

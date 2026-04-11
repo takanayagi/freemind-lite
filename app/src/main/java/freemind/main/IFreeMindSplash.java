@@ -22,12 +22,11 @@ import javax.swing.ImageIcon;
 
 public interface IFreeMindSplash {
 
-	FeedBack getFeedBack();
+  FeedBack getFeedBack();
 
-	void close();
+  void close();
 
-	void setVisible(boolean pB);
+  void setVisible(boolean pB);
 
-	ImageIcon getWindowIcon();
-
+  ImageIcon getWindowIcon();
 }

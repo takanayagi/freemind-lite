@@ -37,35 +37,32 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 /**
- * 
  * @author joerg
  */
 public class XmlExporter {
 
-	/** Creates a new instance of XmlExporter */
-	public XmlExporter() {}
+  /** Creates a new instance of XmlExporter */
+  public XmlExporter() {}
 
-	public void transForm(File xmlFile, File xsltFile, File resultFile)
-			throws FileNotFoundException {
-		Source xmlSource = new StreamSource(xmlFile);
-		Source xsltSource = new StreamSource(xsltFile);
-		FileOutputStream resultOutputStream = new FileOutputStream(resultFile);
+  public void transForm(File xmlFile, File xsltFile, File resultFile) throws FileNotFoundException {
+    Source xmlSource = new StreamSource(xmlFile);
+    Source xsltSource = new StreamSource(xsltFile);
+    FileOutputStream resultOutputStream = new FileOutputStream(resultFile);
 
-		// create an instance of TransformerFactory
-		try (resultOutputStream) {
-			try {
-				Result result = new StreamResult(resultOutputStream);
-				TransformerFactory transFact = TransformerFactory.newInstance();
+    // create an instance of TransformerFactory
+    try (resultOutputStream) {
+      try {
+        Result result = new StreamResult(resultOutputStream);
+        TransformerFactory transFact = TransformerFactory.newInstance();
 
-				Transformer trans = transFact.newTransformer(xsltSource);
+        Transformer trans = transFact.newTransformer(xsltSource);
 
-				trans.transform(xmlSource, result);
-			} catch (Exception e) {
-				freemind.main.Resources.getInstance().logException(e);
-			}
-		} catch (IOException e) {
-			freemind.main.Resources.getInstance().logException(e);
-		}
-	}
-
+        trans.transform(xmlSource, result);
+      } catch (Exception e) {
+        freemind.main.Resources.getInstance().logException(e);
+      }
+    } catch (IOException e) {
+      freemind.main.Resources.getInstance().logException(e);
+    }
+  }
 }

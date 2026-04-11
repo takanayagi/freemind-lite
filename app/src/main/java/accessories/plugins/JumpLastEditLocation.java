@@ -47,146 +47,140 @@ import freemind.modes.mindmapmode.hooks.MindMapNodeHookAdapter;
 
 /**
  * This plugin stores the location of last edit taken place in order to jump to it on keystroke.
- * 
+ *
  * @author foltin
  */
 public class JumpLastEditLocation extends MindMapNodeHookAdapter {
 
-	public JumpLastEditLocation() {
+  public JumpLastEditLocation() {}
 
-	}
+  public void invoke(MindMapNode pNode) {
+    super.invoke(pNode);
+    try {
+      JumpLastEditLocationRegistration base =
+          (JumpLastEditLocationRegistration) getPluginBaseClass();
+      MindMapNode node = base.getLastEditLocation(pNode);
+      if (node == null) {
+        return;
+      }
+      this.logger.fine("Selecting " + node + " as last edit location.");
+      getMindMapController().select(node, Tools.getVectorWithSingleElement(node));
+    } catch (Exception e) {
+      freemind.main.Resources.getInstance().logException(e);
+    }
+  }
 
-	public void invoke(MindMapNode pNode) {
-		super.invoke(pNode);
-		try {
-			JumpLastEditLocationRegistration base =
-					(JumpLastEditLocationRegistration) getPluginBaseClass();
-			MindMapNode node = base.getLastEditLocation(pNode);
-			if (node == null) {
-				return;
-			}
-			this.logger.fine("Selecting " + node + " as last edit location.");
-			getMindMapController().select(node, Tools.getVectorWithSingleElement(node));
-		} catch (Exception e) {
-			freemind.main.Resources.getInstance().logException(e);
-		}
-	}
+  public static class JumpLastEditLocationRegistration
+      implements HookRegistration, ActionHandler, MenuItemEnabledListener {
 
-	public static class JumpLastEditLocationRegistration
-			implements HookRegistration, ActionHandler, MenuItemEnabledListener {
+    private static final String PLUGIN_NAME = "accessories/plugins/JumpLastEditLocation.properties";
 
-		private static final String PLUGIN_NAME =
-				"accessories/plugins/JumpLastEditLocation.properties";
+    private MindMapController controller;
 
-		private MindMapController controller;
+    private Logger logger;
 
-		private Logger logger;
+    private Vector<String> mLastEditLocations = new Vector<>();
 
-		private Vector<String> mLastEditLocations = new Vector<>();
+    public MindMapNode getLastEditLocation(MindMapNode pCurrentNode) {
+      int size = mLastEditLocations.size();
+      if (size == 0) {
+        return null;
+      }
+      // search for the current node inside the vector:
+      String id = controller.getNodeID(pCurrentNode);
+      int index = mLastEditLocations.lastIndexOf(id);
+      do {
+        if (index < 0) {
+          // current node not present, we start with the last position:
+          index = size - 1;
+        } else {
+          index = index - 1;
+          if (index < 0) {
+            index = 0;
+          }
+        }
+        id = mLastEditLocations.get(index);
+        try {
+          pCurrentNode = controller.getNodeFromID(id);
+          return pCurrentNode;
+        } catch (IllegalArgumentException e) {
+          // node not found, retry...
+        } catch (Exception e) {
+          freemind.main.Resources.getInstance().logException(e);
+        }
+      } while (index > 0);
+      return null;
+    }
 
-		public MindMapNode getLastEditLocation(MindMapNode pCurrentNode) {
-			int size = mLastEditLocations.size();
-			if (size == 0) {
-				return null;
-			}
-			// search for the current node inside the vector:
-			String id = controller.getNodeID(pCurrentNode);
-			int index = mLastEditLocations.lastIndexOf(id);
-			do {
-				if (index < 0) {
-					// current node not present, we start with the last position:
-					index = size - 1;
-				} else {
-					index = index - 1;
-					if (index < 0) {
-						index = 0;
-					}
-				}
-				id = mLastEditLocations.get(index);
-				try {
-					pCurrentNode = controller.getNodeFromID(id);
-					return pCurrentNode;
-				} catch (IllegalArgumentException e) {
-					// node not found, retry...
-				} catch (Exception e) {
-					freemind.main.Resources.getInstance().logException(e);
-				}
-			} while (index > 0);
-			return null;
-		}
+    public JumpLastEditLocationRegistration(ModeController controller, MindMap map) {
+      this.controller = (MindMapController) controller;
+      logger = controller.getFrame().getLogger(this.getClass().getName());
+    }
 
-		public JumpLastEditLocationRegistration(ModeController controller, MindMap map) {
-			this.controller = (MindMapController) controller;
-			logger = controller.getFrame().getLogger(this.getClass().getName());
-		}
+    public void register() {
+      controller.getActionRegistry().registerHandler(this);
+    }
 
-		public void register() {
-			controller.getActionRegistry().registerHandler(this);
-		}
+    public void deRegister() {
+      controller.getActionRegistry().deregisterHandler(this);
+    }
 
-		public void deRegister() {
-			controller.getActionRegistry().deregisterHandler(this);
-		}
+    public void executeAction(XmlAction action) {
+      // detect format changes:
+      detectFormatChanges(action);
+    }
 
-		public void executeAction(XmlAction action) {
-			// detect format changes:
-			detectFormatChanges(action);
-		}
+    /** */
+    private void detectFormatChanges(XmlAction doAction) {
+      if (doAction instanceof CompoundAction compAction) {
+        for (Iterator<XmlAction> i = compAction.getListChoiceList().iterator(); i.hasNext(); ) {
+          XmlAction childAction = i.next();
+          detectFormatChanges(childAction);
+        }
+      } else if ((doAction instanceof NodeAction) && !(doAction instanceof FoldAction)) {
+        // remove myself:
+        if (doAction instanceof HookNodeAction hookAction) {
+          if (Tools.safeEquals(hookAction.getHookName(), PLUGIN_NAME)) {
+            return;
+          }
+        }
+        String lastLocation = ((NodeAction) doAction).getNode();
+        if (doAction instanceof NewNodeAction) {
+          NewNodeAction newNodeAction = (NewNodeAction) doAction;
+          lastLocation = newNodeAction.getNewId();
+        }
+        // prevent double entries
+        if (mLastEditLocations.size() > 0
+            && Tools.safeEquals(lastLocation, mLastEditLocations.lastElement())) {
+          return;
+        }
+        mLastEditLocations.add(lastLocation);
+        if (mLastEditLocations.size() > 10) {
+          mLastEditLocations.remove(0);
+        }
+        try {
+          logger.fine(
+              "New last edit location: " + lastLocation + " from " + controller.marshall(doAction));
+        } catch (Exception e) {
+          freemind.main.Resources.getInstance().logException(e);
+          logger.warning(
+              "Not able to marshall the action " + doAction.getClass() + " as " + doAction);
+        }
+      }
+    }
 
-		/**
-		 */
-		private void detectFormatChanges(XmlAction doAction) {
-			if (doAction instanceof CompoundAction compAction) {
-				for (Iterator<XmlAction> i = compAction.getListChoiceList().iterator(); i
-						.hasNext();) {
-					XmlAction childAction = i.next();
-					detectFormatChanges(childAction);
-				}
-			} else if ((doAction instanceof NodeAction) && !(doAction instanceof FoldAction)) {
-				// remove myself:
-				if (doAction instanceof HookNodeAction hookAction) {
-					if (Tools.safeEquals(hookAction.getHookName(), PLUGIN_NAME)) {
-						return;
-					}
-				}
-				String lastLocation = ((NodeAction) doAction).getNode();
-				if (doAction instanceof NewNodeAction) {
-					NewNodeAction newNodeAction = (NewNodeAction) doAction;
-					lastLocation = newNodeAction.getNewId();
-				}
-				// prevent double entries
-				if (mLastEditLocations.size() > 0
-						&& Tools.safeEquals(lastLocation, mLastEditLocations.lastElement())) {
-					return;
-				}
-				mLastEditLocations.add(lastLocation);
-				if (mLastEditLocations.size() > 10) {
-					mLastEditLocations.remove(0);
-				}
-				try {
-					logger.fine("New last edit location: " + lastLocation + " from "
-							+ controller.marshall(doAction));
-				} catch (Exception e) {
-					freemind.main.Resources.getInstance().logException(e);
-					logger.warning("Not able to marshall the action " + doAction.getClass() + " as "
-							+ doAction);
-				}
-			}
+    public void startTransaction(String name) {}
 
-		}
+    public void endTransaction(String name) {}
 
-		public void startTransaction(String name) {}
-
-		public void endTransaction(String name) {}
-
-		public boolean isEnabled(JMenuItem pItem, Action pAction) {
-			String hookName = ((NodeHookAction) pAction).getHookName();
-			if (PLUGIN_NAME.equals(hookName)) {
-				// back is only enabled if there are already some nodes to go
-				// back ;-)
-				return !mLastEditLocations.isEmpty();
-			}
-			return true;
-		}
-	}
+    public boolean isEnabled(JMenuItem pItem, Action pAction) {
+      String hookName = ((NodeHookAction) pAction).getHookName();
+      if (PLUGIN_NAME.equals(hookName)) {
+        // back is only enabled if there are already some nodes to go
+        // back ;-)
+        return !mLastEditLocations.isEmpty();
+      }
+      return true;
+    }
+  }
 }

@@ -29,15 +29,15 @@ import freemind.modes.MindMapNode;
  * @author Dimitri Polivaev 10.07.2005
  */
 public interface AttributeTableModel extends TableModel {
-	int getRowCount();
+  int getRowCount();
 
-	int getColumnWidth(int col);
+  int getColumnWidth(int col);
 
-	Object getValueAt(int row, int col);
+  Object getValueAt(int row, int col);
 
-	void setValueAt(Object o, int row, int col);
+  void setValueAt(Object o, int row, int col);
 
-	MindMapNode getNode();
+  MindMapNode getNode();
 
-	void fireTableDataChanged();
+  void fireTableDataChanged();
 }

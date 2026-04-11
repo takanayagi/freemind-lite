@@ -4,11 +4,11 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
 public interface IconInformation {
-	String getDescription();
+  String getDescription();
 
-	ImageIcon getIcon();
+  ImageIcon getIcon();
 
-	String getKeystrokeResourceName();
+  String getKeystrokeResourceName();
 
-	KeyStroke getKeyStroke();
+  KeyStroke getKeyStroke();
 }

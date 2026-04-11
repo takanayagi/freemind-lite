@@ -25,28 +25,25 @@ import freemind.swing.FreeMindFormBuilder;
 
 public class NextLineProperty implements PropertyControl {
 
-	public NextLineProperty() {
-		super();
-	}
+  public NextLineProperty() {
+    super();
+  }
 
-	@Override
-	public String getDescription() {
-		return null;
-	}
+  @Override
+  public String getDescription() {
+    return null;
+  }
 
-	@Override
-	public String getLabel() {
-		return null;
-	}
+  @Override
+  public String getLabel() {
+    return null;
+  }
 
-	@Override
-	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
-		builder.nextLine();
-	}
+  @Override
+  public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
+    builder.nextLine();
+  }
 
-	@Override
-	public void setEnabled(boolean pEnabled) {
-
-	}
-
+  @Override
+  public void setEnabled(boolean pEnabled) {}
 }

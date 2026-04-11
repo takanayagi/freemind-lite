@@ -26,93 +26,105 @@ import java.awt.geom.Point2D;
 
 import freemind.main.Tools;
 
-/**
- * This class represents a sharp Edge of a MindMap.
- */
+/** This class represents a sharp Edge of a MindMap. */
 public class SharpBezierEdgeView extends EdgeView {
 
-	CubicCurve2D.Float line1 = new CubicCurve2D.Float();
-	CubicCurve2D.Float line2 = new CubicCurve2D.Float();
-	GeneralPath graph = new GeneralPath();
-	Point2D.Float one, two;
-	private int deltaX;
-	private int deltaY;
+  CubicCurve2D.Float line1 = new CubicCurve2D.Float();
+  CubicCurve2D.Float line2 = new CubicCurve2D.Float();
+  GeneralPath graph = new GeneralPath();
+  Point2D.Float one, two;
+  private int deltaX;
+  private int deltaY;
 
-	private static final float XCTRL = 12;// the distance between endpoint and
-											// controlpoint
+  private static final float XCTRL = 12; // the distance between endpoint and
 
-	public SharpBezierEdgeView() {
-		super();
-	}
+  // controlpoint
 
-	private void update() {
-		float zoom = getMap().getZoom();
-		float xctrlRelative = XCTRL * zoom;
-		// YCTRL could be implemented but then we had to check whether target is
-		// above or below source.
-		if (getTarget().isLeft()) {
-			one = new Point2D.Float(start.x - xctrlRelative, start.y);
-			two = new Point2D.Float(end.x + xctrlRelative, end.y);
-		} else {
-			one = new Point2D.Float(start.x + xctrlRelative, start.y);
-			two = new Point2D.Float(end.x - xctrlRelative, end.y);
-		}
-		float w = (getWidth() / 2f + 1) * zoom;
-		float w2 = w / 2;
-		line1.setCurve(start.x - deltaX, start.y - deltaY, one.x - deltaX, one.y - deltaY, two.x,
-				two.y - w2, end.x, end.y);
-		line2.setCurve(end.x, end.y, two.x, two.y + w2, one.x + deltaX, one.y + deltaY,
-				start.x + deltaX, start.y + deltaY);
-		graph.reset();
-		graph.append(line1, true);
-		graph.append(line2, true);
-		graph.closePath();
-	}
+  public SharpBezierEdgeView() {
+    super();
+  }
 
-	protected void paint(Graphics2D g) {
-		update();
-		g.setColor(getColor());
-		g.setPaint(getColor());
-		g.setStroke(DEF_STROKE);
-		g.fill(graph);
-		g.draw(graph);
-	}
+  private void update() {
+    float zoom = getMap().getZoom();
+    float xctrlRelative = XCTRL * zoom;
+    // YCTRL could be implemented but then we had to check whether target is
+    // above or below source.
+    if (getTarget().isLeft()) {
+      one = new Point2D.Float(start.x - xctrlRelative, start.y);
+      two = new Point2D.Float(end.x + xctrlRelative, end.y);
+    } else {
+      one = new Point2D.Float(start.x + xctrlRelative, start.y);
+      two = new Point2D.Float(end.x - xctrlRelative, end.y);
+    }
+    float w = (getWidth() / 2f + 1) * zoom;
+    float w2 = w / 2;
+    line1.setCurve(
+        start.x - deltaX,
+        start.y - deltaY,
+        one.x - deltaX,
+        one.y - deltaY,
+        two.x,
+        two.y - w2,
+        end.x,
+        end.y);
+    line2.setCurve(
+        end.x,
+        end.y,
+        two.x,
+        two.y + w2,
+        one.x + deltaX,
+        one.y + deltaY,
+        start.x + deltaX,
+        start.y + deltaY);
+    graph.reset();
+    graph.append(line1, true);
+    graph.append(line2, true);
+    graph.closePath();
+  }
 
-	public Color getColor() {
-		return getModel().getColor();
-	}
+  protected void paint(Graphics2D g) {
+    update();
+    g.setColor(getColor());
+    g.setPaint(getColor());
+    g.setStroke(DEF_STROKE);
+    g.fill(graph);
+    g.draw(graph);
+  }
 
-	protected void createStart() {
-		if (source.isRoot()) {
-			start = source.getMainViewOutPoint(getTarget(), end);
-			final MainView mainView = source.getMainView();
-			final double w = mainView.getWidth() / 2.0;
-			final double x0 = start.x - w;
-			final double w2 = w * w;
-			final double x02 = x0 * x0;
-			if (w2 == x02) {
-				final int delta = getMap().getZoomed(getWidth() / 2 + 1);
-				deltaX = 0;
-				deltaY = delta;
-			} else {
-				final double delta = getMap().getZoom() * (getWidth() / 2.0 + 1);
-				final int h = mainView.getHeight() / 2;
-				final int y0 = start.y - h;
-				final double k = h / w * x0 / Math.sqrt(w2 - x02);
-				final double dx = delta / Math.sqrt(1 + k * k);
-				deltaX = (int) dx;
-				deltaY = (int) (k * dx);
-				if (y0 > 0) {
-					deltaY = -deltaY;
-				}
-			}
-			Tools.convertPointToAncestor(mainView, start, source);
-		} else {
-			final int delta = getMap().getZoomed(getWidth() / 2 + 1);
-			super.createStart();
-			deltaX = 0;
-			deltaY = delta;
-		}
-	}
+  public Color getColor() {
+    return getModel().getColor();
+  }
 
+  protected void createStart() {
+    if (source.isRoot()) {
+      start = source.getMainViewOutPoint(getTarget(), end);
+      final MainView mainView = source.getMainView();
+      final double w = mainView.getWidth() / 2.0;
+      final double x0 = start.x - w;
+      final double w2 = w * w;
+      final double x02 = x0 * x0;
+      if (w2 == x02) {
+        final int delta = getMap().getZoomed(getWidth() / 2 + 1);
+        deltaX = 0;
+        deltaY = delta;
+      } else {
+        final double delta = getMap().getZoom() * (getWidth() / 2.0 + 1);
+        final int h = mainView.getHeight() / 2;
+        final int y0 = start.y - h;
+        final double k = h / w * x0 / Math.sqrt(w2 - x02);
+        final double dx = delta / Math.sqrt(1 + k * k);
+        deltaX = (int) dx;
+        deltaY = (int) (k * dx);
+        if (y0 > 0) {
+          deltaY = -deltaY;
+        }
+      }
+      Tools.convertPointToAncestor(mainView, start, source);
+    } else {
+      final int delta = getMap().getZoomed(getWidth() / 2 + 1);
+      super.createStart();
+      deltaX = 0;
+      deltaY = delta;
+    }
+  }
 }

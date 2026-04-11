@@ -2,7 +2,7 @@ package freemind.main;
 
 /*
  * XHTMLWriter -- A simple XHTML document writer
- * 
+ *
  * (C) 2004 Richard "Shred" Koerber http://www.shredzone.net/
  *
  * This is free software. You can modify and use it at will.
@@ -24,91 +24,91 @@ import javax.swing.text.html.HTMLWriter;
 
 /**
  * Create a new XHTMLWriter which is able to save a HTMLDocument as XHTML.
- * <p>
- * The result will be a valid XML file, but it is not granted that the file will really be XHTML 1.0
- * transitional conformous. The basic purpose of this class is to give an XSL processor access to
- * plain HTML files.
- * 
+ *
+ * <p>The result will be a valid XML file, but it is not granted that the file will really be XHTML
+ * 1.0 transitional conformous. The basic purpose of this class is to give an XSL processor access
+ * to plain HTML files.
+ *
  * @author Richard "Shred" Körber
  */
 public class FixedHTMLWriter extends HTMLWriter {
-	final private MutableAttributeSet convAttr = new SimpleAttributeSet();
+  private final MutableAttributeSet convAttr = new SimpleAttributeSet();
 
-	/**
-	 * Create a new XHTMLWriter that will write the entire HTMLDocument.
-	 * 
-	 * @param writer Writer to write to
-	 * @param doc Source document
-	 */
-	public FixedHTMLWriter(Writer writer, HTMLDocument doc) {
-		this(writer, doc, 0, doc.getLength());
-	}
+  /**
+   * Create a new XHTMLWriter that will write the entire HTMLDocument.
+   *
+   * @param writer Writer to write to
+   * @param doc Source document
+   */
+  public FixedHTMLWriter(Writer writer, HTMLDocument doc) {
+    this(writer, doc, 0, doc.getLength());
+  }
 
-	/**
-	 * Create a new XHTMLWriter that will write a part of a HTMLDocument.
-	 * 
-	 * @param writer Writer to write to
-	 * @param doc Source document
-	 * @param pos Starting position
-	 * @param len Length
-	 */
-	public FixedHTMLWriter(Writer writer, HTMLDocument doc, int pos, int len) {
-		super(writer, doc, pos, len);
-	}
+  /**
+   * Create a new XHTMLWriter that will write a part of a HTMLDocument.
+   *
+   * @param writer Writer to write to
+   * @param doc Source document
+   * @param pos Starting position
+   * @param len Length
+   */
+  public FixedHTMLWriter(Writer writer, HTMLDocument doc, int pos, int len) {
+    super(writer, doc, pos, len);
+  }
 
-	/**
-	 * Create an older style of HTML attributes. This will convert character level attributes that
-	 * have a StyleConstants mapping over to an HTML tag/attribute. Other CSS attributes will be
-	 * placed in an HTML style attribute.
-	 */
-	private static void convertToHTML(AttributeSet from, MutableAttributeSet to) {
-		if (from == null) {
-			return;
-		}
-		Enumeration<?> keys = from.getAttributeNames();
-		StringBuilder value = new StringBuilder();
-		while (keys.hasMoreElements()) {
-			Object key = keys.nextElement();
-			if (key instanceof CSS.Attribute) {
-				// default is to store in a HTML style attribute
-				if (!value.isEmpty()) {
-					value.append("; ");
-				}
-				value.append(key).append(": ").append(from.getAttribute(key));
-			} else {
-				to.addAttribute(key, from.getAttribute(key));
-			}
-		}
-		if (!value.isEmpty()) {
-			to.addAttribute(HTML.Attribute.STYLE, value.toString());
-		}
-	}
+  /**
+   * Create an older style of HTML attributes. This will convert character level attributes that
+   * have a StyleConstants mapping over to an HTML tag/attribute. Other CSS attributes will be
+   * placed in an HTML style attribute.
+   */
+  private static void convertToHTML(AttributeSet from, MutableAttributeSet to) {
+    if (from == null) {
+      return;
+    }
+    Enumeration<?> keys = from.getAttributeNames();
+    StringBuilder value = new StringBuilder();
+    while (keys.hasMoreElements()) {
+      Object key = keys.nextElement();
+      if (key instanceof CSS.Attribute) {
+        // default is to store in a HTML style attribute
+        if (!value.isEmpty()) {
+          value.append("; ");
+        }
+        value.append(key).append(": ").append(from.getAttribute(key));
+      } else {
+        to.addAttribute(key, from.getAttribute(key));
+      }
+    }
+    if (!value.isEmpty()) {
+      to.addAttribute(HTML.Attribute.STYLE, value.toString());
+    }
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.text.html.HTMLWriter#writeAttributes(javax.swing.text. AttributeSet)
-	 */
-	protected void writeAttributes(AttributeSet attr) throws IOException {
-		// translate css attributes to html
-		if (attr instanceof Element elem) {
-			if (elem.isLeaf() || elem.getName().equalsIgnoreCase("p-implied")) {
-				super.writeAttributes(attr);
-				return;
-			}
-		}
-		convAttr.removeAttributes(convAttr);
-		convertToHTML(attr, convAttr);
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.text.html.HTMLWriter#writeAttributes(javax.swing.text. AttributeSet)
+   */
+  protected void writeAttributes(AttributeSet attr) throws IOException {
+    // translate css attributes to html
+    if (attr instanceof Element elem) {
+      if (elem.isLeaf() || elem.getName().equalsIgnoreCase("p-implied")) {
+        super.writeAttributes(attr);
+        return;
+      }
+    }
+    convAttr.removeAttributes(convAttr);
+    convertToHTML(attr, convAttr);
 
-		Enumeration<?> names = convAttr.getAttributeNames();
-		while (names.hasMoreElements()) {
-			Object name = names.nextElement();
-			if (name instanceof HTML.Tag || name instanceof StyleConstants
-					|| name == HTML.Attribute.ENDTAG) {
-				continue;
-			}
-			write(" " + name + "=\"" + convAttr.getAttribute(name) + "\"");
-		}
-	}
-
+    Enumeration<?> names = convAttr.getAttributeNames();
+    while (names.hasMoreElements()) {
+      Object name = names.nextElement();
+      if (name instanceof HTML.Tag
+          || name instanceof StyleConstants
+          || name == HTML.Attribute.ENDTAG) {
+        continue;
+      }
+      write(" " + name + "=\"" + convAttr.getAttribute(name) + "\"");
+    }
+  }
 }

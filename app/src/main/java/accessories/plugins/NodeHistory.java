@@ -44,234 +44,233 @@ import freemind.view.mindmapview.NodeView;
 
 /**
  * @author foltin
- * 
  */
 public class NodeHistory extends MindMapNodeHookAdapter {
 
-	/** Of NodeHolder */
-	private static Vector<NodeHolder> sNodeVector = new Vector<>();
+  /** Of NodeHolder */
+  private static Vector<NodeHolder> sNodeVector = new Vector<>();
 
-	private static int sCurrentPosition = 0;
+  private static int sCurrentPosition = 0;
 
-	private static boolean sPreventRegistration = false;
+  private static boolean sPreventRegistration = false;
 
-	private static class NodeHolder {
-		public String mNodeId;
+  private static class NodeHolder {
+    public String mNodeId;
 
-		public String mMapModuleName;
+    public String mMapModuleName;
 
-		public NodeHolder(MindMapNode pNode, MindMapController pMindMapController) {
-			mNodeId = pNode.getObjectId(pMindMapController);
-			MapModule mapModule = pMindMapController.getMapModule();
-			if (mapModule == null) {
-				throw new IllegalArgumentException(
-						"MapModule not present to controller " + pMindMapController);
-			}
-			mMapModuleName = mapModule.toString();
-		}
+    public NodeHolder(MindMapNode pNode, MindMapController pMindMapController) {
+      mNodeId = pNode.getObjectId(pMindMapController);
+      MapModule mapModule = pMindMapController.getMapModule();
+      if (mapModule == null) {
+        throw new IllegalArgumentException(
+            "MapModule not present to controller " + pMindMapController);
+      }
+      mMapModuleName = mapModule.toString();
+    }
 
-		/** @return null, if node not found. */
-		public MindMapNode getNode(Controller pController) {
-			ModeController modeController = getModeController(pController);
-			if (modeController != null) {
-				return modeController.getNodeFromID(mNodeId);
-			}
-			return null;
-		}
+    /**
+     * @return null, if node not found.
+     */
+    public MindMapNode getNode(Controller pController) {
+      ModeController modeController = getModeController(pController);
+      if (modeController != null) {
+        return modeController.getNodeFromID(mNodeId);
+      }
+      return null;
+    }
 
-		private ModeController getModeController(Controller pController) {
-			ModeController modeController = null;
-			MapModule mapModule = getMapModule(pController);
-			if (mapModule != null) {
-				modeController = mapModule.getModeController();
-			}
-			return modeController;
-		}
+    private ModeController getModeController(Controller pController) {
+      ModeController modeController = null;
+      MapModule mapModule = getMapModule(pController);
+      if (mapModule != null) {
+        modeController = mapModule.getModeController();
+      }
+      return modeController;
+    }
 
-		private MapModule getMapModule(Controller pController) {
-			List<MapModule> mapModules = pController.getMapModuleManager().getMapModuleVector();
-			for (MapModule mapModule : mapModules) {
-				String mapModuleName = mapModule.getDisplayName();
-				if (mapModuleName != null && mapModuleName.equals(mMapModuleName)) {
-					return mapModule;
-				}
-			}
-			return null;
-		}
+    private MapModule getMapModule(Controller pController) {
+      List<MapModule> mapModules = pController.getMapModuleManager().getMapModuleVector();
+      for (MapModule mapModule : mapModules) {
+        String mapModuleName = mapModule.getDisplayName();
+        if (mapModuleName != null && mapModuleName.equals(mMapModuleName)) {
+          return mapModule;
+        }
+      }
+      return null;
+    }
 
-		public boolean isIdentical(MindMapNode pNode, MindMapController pMindMapController) {
-			String id = pNode.getObjectId(pMindMapController);
-			MapModule mapModule = pMindMapController.getMapModule();
-			if (mapModule != null) {
-				return id.equals(mNodeId);
-			}
-			return false;
-		}
+    public boolean isIdentical(MindMapNode pNode, MindMapController pMindMapController) {
+      String id = pNode.getObjectId(pMindMapController);
+      MapModule mapModule = pMindMapController.getMapModule();
+      if (mapModule != null) {
+        return id.equals(mNodeId);
+      }
+      return false;
+    }
+  }
 
-	}
+  public static class Registration
+      implements HookRegistration, NodeSelectionListener, MenuItemEnabledListener {
 
-	public static class Registration
-			implements HookRegistration, NodeSelectionListener, MenuItemEnabledListener {
+    private final MindMapController controller;
 
-		private final MindMapController controller;
+    public Registration(ModeController controller, MindMap map) {
+      this.controller = (MindMapController) controller;
+    }
 
-		public Registration(ModeController controller, MindMap map) {
-			this.controller = (MindMapController) controller;
-		}
+    public void register() {
+      controller.registerNodeSelectionListener(this, false);
+    }
 
-		public void register() {
-			controller.registerNodeSelectionListener(this, false);
-		}
+    public void deRegister() {
+      controller.deregisterNodeSelectionListener(this);
+    }
 
-		public void deRegister() {
-			controller.deregisterNodeSelectionListener(this);
-		}
+    public void onLostFocusNode(NodeView pNode) {}
 
-		public void onLostFocusNode(NodeView pNode) {}
+    public void onFocusNode(NodeView pNode) {
+      /*******************************************************************
+       * don't denote positions, if somebody navigates through them. *
+       */
+      if (!NodeHistory.sPreventRegistration) {
+        // no duplicates:
+        if (sCurrentPosition > 0
+            && sNodeVector.get(sCurrentPosition - 1).isIdentical(pNode.getModel(), controller)) {
+          // logger.info("Avoid duplicate " + pNode + " at " +
+          // sCurrentPosition);
+          return;
+        }
+        if (sCurrentPosition != sNodeVector.size()) {
+          /***********************************************************
+           * * we change the selected in the middle of our vector. Thus we remove all the
+           * coming nodes:
+           **********************************************************/
+          for (int i = sNodeVector.size() - 1; i >= sCurrentPosition; --i) {
+            sNodeVector.removeElementAt(i);
+          }
+        }
+        // logger.info("Adding " + pNode + " at " + sCurrentPosition);
+        sNodeVector.add(new NodeHolder(pNode.getModel(), controller));
+        sCurrentPosition++;
+        // only the last 100 nodes
+        while (sNodeVector.size() > 100) {
+          sNodeVector.removeElementAt(0);
+          sCurrentPosition--;
+        }
+      }
+    }
 
-		public void onFocusNode(NodeView pNode) {
-			/*******************************************************************
-			 * don't denote positions, if somebody navigates through them. *
-			 */
-			if (!NodeHistory.sPreventRegistration) {
-				// no duplicates:
-				if (sCurrentPosition > 0 && sNodeVector.get(sCurrentPosition - 1)
-						.isIdentical(pNode.getModel(), controller)) {
-					// logger.info("Avoid duplicate " + pNode + " at " +
-					// sCurrentPosition);
-					return;
-				}
-				if (sCurrentPosition != sNodeVector.size()) {
-					/***********************************************************
-					 * * we change the selected in the middle of our vector. Thus we remove all the
-					 * coming nodes:
-					 **********************************************************/
-					for (int i = sNodeVector.size() - 1; i >= sCurrentPosition; --i) {
-						sNodeVector.removeElementAt(i);
-					}
-				}
-				// logger.info("Adding " + pNode + " at " + sCurrentPosition);
-				sNodeVector.add(new NodeHolder(pNode.getModel(), controller));
-				sCurrentPosition++;
-				// only the last 100 nodes
-				while (sNodeVector.size() > 100) {
-					sNodeVector.removeElementAt(0);
-					sCurrentPosition--;
-				}
-			}
-		}
+    public void onSaveNode(MindMapNode pNode) {}
 
-		public void onSaveNode(MindMapNode pNode) {}
+    public void onUpdateNodeHook(MindMapNode pNode) {}
 
-		public void onUpdateNodeHook(MindMapNode pNode) {}
+    public boolean isEnabled(JMenuItem pItem, Action pAction) {
+      String hookName = ((NodeHookAction) pAction).getHookName();
+      if ("accessories/plugins/NodeHistoryBack.properties".equals(hookName)) {
+        // back is only enabled if there are already some nodes to go
+        // back ;-)
+        return sCurrentPosition > 1;
+      } else {
+        return sCurrentPosition < sNodeVector.size();
+      }
+    }
 
-		public boolean isEnabled(JMenuItem pItem, Action pAction) {
-			String hookName = ((NodeHookAction) pAction).getHookName();
-			if ("accessories/plugins/NodeHistoryBack.properties".equals(hookName)) {
-				// back is only enabled if there are already some nodes to go
-				// back ;-)
-				return sCurrentPosition > 1;
-			} else {
-				return sCurrentPosition < sNodeVector.size();
-			}
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.modes.ModeController.NodeSelectionListener#onSelectionChange(
+     * freemind.modes.MindMapNode, boolean)
+     */
+    public void onSelectionChange(NodeView pNode, boolean pIsSelected) {}
+  }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.modes.ModeController.NodeSelectionListener#onSelectionChange(
-		 * freemind.modes.MindMapNode, boolean)
-		 */
-		public void onSelectionChange(NodeView pNode, boolean pIsSelected) {}
+  /** */
+  public NodeHistory() {
+    super();
+  }
 
-	}
+  public void invoke(MindMapNode node) {
+    super.invoke(node);
+    final MindMapController modeController = getMindMapController();
+    String direction = getResourceString("direction");
+    // logger.info("Direction: " + direction);
+    if ("back".equals(direction)) {
+      if (sCurrentPosition > 1) {
+        --sCurrentPosition;
+      } else {
+        return;
+      }
+    } else {
+      if (sCurrentPosition < sNodeVector.size()) {
+        ++sCurrentPosition;
+      } else {
+        return;
+      }
+    }
+    if (sCurrentPosition == 0) return;
+    // printVector();
+    NodeHolder nodeHolder = sNodeVector.get(sCurrentPosition - 1);
+    final Controller mainController = getController().getController();
+    final MindMapNode toBeSelected = nodeHolder.getNode(mainController);
+    boolean changeModule = false;
+    MapModule newModule = null;
+    if (nodeHolder.getModeController(mainController) != getMindMapController()) {
+      changeModule = true;
+      newModule = nodeHolder.getMapModule(mainController);
+      if (newModule == null) {
+        // the map was apparently closed, we try with the next node.
+        invoke(node);
+        return;
+      }
+    }
+    final boolean fChangeModule = changeModule;
+    final MapModule fNewModule = newModule;
+    logger.finest("Selecting " + toBeSelected + " at pos " + sCurrentPosition);
+    sPreventRegistration = true;
+    /***********************************************************************
+     * as the selection is restored after invoke, we make this trick to change it.
+     **********************************************************************/
+    EventQueue.invokeLater(
+        new Runnable() {
+          public void run() {
+            ModeController c = modeController;
+            if (fChangeModule) {
+              boolean res =
+                  mainController.getMapModuleManager().changeToMapModule(fNewModule.toString());
+              if (!res) {
+                logger.warning("Can't change to map module " + fNewModule);
+                sPreventRegistration = false;
+                return;
+              }
+              c = fNewModule.getModeController();
+            }
+            if (!toBeSelected.isRoot()) {
+              c.setFolded(toBeSelected.getParentNode(), false);
+            }
+            NodeView nodeView = c.getNodeView(toBeSelected);
+            if (nodeView != null) {
+              c.select(nodeView);
+              sPreventRegistration = false;
+            }
+          }
+        });
+  }
 
-	/**
-	 * 
-	 */
-	public NodeHistory() {
-		super();
-	}
-
-	public void invoke(MindMapNode node) {
-		super.invoke(node);
-		final MindMapController modeController = getMindMapController();
-		String direction = getResourceString("direction");
-		// logger.info("Direction: " + direction);
-		if ("back".equals(direction)) {
-			if (sCurrentPosition > 1) {
-				--sCurrentPosition;
-			} else {
-				return;
-			}
-		} else {
-			if (sCurrentPosition < sNodeVector.size()) {
-				++sCurrentPosition;
-			} else {
-				return;
-			}
-
-		}
-		if (sCurrentPosition == 0)
-			return;
-		// printVector();
-		NodeHolder nodeHolder = sNodeVector.get(sCurrentPosition - 1);
-		final Controller mainController = getController().getController();
-		final MindMapNode toBeSelected = nodeHolder.getNode(mainController);
-		boolean changeModule = false;
-		MapModule newModule = null;
-		if (nodeHolder.getModeController(mainController) != getMindMapController()) {
-			changeModule = true;
-			newModule = nodeHolder.getMapModule(mainController);
-			if (newModule == null) {
-				// the map was apparently closed, we try with the next node.
-				invoke(node);
-				return;
-			}
-		}
-		final boolean fChangeModule = changeModule;
-		final MapModule fNewModule = newModule;
-		logger.finest("Selecting " + toBeSelected + " at pos " + sCurrentPosition);
-		sPreventRegistration = true;
-		/***********************************************************************
-		 * as the selection is restored after invoke, we make this trick to change it.
-		 **********************************************************************/
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				ModeController c = modeController;
-				if (fChangeModule) {
-					boolean res = mainController.getMapModuleManager()
-							.changeToMapModule(fNewModule.toString());
-					if (!res) {
-						logger.warning("Can't change to map module " + fNewModule);
-						sPreventRegistration = false;
-						return;
-					}
-					c = fNewModule.getModeController();
-				}
-				if (!toBeSelected.isRoot()) {
-					c.setFolded(toBeSelected.getParentNode(), false);
-				}
-				NodeView nodeView = c.getNodeView(toBeSelected);
-				if (nodeView != null) {
-					c.select(nodeView);
-					sPreventRegistration = false;
-				}
-			}
-		});
-	}
-
-	@SuppressWarnings("unused")
-	private void printVector() {
-		StringBuffer sb = new StringBuffer("\n");
-		int i = 0;
-		for (NodeHolder holder : sNodeVector) {
-			sb.append(((sCurrentPosition - 1 == i) ? "==>" : "   ") + "Node pos " + i + " is "
-					+ holder.getNode(getMindMapController().getController()));
-			sb.append("\n");
-			i++;
-		}
-		logger.info(sb.toString() + "\n");
-	}
-
+  @SuppressWarnings("unused")
+  private void printVector() {
+    StringBuffer sb = new StringBuffer("\n");
+    int i = 0;
+    for (NodeHolder holder : sNodeVector) {
+      sb.append(
+          ((sCurrentPosition - 1 == i) ? "==>" : "   ")
+              + "Node pos "
+              + i
+              + " is "
+              + holder.getNode(getMindMapController().getController()));
+      sb.append("\n");
+      i++;
+    }
+    logger.info(sb.toString() + "\n");
+  }
 }

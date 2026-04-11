@@ -65,415 +65,418 @@ import freemind.modes.mindmapmode.hooks.MindMapHookAdapter;
 import freemind.view.MapModule;
 
 public class LogFileViewer extends MindMapHookAdapter
-		implements MapModuleChangeObserver, LogReceiver {
+    implements MapModuleChangeObserver, LogReceiver {
 
-	public static class Registration implements HookRegistration {
-		/**
-		 * Maps MindMapController --> PrintActionHandler Here, a static map is used, as the
-		 * HookRegistration are registered each time a map is changed. Thus, a normal member isn't
-		 * possible here.
-		 */
-		private static HashMap<MindMapController, PrintActionHandler> mPrintActionHandler =
-				new HashMap<>();
+  public static class Registration implements HookRegistration {
+    /**
+     * Maps MindMapController --> PrintActionHandler Here, a static map is used, as the
+     * HookRegistration are registered each time a map is changed. Thus, a normal member isn't
+     * possible here.
+     */
+    private static HashMap<MindMapController, PrintActionHandler> mPrintActionHandler =
+        new HashMap<>();
 
-		private final MindMapController modeController;
+    private final MindMapController modeController;
 
-		public Registration(ModeController controller, MindMap map) {
-			modeController = (MindMapController) controller;
-		}
+    public Registration(ModeController controller, MindMap map) {
+      modeController = (MindMapController) controller;
+    }
 
-		@Override
-		public void register() {}
+    @Override
+    public void register() {}
 
-		@Override
-		public void deRegister() {}
+    @Override
+    public void deRegister() {}
 
-		public void togglePrintAction() {
-			if (!mPrintActionHandler.containsKey(modeController)) {
-				PrintActionHandler printActionHandler =
-						new freemind.modes.mindmapmode.actions.xml.PrintActionHandler(
-								modeController);
-				modeController.getActionRegistry().registerHandler(printActionHandler);
-				mPrintActionHandler.put(modeController, printActionHandler);
-			} else {
-				modeController.getActionRegistry()
-						.deregisterHandler((ActionHandler) mPrintActionHandler.get(modeController));
-			}
+    public void togglePrintAction() {
+      if (!mPrintActionHandler.containsKey(modeController)) {
+        PrintActionHandler printActionHandler =
+            new freemind.modes.mindmapmode.actions.xml.PrintActionHandler(modeController);
+        modeController.getActionRegistry().registerHandler(printActionHandler);
+        mPrintActionHandler.put(modeController, printActionHandler);
+      } else {
+        modeController
+            .getActionRegistry()
+            .deregisterHandler((ActionHandler) mPrintActionHandler.get(modeController));
+      }
+    }
 
-		}
+    public boolean isPrintActionActive() {
+      return mPrintActionHandler.containsKey(modeController);
+    }
+  }
 
-		public boolean isPrintActionActive() {
-			return mPrintActionHandler.containsKey(modeController);
-		}
-	}
+  private static final String WINDOW_PREFERENCE_STORAGE_PROPERTY = LogFileViewer.class.getName();
 
-	private static final String WINDOW_PREFERENCE_STORAGE_PROPERTY = LogFileViewer.class.getName();
+  private MindMapController mMyMindMapController;
 
-	private MindMapController mMyMindMapController;
+  private JDialog mLogFileViewer;
 
-	private JDialog mLogFileViewer;
+  private CloseAction mCloseAction;
 
-	private CloseAction mCloseAction;
+  private JTextArea mTextArea;
 
-	private JTextArea mTextArea;
+  protected static Logger logger = null;
 
-	protected static Logger logger = null;
+  private JMenuBar mMenuBar;
 
-	private JMenuBar mMenuBar;
+  private UpdateTextAreaThread mUpdateTextAreaThread;
 
-	private UpdateTextAreaThread mUpdateTextAreaThread;
+  private final class CloseAction extends AbstractAction {
 
-	private final class CloseAction extends AbstractAction {
+    public CloseAction() {
+      super(getResourceString("LogFileViewer_close"));
+    }
 
-		public CloseAction() {
-			super(getResourceString("LogFileViewer_close"));
-		}
+    @Override
+    public void actionPerformed(ActionEvent arg0) {
+      disposeDialog();
+    }
+  }
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			disposeDialog();
-		}
-	}
+  private final class PrintOperationAction extends AbstractAction
+      implements MenuItemSelectedListener {
 
-	private final class PrintOperationAction extends AbstractAction
-			implements MenuItemSelectedListener {
+    public PrintOperationAction() {
+      super(getResourceString("LogFileViewer.PrintOperationAction"));
+    }
 
-		public PrintOperationAction() {
-			super(getResourceString("LogFileViewer.PrintOperationAction"));
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent )
+     */
+    @Override
+    public void actionPerformed(ActionEvent pE) {
+      getRegistration().togglePrintAction();
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent )
-		 */
-		@Override
-		public void actionPerformed(ActionEvent pE) {
-			getRegistration().togglePrintAction();
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.controller.MenuItemSelectedListener#isSelected(javax.swing .JMenuItem,
+     * javax.swing.Action)
+     */
+    @Override
+    public boolean isSelected(JMenuItem pCheckItem, Action pAction) {
+      return getRegistration().isPrintActionActive();
+    }
+  }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.controller.MenuItemSelectedListener#isSelected(javax.swing .JMenuItem,
-		 * javax.swing.Action)
-		 */
-		@Override
-		public boolean isSelected(JMenuItem pCheckItem, Action pAction) {
-			return getRegistration().isPrintActionActive();
-		}
+  private final class SetLogLevelAction extends AbstractAction implements MenuItemSelectedListener {
 
-	}
+    private final Level mLevel;
 
-	private final class SetLogLevelAction extends AbstractAction
-			implements MenuItemSelectedListener {
+    public SetLogLevelAction(Level pLevel) {
+      super(pLevel.getLocalizedName());
+      mLevel = pLevel;
+    }
 
-		private final Level mLevel;
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent )
+     */
+    @Override
+    public void actionPerformed(ActionEvent pE) {
+      Logger.getLogger("freemind").setLevel(mLevel);
+      Logger.getLogger("accessories").setLevel(mLevel);
+      logger.info("Log level set to " + mLevel.getName());
+    }
 
-		public SetLogLevelAction(Level pLevel) {
-			super(pLevel.getLocalizedName());
-			mLevel = pLevel;
-		}
+    /*
+     * (non-Javadoc)
+     *
+     * @see freemind.controller.MenuItemSelectedListener#isSelected(javax.swing .JMenuItem,
+     * javax.swing.Action)
+     */
+    @Override
+    public boolean isSelected(JMenuItem pCheckItem, Action pAction) {
+      return Logger.getLogger("freemind").getLevel() == mLevel;
+    }
+  }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent )
-		 */
-		@Override
-		public void actionPerformed(ActionEvent pE) {
-			Logger.getLogger("freemind").setLevel(mLevel);
-			Logger.getLogger("accessories").setLevel(mLevel);
-			logger.info("Log level set to " + mLevel.getName());
-		}
+  public Registration getRegistration() {
+    return (Registration) getPluginBaseClass();
+  }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see freemind.controller.MenuItemSelectedListener#isSelected(javax.swing .JMenuItem,
-		 * javax.swing.Action)
-		 */
-		@Override
-		public boolean isSelected(JMenuItem pCheckItem, Action pAction) {
-			return Logger.getLogger("freemind").getLevel() == mLevel;
-		}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.extensions.HookAdapter#startupMapHook()
+   */
+  @Override
+  public void startupMapHook() {
+    super.startupMapHook();
+    if (logger == null) {
+      logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
+    }
+    mMyMindMapController = super.getMindMapController();
+    // retrieve content
+    final String pathname =
+        getMindMapController().getFrame().getFreemindDirectory()
+            + File.separator
+            + FreeMind.LOG_FILE_NAME
+            + ".0";
+    String logFileContents = Tools.getFile(new File(pathname));
+    // done.
+    getMindMapController().getController().getMapModuleManager().addListener(this);
+    mLogFileViewer = new JDialog(getController().getFrame().getJFrame(), false);
+    mLogFileViewer.setTitle(getResourceString("LogFileViewer_title") + pathname);
+    mLogFileViewer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    mLogFileViewer.addWindowListener(
+        new WindowAdapter() {
+          public void windowClosing(WindowEvent event) {
+            disposeDialog();
+          }
+        });
+    mCloseAction = new CloseAction();
+    // the action title is changed by the following method, thus we create
+    // another close action.
+    Tools.addEscapeActionToDialog(mLogFileViewer, new CloseAction());
 
-	}
+    /** Menu * */
+    StructuredMenuHolder menuHolder = new StructuredMenuHolder();
+    mMenuBar = new JMenuBar();
+    JMenu mainItem = new JMenu(getResourceString("MapControllerPopupDialog.Actions"));
+    menuHolder.addMenu(mainItem, "main/actions/.");
+    Action printOperationAction = new PrintOperationAction();
+    addAccelerator(
+        menuHolder.addAction(printOperationAction, "main/actions/printOperationAction"),
+        "keystroke_accessories/plugins/LogFileViewer_printOperationAction");
+    JMenu loggerItem = new JMenu(getResourceString("MapControllerPopupDialog.LogLevels"));
+    menuHolder.addMenu(loggerItem, "main/loglevel/.");
+    Level[] levels =
+        new Level[] {
+          Level.FINEST,
+          Level.FINER,
+          Level.FINE,
+          Level.CONFIG,
+          Level.INFO,
+          Level.WARNING,
+          Level.SEVERE,
+          Level.OFF
+        };
+    Arrays.stream(levels)
+        .forEach(
+            level ->
+                menuHolder.addAction(
+                    new SetLogLevelAction(level), "main/loglevel/setLogLevel_" + level.getName()));
+    menuHolder.updateMenus(mMenuBar, "main/");
+    mLogFileViewer.setJMenuBar(mMenuBar);
+    mLogFileViewer.setSize(400, 400);
+    mLogFileViewer.setLayout(new BorderLayout());
+    Font font = new Font("Monospaced", Font.PLAIN, 12);
+    mTextArea = new JTextArea(logFileContents);
+    mTextArea.setFont(font);
+    mTextArea.setEditable(false);
+    mTextArea.getCaret().setVisible(true);
+    // scroll at the end
+    mTextArea.setCaretPosition(logFileContents.length());
+    mLogFileViewer.add(new JScrollPane(mTextArea), BorderLayout.CENTER);
+    // restore preferences:
+    // Retrieve window size and column positions.
+    LogFileViewerConfigurationStorage storage =
+        (LogFileViewerConfigurationStorage)
+            getMindMapController()
+                .decorateDialog(mLogFileViewer, WINDOW_PREFERENCE_STORAGE_PROPERTY);
+    if (storage != null) {
+      // retrieve_additional_data_here
+    }
+    mLogFileViewer.setVisible(true);
+    mUpdateTextAreaThread = new UpdateTextAreaThread();
+    mUpdateTextAreaThread.start();
+    findOrCreateBaseHandler().setLogReceiver(this);
+  }
 
-	public Registration getRegistration() {
-		return (Registration) getPluginBaseClass();
-	}
+  /** Find or create LogFileLogHandler from the root logger */
+  protected LogFileLogHandler findOrCreateBaseHandler() {
+    Logger rootLogger = logger;
+    while (rootLogger.getParent() != null) {
+      rootLogger = rootLogger.getParent();
+    }
+    Formatter formatter = null;
+    Level level = null;
+    for (Handler handler : rootLogger.getHandlers()) {
+      if (handler instanceof LogFileLogHandler logHandler) {
+        return logHandler;
+      }
+      if (handler instanceof FileHandler fHandler) {
+        formatter = fHandler.getFormatter();
+        level = fHandler.getLevel();
+      }
+    }
+    // we did not find LogFileLogHandler, so create one
+    LogFileLogHandler logFileHandler = new LogFileLogHandler();
+    logFileHandler.setFormatter(formatter != null ? formatter : new StdFormatter());
+    logFileHandler.setLevel(level != null ? level : Level.ALL);
+    rootLogger.addHandler(logFileHandler);
+    return logFileHandler;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.extensions.HookAdapter#startupMapHook()
-	 */
-	@Override
-	public void startupMapHook() {
-		super.startupMapHook();
-		if (logger == null) {
-			logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());
-		}
-		mMyMindMapController = super.getMindMapController();
-		// retrieve content
-		final String pathname = getMindMapController().getFrame().getFreemindDirectory()
-				+ File.separator + FreeMind.LOG_FILE_NAME + ".0";
-		String logFileContents = Tools.getFile(new File(pathname));
-		// done.
-		getMindMapController().getController().getMapModuleManager().addListener(this);
-		mLogFileViewer = new JDialog(getController().getFrame().getJFrame(), false);
-		mLogFileViewer.setTitle(getResourceString("LogFileViewer_title") + pathname);
-		mLogFileViewer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		mLogFileViewer.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent event) {
-				disposeDialog();
-			}
-		});
-		mCloseAction = new CloseAction();
-		// the action title is changed by the following method, thus we create
-		// another close action.
-		Tools.addEscapeActionToDialog(mLogFileViewer, new CloseAction());
+  /**
+   * Overwritten, as this dialog is not modal, but after the plugin has terminated, the dialog is
+   * still present and needs the controller to store its values.
+   */
+  @Override
+  public MindMapController getMindMapController() {
+    return mMyMindMapController;
+  }
 
-		/** Menu **/
-		StructuredMenuHolder menuHolder = new StructuredMenuHolder();
-		mMenuBar = new JMenuBar();
-		JMenu mainItem = new JMenu(getResourceString("MapControllerPopupDialog.Actions"));
-		menuHolder.addMenu(mainItem, "main/actions/.");
-		Action printOperationAction = new PrintOperationAction();
-		addAccelerator(
-				menuHolder.addAction(printOperationAction, "main/actions/printOperationAction"),
-				"keystroke_accessories/plugins/LogFileViewer_printOperationAction");
-		JMenu loggerItem = new JMenu(getResourceString("MapControllerPopupDialog.LogLevels"));
-		menuHolder.addMenu(loggerItem, "main/loglevel/.");
-		Level[] levels = new Level[] {Level.FINEST, Level.FINER, Level.FINE, Level.CONFIG,
-				Level.INFO, Level.WARNING, Level.SEVERE, Level.OFF};
-		Arrays.stream(levels).forEach(level -> menuHolder.addAction(new SetLogLevelAction(level),
-				"main/loglevel/setLogLevel_" + level.getName()));
-		menuHolder.updateMenus(mMenuBar, "main/");
-		mLogFileViewer.setJMenuBar(mMenuBar);
-		mLogFileViewer.setSize(400, 400);
-		mLogFileViewer.setLayout(new BorderLayout());
-		Font font = new Font("Monospaced", Font.PLAIN, 12);
-		mTextArea = new JTextArea(logFileContents);
-		mTextArea.setFont(font);
-		mTextArea.setEditable(false);
-		mTextArea.getCaret().setVisible(true);
-		// scroll at the end
-		mTextArea.setCaretPosition(logFileContents.length());
-		mLogFileViewer.add(new JScrollPane(mTextArea), BorderLayout.CENTER);
-		// restore preferences:
-		// Retrieve window size and column positions.
-		LogFileViewerConfigurationStorage storage =
-				(LogFileViewerConfigurationStorage) getMindMapController()
-						.decorateDialog(mLogFileViewer, WINDOW_PREFERENCE_STORAGE_PROPERTY);
-		if (storage != null) {
-			// retrieve_additional_data_here
-		}
-		mLogFileViewer.setVisible(true);
-		mUpdateTextAreaThread = new UpdateTextAreaThread();
-		mUpdateTextAreaThread.start();
-		findOrCreateBaseHandler().setLogReceiver(this);
-	}
+  /** */
+  public void disposeDialog() {
+    mUpdateTextAreaThread.commitSuicide();
+    mUpdateTextAreaThread = null;
+    findOrCreateBaseHandler().setLogReceiver(null);
+    // store window positions:
+    LogFileViewerConfigurationStorage storage = new LogFileViewerConfigurationStorage();
+    // put_additional_data_here
+    getMindMapController()
+        .storeDialogPositions(mLogFileViewer, storage, WINDOW_PREFERENCE_STORAGE_PROPERTY);
 
-	/**
-	 * Find or create LogFileLogHandler from the root logger
-	 */
-	protected LogFileLogHandler findOrCreateBaseHandler() {
-		Logger rootLogger = logger;
-		while (rootLogger.getParent() != null) {
-			rootLogger = rootLogger.getParent();
-		}
-		Formatter formatter = null;
-		Level level = null;
-		for (Handler handler : rootLogger.getHandlers()) {
-			if (handler instanceof LogFileLogHandler logHandler) {
-				return logHandler;
-			}
-			if (handler instanceof FileHandler fHandler) {
-				formatter = fHandler.getFormatter();
-				level = fHandler.getLevel();
-			}
-		}
-		// we did not find LogFileLogHandler, so create one
-		LogFileLogHandler logFileHandler = new LogFileLogHandler();
-		logFileHandler.setFormatter(formatter != null ? formatter : new StdFormatter());
-		logFileHandler.setLevel(level != null ? level : Level.ALL);
-		rootLogger.addHandler(logFileHandler);
-		return logFileHandler;
-	}
+    getMindMapController().getController().getMapModuleManager().removeListener(this);
+    mLogFileViewer.setVisible(false);
+    mLogFileViewer.dispose();
+  }
 
-	/**
-	 * Overwritten, as this dialog is not modal, but after the plugin has terminated, the dialog is
-	 * still present and needs the controller to store its values.
-	 */
-	@Override
-	public MindMapController getMindMapController() {
-		return mMyMindMapController;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#
+   * isMapModuleChangeAllowed(freemind.view.MapModule, freemind.modes.Mode,
+   * freemind.view.MapModule, freemind.modes.Mode)
+   */
+  @Override
+  public boolean isMapModuleChangeAllowed(
+      MapModule pOldMapModule, Mode pOldMode, MapModule pNewMapModule, Mode pNewMode) {
+    return true;
+  }
 
-	/**
-	 * 
-	 */
-	public void disposeDialog() {
-		mUpdateTextAreaThread.commitSuicide();
-		mUpdateTextAreaThread = null;
-		findOrCreateBaseHandler().setLogReceiver(null);
-		// store window positions:
-		LogFileViewerConfigurationStorage storage = new LogFileViewerConfigurationStorage();
-		// put_additional_data_here
-		getMindMapController().storeDialogPositions(mLogFileViewer, storage,
-				WINDOW_PREFERENCE_STORAGE_PROPERTY);
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#
+   * beforeMapModuleChange(freemind.view.MapModule, freemind.modes.Mode, freemind.view.MapModule,
+   * freemind.modes.Mode)
+   */
+  @Override
+  public void beforeMapModuleChange(
+      MapModule pOldMapModule, Mode pOldMode, MapModule pNewMapModule, Mode pNewMode) {}
 
-		getMindMapController().getController().getMapModuleManager().removeListener(this);
-		mLogFileViewer.setVisible(false);
-		mLogFileViewer.dispose();
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#afterMapClose
+   * (freemind.view.MapModule, freemind.modes.Mode)
+   */
+  @Override
+  public void afterMapClose(MapModule pOldMapModule, Mode pOldMode) {
+    disposeDialog();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#
-	 * isMapModuleChangeAllowed(freemind.view.MapModule, freemind.modes.Mode,
-	 * freemind.view.MapModule, freemind.modes.Mode)
-	 */
-	@Override
-	public boolean isMapModuleChangeAllowed(MapModule pOldMapModule, Mode pOldMode,
-			MapModule pNewMapModule, Mode pNewMode) {
-		return true;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#
+   * afterMapModuleChange(freemind.view.MapModule, freemind.modes.Mode, freemind.view.MapModule,
+   * freemind.modes.Mode)
+   */
+  @Override
+  public void afterMapModuleChange(
+      MapModule pOldMapModule, Mode pOldMode, MapModule pNewMapModule, Mode pNewMode) {
+    disposeDialog();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#
-	 * beforeMapModuleChange(freemind.view.MapModule, freemind.modes.Mode, freemind.view.MapModule,
-	 * freemind.modes.Mode)
-	 */
-	@Override
-	public void beforeMapModuleChange(MapModule pOldMapModule, Mode pOldMode,
-			MapModule pNewMapModule, Mode pNewMode) {}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#
+   * numberOfOpenMapInformation(int, int)
+   */
+  @Override
+  public void numberOfOpenMapInformation(int pNumber, int pIndex) {}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#afterMapClose
-	 * (freemind.view.MapModule, freemind.modes.Mode)
-	 */
-	@Override
-	public void afterMapClose(MapModule pOldMapModule, Mode pOldMode) {
-		disposeDialog();
-	}
+  public CloseAction getCloseAction() {
+    return mCloseAction;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#
-	 * afterMapModuleChange(freemind.view.MapModule, freemind.modes.Mode, freemind.view.MapModule,
-	 * freemind.modes.Mode)
-	 */
-	@Override
-	public void afterMapModuleChange(MapModule pOldMapModule, Mode pOldMode,
-			MapModule pNewMapModule, Mode pNewMode) {
-		disposeDialog();
-	}
+  @Override
+  public void receiveLog(final String formattedMessage) {
+    mUpdateTextAreaThread.addToInbox(formattedMessage);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.MapModuleManager.MapModuleChangeObserver#
-	 * numberOfOpenMapInformation(int, int)
-	 */
-	@Override
-	public void numberOfOpenMapInformation(int pNumber, int pIndex) {}
+  private class UpdateTextAreaThread extends Thread {
+    Vector<String> mInbox = new Vector<>();
+    private boolean mCommitSuicide = false;
+    private boolean mSuicided = false;
 
-	public CloseAction getCloseAction() {
-		return mCloseAction;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Thread#run()
+     */
+    @Override
+    public void run() {
+      while (!mCommitSuicide) {
+        final Vector<String> queue = new Vector<>();
+        synchronized (mInbox) {
+          if (!mInbox.isEmpty()) {
+            queue.addAll(mInbox);
+            mInbox.clear();
+          }
+        }
+        if (!queue.isEmpty()) {
+          EventQueue.invokeLater(
+              new Runnable() {
+                public void run() {
+                  try {
+                    StringBuffer buffer = new StringBuffer();
+                    for (String msg : queue) {
+                      buffer.append(msg);
+                      // buffer.append('\n');
+                    }
+                    String msg = buffer.toString();
+                    // is cursor at the end?
+                    final int length = mTextArea.getDocument().getLength();
+                    boolean atEnd = mTextArea.getCaretPosition() == length;
+                    mTextArea.getDocument().insertString(length, msg, null);
+                    if (atEnd) {
+                      // if at end, scroll again to the end
+                      mTextArea.setCaretPosition(mTextArea.getDocument().getLength());
+                    }
+                  } catch (Exception ex) {
+                    // We don't want to log anything here...
+                  }
+                }
+              });
+        }
+        sleepALittle();
+      }
+      mSuicided = true;
+    }
 
-	@Override
-	public void receiveLog(final String formattedMessage) {
-		mUpdateTextAreaThread.addToInbox(formattedMessage);
-	}
+    /** */
+    public void commitSuicide() {
+      mCommitSuicide = true;
+      int timeout = 100;
+      while (timeout-- > 0) {
+        if (mSuicided) break;
+        sleepALittle();
+      }
+    }
 
-	private class UpdateTextAreaThread extends Thread {
-		Vector<String> mInbox = new Vector<>();
-		private boolean mCommitSuicide = false;
-		private boolean mSuicided = false;
+    protected void sleepALittle() {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        freemind.main.Resources.getInstance().logException(e);
+      }
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Thread#run()
-		 */
-		@Override
-		public void run() {
-			while (!mCommitSuicide) {
-				final Vector<String> queue = new Vector<>();
-				synchronized (mInbox) {
-					if (!mInbox.isEmpty()) {
-						queue.addAll(mInbox);
-						mInbox.clear();
-					}
-				}
-				if (!queue.isEmpty()) {
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							try {
-								StringBuffer buffer = new StringBuffer();
-								for (String msg : queue) {
-									buffer.append(msg);
-									// buffer.append('\n');
-								}
-								String msg = buffer.toString();
-								// is cursor at the end?
-								final int length = mTextArea.getDocument().getLength();
-								boolean atEnd = mTextArea.getCaretPosition() == length;
-								mTextArea.getDocument().insertString(length, msg, null);
-								if (atEnd) {
-									// if at end, scroll again to the end
-									mTextArea.setCaretPosition(mTextArea.getDocument().getLength());
-								}
-							} catch (Exception ex) {
-								// We don't want to log anything here...
-							}
-
-						}
-					});
-				}
-				sleepALittle();
-			}
-			mSuicided = true;
-		}
-
-		/**
-		 * 
-		 */
-		public void commitSuicide() {
-			mCommitSuicide = true;
-			int timeout = 100;
-			while (timeout-- > 0) {
-				if (mSuicided)
-					break;
-				sleepALittle();
-			}
-		}
-
-		protected void sleepALittle() {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				freemind.main.Resources.getInstance().logException(e);
-
-			}
-		}
-
-		public void addToInbox(String msg) {
-			synchronized (mInbox) {
-				mInbox.add(msg);
-			}
-		}
-
-	}
-
+    public void addToInbox(String msg) {
+      synchronized (mInbox) {
+        mInbox.add(msg);
+      }
+    }
+  }
 }

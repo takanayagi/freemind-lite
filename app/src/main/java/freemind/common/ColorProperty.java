@@ -36,114 +36,113 @@ import freemind.main.Tools;
 import freemind.swing.FreeMindFormBuilder;
 
 public class ColorProperty extends PropertyBean implements PropertyControl, ActionListener {
-	String description;
+  String description;
 
-	String label;
+  String label;
 
-	Color color;
+  Color color;
 
-	JButton mButton;
-	final JPopupMenu menu = new JPopupMenu();
+  JButton mButton;
+  final JPopupMenu menu = new JPopupMenu();
 
-	private final String defaultColor;
+  private final String defaultColor;
 
-	private final TextTranslator mTranslator;
+  private final TextTranslator mTranslator;
 
-	/**
-	 * @param defaultColor TODO
-	 * @param pTranslator TODO
-	 */
-	public ColorProperty(String description, String label, String defaultColor,
-			TextTranslator pTranslator) {
-		super();
-		this.description = description;
-		this.label = label;
-		this.defaultColor = defaultColor;
-		mTranslator = pTranslator;
-		mButton = new JButton();
-		mButton.addActionListener(this);
-		color = Color.BLACK;
-	}
+  /**
+   * @param defaultColor TODO
+   * @param pTranslator TODO
+   */
+  public ColorProperty(
+      String description, String label, String defaultColor, TextTranslator pTranslator) {
+    super();
+    this.description = description;
+    this.label = label;
+    this.defaultColor = defaultColor;
+    mTranslator = pTranslator;
+    mButton = new JButton();
+    mButton.addActionListener(this);
+    color = Color.BLACK;
+  }
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+  @Override
+  public String getDescription() {
+    return description;
+  }
 
-	@Override
-	public String getLabel() {
-		return label;
-	}
+  @Override
+  public String getLabel() {
+    return label;
+  }
 
-	@Override
-	public void setValue(String value) {
-		setColorValue(Tools.xmlToColor(value));
-	}
+  @Override
+  public void setValue(String value) {
+    setColorValue(Tools.xmlToColor(value));
+  }
 
-	@Override
-	public String getValue() {
-		return Tools.colorToXml(getColorValue());
-	}
+  @Override
+  public String getValue() {
+    return Tools.colorToXml(getColorValue());
+  }
 
-	@Override
-	public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
-		JLabel label = builder.append(pTranslator.getText(getLabel()), mButton);
-		label.setToolTipText(pTranslator.getText(getDescription()));
-		// add "reset to standard" popup:
+  @Override
+  public void layout(FreeMindFormBuilder builder, TextTranslator pTranslator) {
+    JLabel label = builder.append(pTranslator.getText(getLabel()), mButton);
+    label.setToolTipText(pTranslator.getText(getDescription()));
+    // add "reset to standard" popup:
 
-		// Create and add a menu item
-		JMenuItem item = new JMenuItem(mTranslator.getText("ColorProperty.ResetColor"));
-		item.addActionListener(e -> setValue(defaultColor));
-		menu.add(item);
+    // Create and add a menu item
+    JMenuItem item = new JMenuItem(mTranslator.getText("ColorProperty.ResetColor"));
+    item.addActionListener(e -> setValue(defaultColor));
+    menu.add(item);
 
-		// Set the component to show the popup menu
-		mButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent evt) {
-				if (evt.isPopupTrigger()) {
-					menu.show(evt.getComponent(), evt.getX(), evt.getY());
-				}
-			}
+    // Set the component to show the popup menu
+    mButton.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent evt) {
+            if (evt.isPopupTrigger()) {
+              menu.show(evt.getComponent(), evt.getX(), evt.getY());
+            }
+          }
 
-			@Override
-			public void mouseReleased(MouseEvent evt) {
-				if (evt.isPopupTrigger()) {
-					menu.show(evt.getComponent(), evt.getX(), evt.getY());
-				}
-			}
-		});
-	}
+          @Override
+          public void mouseReleased(MouseEvent evt) {
+            if (evt.isPopupTrigger()) {
+              menu.show(evt.getComponent(), evt.getX(), evt.getY());
+            }
+          }
+        });
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		Color result = Controller.showCommonJColorChooserDialog(mButton.getRootPane(),
-				mTranslator.getText(getLabel()), getColorValue());
-		if (result != null) {
-			setColorValue(result);
-			firePropertyChangeEvent();
-		}
-	}
+  @Override
+  public void actionPerformed(ActionEvent arg0) {
+    Color result =
+        Controller.showCommonJColorChooserDialog(
+            mButton.getRootPane(), mTranslator.getText(getLabel()), getColorValue());
+    if (result != null) {
+      setColorValue(result);
+      firePropertyChangeEvent();
+    }
+  }
 
-	/**
-	 */
-	private void setColorValue(Color result) {
-		color = result;
-		if (result == null) {
-			result = Color.WHITE;
-		}
-		mButton.setBackground(result);
-		mButton.setText(Tools.colorToXml(result));
-	}
+  /** */
+  private void setColorValue(Color result) {
+    color = result;
+    if (result == null) {
+      result = Color.WHITE;
+    }
+    mButton.setBackground(result);
+    mButton.setText(Tools.colorToXml(result));
+  }
 
-	/**
-	 */
-	private Color getColorValue() {
-		return color;
-	}
+  /** */
+  private Color getColorValue() {
+    return color;
+  }
 
-	@Override
-	public void setEnabled(boolean pEnabled) {
-		mButton.setEnabled(pEnabled);
-	}
-
+  @Override
+  public void setEnabled(boolean pEnabled) {
+    mButton.setEnabled(pEnabled);
+  }
 }

@@ -27,24 +27,24 @@ import javax.swing.ComboBoxModel;
  * @author Dimitri Polivaev 10.07.2005
  */
 public class SortedComboBoxModel extends SortedMapListModel implements ComboBoxModel<Object> {
-	private Object selectedItem;
+  private Object selectedItem;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
-	 */
-	public void setSelectedItem(Object o) {
-		selectedItem = o;
-		fireContentsChanged(this, -1, -1);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
+   */
+  public void setSelectedItem(Object o) {
+    selectedItem = o;
+    fireContentsChanged(this, -1, -1);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.ComboBoxModel#getSelectedItem()
-	 */
-	public Object getSelectedItem() {
-		return selectedItem;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see javax.swing.ComboBoxModel#getSelectedItem()
+   */
+  public Object getSelectedItem() {
+    return selectedItem;
+  }
 }

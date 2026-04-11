@@ -25,39 +25,35 @@ import freemind.view.mindmapview.MapView;
 
 public interface MindMapArrowLink extends MindMapLink {
 
-	/**
-	 * Means: yes, it has the default arrow
-	 */
-	String ARROW_DEFAULT = "Default";
-	/**
-	 * Means: no, it hasn't an arrow at this side.
-	 */
-	String ARROW_NONE = "None";
+  /** Means: yes, it has the default arrow */
+  String ARROW_DEFAULT = "Default";
 
-	/* for arrows: */
-	Point getStartInclination(); // the zero is the start point of the line;
+  /** Means: no, it hasn't an arrow at this side. */
+  String ARROW_NONE = "None";
 
-	Point getEndInclination(); // the zero is the end point of the line;
+  /* for arrows: */
+  Point getStartInclination(); // the zero is the start point of the line;
 
-	void setStartInclination(Point startInclination);
+  Point getEndInclination(); // the zero is the end point of the line;
 
-	void setEndInclination(Point endInclination);
+  void setStartInclination(Point startInclination);
 
-	/** the type of the start arrow: currently "None" and "Default". */
-	String getStartArrow();
+  void setEndInclination(Point endInclination);
 
-	/** the type of the end arrow: currently "None" and "Default". */
-	String getEndArrow();
+  /** the type of the start arrow: currently "None" and "Default". */
+  String getStartArrow();
 
-	/**
-	 * @param map TODO
-	 */
-	void changeInclination(MapView map, int originX, int originY, int deltaX, int deltaY);
+  /** the type of the end arrow: currently "None" and "Default". */
+  String getEndArrow();
 
-	void showControlPoints(boolean bShowControlPointsFlag);
+  /**
+   * @param map TODO
+   */
+  void changeInclination(MapView map, int originX, int originY, int deltaX, int deltaY);
 
-	boolean getShowControlPointsFlag();
+  void showControlPoints(boolean bShowControlPointsFlag);
 
-	XMLElement save();
+  boolean getShowControlPointsFlag();
 
+  XMLElement save();
 }

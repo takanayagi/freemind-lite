@@ -39,55 +39,51 @@ import freemind.modes.MindMapNode;
  */
 public class ConditionNotSatisfiedDecorator implements Condition {
 
-	static final String NAME = "negate_condition";
-	private Condition originalCondition;
+  static final String NAME = "negate_condition";
+  private Condition originalCondition;
 
-	/**
-	 *
-	 */
-	public ConditionNotSatisfiedDecorator(Condition originalCondition) {
-		super();
-		this.originalCondition = originalCondition;
-	}
+  /** */
+  public ConditionNotSatisfiedDecorator(Condition originalCondition) {
+    super();
+    this.originalCondition = originalCondition;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.filter.condition.Condition#checkNode(freemind.modes .MindMapNode)
-	 */
-	public boolean checkNode(Controller c, MindMapNode node) {
-		return !originalCondition.checkNode(null, node);
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.filter.condition.Condition#checkNode(freemind.modes .MindMapNode)
+   */
+  public boolean checkNode(Controller c, MindMapNode node) {
+    return !originalCondition.checkNode(null, node);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see freemind.controller.filter.condition.Condition#getListCellRendererComponent ()
-	 */
-	public JComponent getListCellRendererComponent() {
-		JCondition component = new JCondition();
-		final String not =
-				Tools.removeMnemonic(Resources.getInstance().getResourceString("filter_not"));
-		String text = not + ' ';
-		component.add(new JLabel(text));
-		final JComponent renderer = originalCondition.getListCellRendererComponent();
-		renderer.setOpaque(false);
-		component.add(renderer);
-		return component;
-	}
+  /*
+   * (non-Javadoc)
+   *
+   * @see freemind.controller.filter.condition.Condition#getListCellRendererComponent ()
+   */
+  public JComponent getListCellRendererComponent() {
+    JCondition component = new JCondition();
+    final String not =
+        Tools.removeMnemonic(Resources.getInstance().getResourceString("filter_not"));
+    String text = not + ' ';
+    component.add(new JLabel(text));
+    final JComponent renderer = originalCondition.getListCellRendererComponent();
+    renderer.setOpaque(false);
+    component.add(renderer);
+    return component;
+  }
 
-	public void save(XMLElement element) {
-		XMLElement child = new XMLElement();
-		child.setName(NAME);
-		originalCondition.save(child);
-		element.addChild(child);
-	}
+  public void save(XMLElement element) {
+    XMLElement child = new XMLElement();
+    child.setName(NAME);
+    originalCondition.save(child);
+    element.addChild(child);
+  }
 
-	static Condition load(XMLElement element) {
-		final Vector<XMLElement> children = element.getChildren();
-		Condition cond =
-				FilterController.getConditionFactory().loadCondition(children.get(0));
-		return new ConditionNotSatisfiedDecorator(cond);
-	}
-
+  static Condition load(XMLElement element) {
+    final Vector<XMLElement> children = element.getChildren();
+    Condition cond = FilterController.getConditionFactory().loadCondition(children.get(0));
+    return new ConditionNotSatisfiedDecorator(cond);
+  }
 }

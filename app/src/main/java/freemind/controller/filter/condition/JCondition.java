@@ -29,12 +29,10 @@ import javax.swing.JPanel;
  */
 public class JCondition extends JPanel {
 
-	/**
-	 */
-	public JCondition() {
-		super();
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		setOpaque(false);
-	}
-
+  /** */
+  public JCondition() {
+    super();
+    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+    setOpaque(false);
+  }
 }
