@@ -10,15 +10,20 @@ import java.awt.Toolkit;
 
 import javax.swing.*;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-public class MemoryTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
-  static {
-    AllTests.init();
+public class MemoryTest {
+
+  @BeforeAll
+  public static void registerDictionaries() {
+    SpellCheckerTestHelper.init();
   }
 
   /** Create a large amount of languages menus */
+  @Test
   public void testCreateLanguagesMenu() throws Exception {
     SpellChecker.createLanguagesMenu();
 
@@ -41,6 +46,7 @@ public class MemoryTest extends TestCase {
   }
 
   /** Create many JTextPane and register the spell checker */
+  @Test
   public void testRegister() throws Exception {
     // Create a large text
     StringBuffer buf = new StringBuffer();

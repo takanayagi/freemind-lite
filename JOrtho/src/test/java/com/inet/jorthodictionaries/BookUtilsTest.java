@@ -24,10 +24,13 @@ package com.inet.jorthodictionaries;
 
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class BookUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
+public class BookUtilsTest {
+
+  @Test
   public void testCalcDiff() {
     assertEquals(3, BookUtils.calcDiff("", "abc"));
     assertEquals(3, BookUtils.calcDiff("abc", ""));
@@ -38,6 +41,7 @@ public class BookUtilsTest extends TestCase {
     assertEquals(1, BookUtils.calcDiff("abd", "abcd"));
   }
 
+  @Test
   public void testParseRule() {
     Properties props = BookUtils.parseRule("{{temp|a=foo|bar{{x|y}}|b=xyz}}", "temp", 0);
     assertEquals(3, props.size());
