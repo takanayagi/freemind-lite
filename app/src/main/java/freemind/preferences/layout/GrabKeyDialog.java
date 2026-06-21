@@ -100,6 +100,7 @@ public class GrabKeyDialog extends JDialog {
     this(fmMain, parent, binding, allBindings, debugBuffer, 0);
   }
 
+  @SuppressWarnings("this-escape")
   public GrabKeyDialog(
       FreeMindMain fmMain,
       Dialog parent,

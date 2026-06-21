@@ -41,6 +41,7 @@ public class PasteAsPlainTextAction extends AbstractAction {
   private MindMapController mMindMapController;
   private static Logger logger;
 
+  @SuppressWarnings("this-escape")
   public PasteAsPlainTextAction(MindMapController pMindMapController) {
     super(pMindMapController.getText("paste_as_plain_text"), null);
     this.mMindMapController = pMindMapController;

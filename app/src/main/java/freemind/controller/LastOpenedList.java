@@ -47,6 +47,7 @@ public class LastOpenedList {
   /** Contains Restore string => map name (map.toString()). */
   private Map<String, String> mRestorableToMapName = new HashMap<>();
 
+  @SuppressWarnings("this-escape")
   public LastOpenedList(Controller c, String restored) {
     this.mController = c;
     try {

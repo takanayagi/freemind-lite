@@ -53,6 +53,7 @@ public class FlatNodeTableFilterModel extends AbstractTableModel {
    * @param node_text_column TODO
    * @param note_text_column TODO
    */
+  @SuppressWarnings("this-escape")
   public FlatNodeTableFilterModel(
       TableModel tableModel, int node_text_column, int note_text_column) {
     super();

@@ -66,6 +66,7 @@ public class EnterPasswordDialog extends JDialog {
   public EnterPasswordDialog() {}
 
   /** This is the default constructor */
+  @SuppressWarnings("this-escape")
   public EnterPasswordDialog(JFrame caller, TextTranslator pTranslator, boolean enterTwoPasswords) {
     super(caller, "", true /* =modal */);
     this.mTranslator = pTranslator;
@@ -74,16 +75,17 @@ public class EnterPasswordDialog extends JDialog {
   }
 
   /** This method initializes this */
+  @SuppressWarnings("this-escape")
   private void initialize() {
     if (enterTwoPasswords)
-      this.setTitle(
+      setTitle(
           mTranslator.getText("accessories/plugins/EncryptNode.properties_0")); // $NON-NLS-1$
     else
-      this.setTitle(
+      setTitle(
           mTranslator.getText("accessories/plugins/EncryptNode.properties_8")); // $NON-NLS-1$
-    this.setSize(350, 200);
-    this.setContentPane(getJContentPane());
-    this.setLocationRelativeTo(getParent());
+    setSize(350, 200);
+    setContentPane(getJContentPane());
+    setLocationRelativeTo(getParent());
     setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
     addWindowListener(
         new WindowAdapter() {
@@ -101,7 +103,7 @@ public class EnterPasswordDialog extends JDialog {
   }
 
   private void close() {
-    this.dispose();
+    dispose();
   }
 
   private void okPressed() {

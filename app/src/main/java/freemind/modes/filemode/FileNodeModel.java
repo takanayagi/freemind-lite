@@ -42,6 +42,7 @@ public class FileNodeModel extends NodeAdapter {
   // Constructors
   //
 
+  @SuppressWarnings("this-escape")
   public FileNodeModel(File file, MindMap map) {
     super(null, map);
     setEdge(new FileEdgeModel(this, getMapFeedback()));

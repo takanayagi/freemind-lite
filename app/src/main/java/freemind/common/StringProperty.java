@@ -36,6 +36,7 @@ public class StringProperty extends PropertyBean implements PropertyControl {
   JTextField mTextField;
 
   /** */
+  @SuppressWarnings("this-escape")
   public StringProperty(String description, String label) {
     super();
     initializeTextfield();

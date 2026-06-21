@@ -77,6 +77,7 @@ public abstract class ExtendedMapFeedbackAdapter extends MapFeedbackAdapter
   private MindMapHookFactory mNodeHookFactory;
 
   /** */
+  @SuppressWarnings("this-escape")
   public ExtendedMapFeedbackAdapter() {
     super();
     mActionRegistry = new ActionRegistry();

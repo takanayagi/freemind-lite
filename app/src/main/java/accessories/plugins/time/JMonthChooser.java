@@ -78,6 +78,7 @@ public class JMonthChooser extends JPanel implements ItemListener, ChangeListene
    *
    * @param hasSpinner true, if the month chooser should have a spinner component
    */
+  @SuppressWarnings("this-escape")
   public JMonthChooser(boolean hasSpinner) {
     super();
     setName("JMonthChooser");

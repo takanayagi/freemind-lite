@@ -36,6 +36,7 @@ import freemind.modes.mindmapmode.MindMapController;
 public class RemoveIconAction extends NodeGeneralAction implements IconInformation {
 
   /** */
+  @SuppressWarnings("this-escape")
   public RemoveIconAction(MindMapController modeController) {
     super(modeController, "remove_last_icon", "images/remove.png");
     setDoActionClass(RemoveIconXmlAction.class);

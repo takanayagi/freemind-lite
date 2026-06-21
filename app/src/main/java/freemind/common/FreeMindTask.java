@@ -66,6 +66,7 @@ public abstract class FreeMindTask extends Thread {
     public Object[] mProgressParameters;
   }
 
+  @SuppressWarnings("this-escape")
   public FreeMindTask(RootPaneContainer pRootPaneContainer, int pAmountOfSteps, String pName) {
     super(pName);
     mFrame = pRootPaneContainer;

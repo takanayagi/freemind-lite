@@ -41,6 +41,7 @@ public class BooleanProperty extends PropertyBean implements PropertyControl {
   JCheckBox mCheckBox = new JCheckBox();
 
   /** */
+  @SuppressWarnings("this-escape")
   public BooleanProperty(String description, String label) {
     super();
     this.description = description;

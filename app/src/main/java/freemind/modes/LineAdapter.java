@@ -37,6 +37,7 @@ public abstract class LineAdapter implements MindMapLine {
   //
   // Constructors
   //
+  @SuppressWarnings("this-escape")
   public LineAdapter(MindMapNode target, MapFeedback pMapFeedback) {
     this.mMapFeedback = pMapFeedback;
     this.target = target;

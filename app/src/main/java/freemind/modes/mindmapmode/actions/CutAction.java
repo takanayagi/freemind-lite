@@ -36,6 +36,7 @@ public class CutAction extends AbstractAction {
   private final MindMapController mMindMapController;
   private static Logger logger = null;
 
+  @SuppressWarnings("this-escape")
   public CutAction(MindMapController c) {
     super(
         c.getText("cut"),

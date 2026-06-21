@@ -67,6 +67,7 @@ public class ThreeCheckBoxProperty extends PropertyBean implements PropertyContr
   JButton mButton = new JButton();
 
   /** */
+  @SuppressWarnings("this-escape")
   public ThreeCheckBoxProperty(String description, String label) {
     super();
     this.description = description;

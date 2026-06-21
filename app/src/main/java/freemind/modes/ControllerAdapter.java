@@ -115,6 +115,7 @@ public abstract class ControllerAdapter extends MapFeedbackAdapter
   private File lastCurrentDir = null;
 
   /** Instantiation order: first me and then the model. */
+  @SuppressWarnings("this-escape")
   public ControllerAdapter(Mode mode) {
     this.setMode(mode);
     // for updates of nodes:

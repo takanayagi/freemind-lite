@@ -58,6 +58,7 @@ public class NodeFoldingComponent extends JButton {
   private NodeView nodeView;
   private Timer mTimer = null;
 
+  @SuppressWarnings("this-escape")
   public NodeFoldingComponent(NodeView view) {
     super();
     if (logger == null) {

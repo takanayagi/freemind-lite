@@ -59,6 +59,7 @@ public class UndoAction extends AbstractXmlAction {
     }
   }
 
+  @SuppressWarnings("this-escape")
   protected UndoAction(MindMapController adapter, String text, Icon icon, MindMapController mode) {
     super(text, icon, mode);
     this.controller = adapter;

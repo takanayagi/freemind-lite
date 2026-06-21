@@ -75,6 +75,7 @@ public class CommonNodeMouseMotionListener implements NodeMouseMotionObserver {
 
   private MouseEvent mMousePressedEvent;
 
+  @SuppressWarnings("this-escape")
   public CommonNodeMouseMotionListener(ModeController controller) {
     c = controller;
     if (logger == null) logger = c.getFrame().getLogger(this.getClass().getName());

@@ -27,6 +27,7 @@ import freemind.modes.mindmapmode.MindMapController;
 public class MoveNodeAction extends NodeGeneralAction {
 
   /** */
+  @SuppressWarnings("this-escape")
   public MoveNodeAction(MindMapController modeController) {
     super(modeController, "reset_node_position", null);
     setDoActionClass(MoveNodeXmlAction.class);

@@ -40,6 +40,7 @@ public class JOptionalSplitPane extends JPanel {
   private JComponent mBasicComponent = null;
   private int mLastDividerPosition = -1;
 
+  @SuppressWarnings("this-escape")
   public JOptionalSplitPane() {
     setLayout(new BorderLayout());
   }

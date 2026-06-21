@@ -34,6 +34,7 @@ public class PasteAction extends AbstractAction {
   private static Logger logger;
   private final MindMapController mMindMapController;
 
+  @SuppressWarnings("this-escape")
   public PasteAction(MindMapController pMindMapController) {
     super(
         pMindMapController.getText("paste"),

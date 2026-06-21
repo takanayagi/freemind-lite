@@ -63,6 +63,7 @@ public class EncryptedMindMapNode extends MindMapNodeModel {
   private boolean isShuttingDown = false;
 
   /** */
+  @SuppressWarnings("this-escape")
   public EncryptedMindMapNode(Object userObject, MindMap map) {
     super(userObject, map);
     if (encryptedIcon == null) {

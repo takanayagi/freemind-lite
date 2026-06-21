@@ -100,6 +100,7 @@ public class ExampleFileFilter extends FileFilter {
    *
    * <p>Note that the "." before the extension is not needed. If provided, it will be ignored.
    */
+  @SuppressWarnings("this-escape")
   public ExampleFileFilter(String extension, String description) {
     this();
     if (extension != null) addExtension(extension);
@@ -122,6 +123,7 @@ public class ExampleFileFilter extends FileFilter {
    *
    * <p>Note that the "." before the extension is not needed and will be ignored.
    */
+  @SuppressWarnings("this-escape")
   public ExampleFileFilter(String[] filters, String description) {
     this();
     for (String filter : filters) {

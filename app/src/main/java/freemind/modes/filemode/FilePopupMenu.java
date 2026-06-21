@@ -32,6 +32,7 @@ public class FilePopupMenu extends JPopupMenu {
     item.setAccelerator(KeyStroke.getKeyStroke(c.getFrame().getAdjustableProperty(keystroke)));
   }
 
+  @SuppressWarnings("this-escape")
   public FilePopupMenu(FileController c) {
     this.c = c;
 

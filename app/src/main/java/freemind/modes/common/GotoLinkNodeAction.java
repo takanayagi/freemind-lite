@@ -35,6 +35,7 @@ public class GotoLinkNodeAction extends AbstractAction {
 
   private final ModeController controller;
 
+  @SuppressWarnings("this-escape")
   public GotoLinkNodeAction(ModeController controller, MindMapNode source) {
     super(
         controller.getText("goto_link_node_action"),

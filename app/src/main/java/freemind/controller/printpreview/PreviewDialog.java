@@ -41,6 +41,7 @@ import freemind.view.mindmapview.MapView;
 public class PreviewDialog extends JDialog implements ActionListener {
   private static final double DEFAULT_ZOOM_FACTOR_STEP = 0.1;
 
+  @SuppressWarnings("this-escape")
   public PreviewDialog(String title, MapView view, PageFormat pPageFormat) {
     super(JOptionPane.getFrameForComponent(view), title, true);
     this.view = view;

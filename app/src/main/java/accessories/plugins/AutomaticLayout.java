@@ -136,6 +136,7 @@ public class AutomaticLayout extends PermanentMindMapNodeHookAdapter {
 
     private final MindMapController mindMapController;
 
+    @SuppressWarnings("this-escape")
     public StylePatternProperty(
         String description,
         String label,
@@ -236,6 +237,7 @@ public class AutomaticLayout extends PermanentMindMapNodeHookAdapter {
 
     private DefaultListModel<String> mDefaultListModel;
 
+    @SuppressWarnings("this-escape")
     public StylePatternListProperty(
         String description,
         String label,

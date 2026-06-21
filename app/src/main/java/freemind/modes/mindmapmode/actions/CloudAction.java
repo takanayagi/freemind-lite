@@ -33,6 +33,7 @@ import freemind.modes.mindmapmode.MindMapController;
  */
 public class CloudAction extends NodeGeneralAction implements MenuItemSelectedListener {
 
+  @SuppressWarnings("this-escape")
   public CloudAction(MindMapController controller) {
     super(controller, "cloud", "images/Cloud24.gif");
     setDoActionClass(getDoActionClass());

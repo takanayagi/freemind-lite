@@ -81,6 +81,7 @@ public class JCalendar extends JPanel implements PropertyChangeListener {
    *
    * @param calendar the calendar
    */
+  @SuppressWarnings("this-escape")
   public JCalendar(Calendar calendar) {
     this(null, null, true, true);
     setCalendar(calendar);
@@ -142,6 +143,7 @@ public class JCalendar extends JPanel implements PropertyChangeListener {
    * @param monthSpinner false, if no month spinner should be used
    * @param weekOfYearVisible true, if weeks of year shall be visible
    */
+  @SuppressWarnings("this-escape")
   public JCalendar(Date date, Locale locale, boolean monthSpinner, boolean weekOfYearVisible) {
 
     setName("JCalendar");

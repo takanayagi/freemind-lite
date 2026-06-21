@@ -362,34 +362,30 @@ public class MindMapController extends ControllerAdapter
   private HookFactory nodeHookFactory;
 
   // Make sure it is initialized
-  public ApplyPatternAction[] patterns = new ApplyPatternAction[0];
-  public Action newMap = new NewMapAction(this);
-  public Action open = new OpenAction(this);
-  public Action save = new SaveAction();
-  public Action saveAs = new SaveAsAction();
-  public Action exportToHTML = new ExportToHTMLAction(this);
-  public Action exportBranchToHTML = new ExportBranchToHTMLAction(this);
+  public ApplyPatternAction[] patterns = null;
+  public Action newMap = null;
+  public Action open = null;
+  public Action save = null;
+  public Action saveAs = null;
+  public Action exportToHTML = null;
+  public Action exportBranchToHTML = null;
 
-  public Action editLong = new EditLongAction();
-  public Action newSibling = new NewSiblingAction(this);
-  public Action newPreviousSibling = new NewPreviousSiblingAction(this);
-  public Action setLinkByFileChooser = new SetLinkByFileChooserAction();
-  public Action setImageByFileChooser = new SetImageByFileChooserAction();
-  public Action followLink = new FollowLinkAction();
-  public Action openLinkDirectory = new OpenLinkDirectoryAction();
-  public Action exportBranch = new ExportBranchAction(this);
-  public Action importBranch = new ImportBranchAction();
-  public Action importLinkedBranch = new ImportLinkedBranchAction();
-  public Action importLinkedBranchWithoutRoot = new ImportLinkedBranchWithoutRootAction();
+  public Action editLong = null;
+  public Action newSibling = null;
+  public Action newPreviousSibling = null;
+  public Action setLinkByFileChooser = null;
+  public Action setImageByFileChooser = null;
+  public Action followLink = null;
+  public Action openLinkDirectory = null;
+  public Action exportBranch = null;
+  public Action importBranch = null;
+  public Action importLinkedBranch = null;
+  public Action importLinkedBranchWithoutRoot = null;
 
   public Action propertyAction = null;
 
-  public Action increaseNodeFont =
-      new NodeGeneralAction(
-          this, "increase_node_font_size", null, (map, node) -> increaseFontSize(node, 1));
-  public Action decreaseNodeFont =
-      new NodeGeneralAction(
-          this, "decrease_node_font_size", null, (map, node) -> increaseFontSize(node, -1));
+  public Action increaseNodeFont = null;
+  public Action decreaseNodeFont = null;
 
   public UndoAction undo = null;
   public RedoAction redo = null;
@@ -467,6 +463,7 @@ public class MindMapController extends ControllerAdapter
   private List<Pattern> mPatternsList = new Vector<>();
   private long mGetEventIfChangedAfterThisTimeInMillies = 0;
 
+  @SuppressWarnings("this-escape")
   public MindMapController(Mode mode) {
     super(mode);
     // create action factory:
@@ -480,6 +477,7 @@ public class MindMapController extends ControllerAdapter
     init();
   }
 
+  @SuppressWarnings("this-escape")
   protected void init() {
     logger.info("createXmlActions");
     mActorFactory = new XmlActorFactory(this);
@@ -499,7 +497,6 @@ public class MindMapController extends ControllerAdapter
       in = this.getFrame().getResource("mindmap_menus.xml").openStream();
       mMenuStructure = updateMenusFromXml(in);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       freemind.main.Resources.getInstance().logException(e);
     }
 
@@ -513,7 +510,36 @@ public class MindMapController extends ControllerAdapter
     propertyAction = getController().propertyAction;
   }
 
+  @SuppressWarnings("this-escape")
   private void createStandardActions() {
+    // Make sure it is initialized
+    patterns = new ApplyPatternAction[0];
+    newMap = new NewMapAction(this);
+    open = new OpenAction(this);
+    save = new SaveAction();
+    saveAs = new SaveAsAction();
+    exportToHTML = new ExportToHTMLAction(this);
+    exportBranchToHTML = new ExportBranchToHTMLAction(this);
+
+    editLong = new EditLongAction();
+    newSibling = new NewSiblingAction(this);
+    newPreviousSibling = new NewPreviousSiblingAction(this);
+    setLinkByFileChooser = new SetLinkByFileChooserAction();
+    setImageByFileChooser = new SetImageByFileChooserAction();
+    followLink = new FollowLinkAction();
+    openLinkDirectory = new OpenLinkDirectoryAction();
+    exportBranch = new ExportBranchAction(this);
+    importBranch = new ImportBranchAction();
+    importLinkedBranch = new ImportLinkedBranchAction();
+    importLinkedBranchWithoutRoot = new ImportLinkedBranchWithoutRootAction();
+
+    increaseNodeFont =
+      new NodeGeneralAction(
+          this, "increase_node_font_size", null, (map, node) -> increaseFontSize(node, 1));
+    decreaseNodeFont =
+      new NodeGeneralAction(
+          this, "decrease_node_font_size", null, (map, node) -> increaseFontSize(node, -1));
+
     // prepare undo:
     undo = new UndoAction(this);
     redo = new RedoAction(this);

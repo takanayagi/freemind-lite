@@ -71,6 +71,7 @@ public class JSpinField extends JPanel
   }
 
   /** JSpinField constructor with given minimum and maximum vaues and initial value 0. */
+  @SuppressWarnings("this-escape")
   public JSpinField(int min, int max) {
     super();
     setName("JSpinField");

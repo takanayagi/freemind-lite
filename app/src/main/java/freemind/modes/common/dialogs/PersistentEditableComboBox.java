@@ -36,6 +36,7 @@ public class PersistentEditableComboBox extends JComboBox<String> {
 
   private final String pStorageKey;
 
+  @SuppressWarnings("this-escape")
   public PersistentEditableComboBox(ModeController modeController, String storageKey) {
     this.mModeController = modeController;
     this.pStorageKey = storageKey;

@@ -31,6 +31,7 @@ import freemind.modes.mindmapmode.MindMapController;
 public class CopyAction extends AbstractAction {
   private final MindMapController controller;
 
+  @SuppressWarnings("this-escape")
   public CopyAction(MindMapController controller) {
     super(
         controller.getText("copy"),

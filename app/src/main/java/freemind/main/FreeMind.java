@@ -252,6 +252,7 @@ public class FreeMind extends JFrame implements FreeMindMain, ActionListener {
 
   private Vector<Logger> mLoggerList = new Vector<>();
 
+  @SuppressWarnings("this-escape")
   public FreeMind(
       Properties pDefaultPreferences, Properties pUserPreferences, File pAutoPropertiesFile) {
     super("FreeMind");

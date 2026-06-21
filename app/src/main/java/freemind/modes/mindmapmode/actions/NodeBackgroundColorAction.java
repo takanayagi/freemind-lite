@@ -52,6 +52,7 @@ public class NodeBackgroundColorAction extends MindmapAction {
 
   public static class RemoveNodeBackgroundColorAction extends NodeGeneralAction {
 
+    @SuppressWarnings("this-escape")
     public RemoveNodeBackgroundColorAction(final MindMapController controller) {
       super(controller, "remove_node_background_color", null);
       setSingleNodeOperation((map, node) -> controller.setNodeBackgroundColor(node, null));

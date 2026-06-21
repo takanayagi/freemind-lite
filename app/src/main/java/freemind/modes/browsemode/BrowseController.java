@@ -134,6 +134,7 @@ public class BrowseController extends ViewControllerAdapter {
     }
   }
 
+  @SuppressWarnings("this-escape")
   public BrowseController(Mode mode) {
     super(mode);
     mBrowseHookFactory = new BrowseHookFactory();

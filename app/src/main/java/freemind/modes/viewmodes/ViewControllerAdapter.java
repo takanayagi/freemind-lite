@@ -51,6 +51,7 @@ public abstract class ViewControllerAdapter extends ControllerAdapter {
   public FindNextAction findNext = null;
 
   /** */
+  @SuppressWarnings("this-escape")
   public ViewControllerAdapter(Mode mode) {
     super(mode);
     toggleFolded = new CommonToggleFoldedAction(this);

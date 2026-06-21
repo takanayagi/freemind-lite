@@ -40,6 +40,7 @@ public class ApplyPatternAction extends NodeGeneralAction implements SingleNodeO
 
   private Pattern mpattern;
 
+  @SuppressWarnings("this-escape")
   public ApplyPatternAction(MindMapController controller, Pattern pattern) {
     super(controller, null /* no text */, null /* = no icon */);
     setName(pattern.getName());

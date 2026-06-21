@@ -111,11 +111,13 @@ public class TableSorter extends AbstractTableModel {
     this.tableModelListener = new TableModelHandler();
   }
 
+  @SuppressWarnings("this-escape")
   public TableSorter(TableModel tableModel) {
     this();
     setTableModel(tableModel);
   }
 
+  @SuppressWarnings("this-escape")
   public TableSorter(TableModel tableModel, JTableHeader tableHeader) {
     this();
     setTableHeader(tableHeader);

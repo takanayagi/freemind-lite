@@ -39,6 +39,7 @@ public class IconAction extends MindmapAction implements IconInformation {
   public MindIcon icon;
   private final MindMapController modeController;
 
+  @SuppressWarnings("this-escape")
   public IconAction(
       MindMapController controller, MindIcon _icon, RemoveIconAction removeLastIconAction) {
     super(_icon.getDescription(), _icon.getIcon(), controller);

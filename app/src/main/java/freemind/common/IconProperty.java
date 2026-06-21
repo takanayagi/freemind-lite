@@ -47,6 +47,7 @@ public class IconProperty extends PropertyBean implements PropertyControl, Actio
 
   private MindIcon mActualIcon = null;
 
+  @SuppressWarnings("this-escape")
   public IconProperty(
       String description, String label, FreeMindMain frame, Vector<MindIcon> icons) {
     super();

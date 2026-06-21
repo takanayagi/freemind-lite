@@ -32,6 +32,7 @@ public class UnderlinedAction extends NodeGeneralAction implements MenuItemSelec
   private final MindMapController modeController;
 
   /** */
+  @SuppressWarnings("this-escape")
   public UnderlinedAction(MindMapController modeController) {
     super(modeController, "underlined", "images/Underline24.gif");
     this.modeController = modeController;

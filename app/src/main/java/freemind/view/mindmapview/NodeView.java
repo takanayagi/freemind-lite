@@ -99,6 +99,7 @@ public class NodeView extends JComponent implements TreeModelListener {
 
   private NodeFoldingComponent mFoldingListener;
 
+  @SuppressWarnings("this-escape")
   protected NodeView(MindMapNode model, int position, MapView map, Container parent) {
     if (logger == null) {
       logger = Resources.getInstance().getLogger(this.getClass().getName());

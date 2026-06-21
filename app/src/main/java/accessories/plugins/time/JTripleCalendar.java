@@ -53,6 +53,7 @@ public class JTripleCalendar extends JPanel implements PropertyChangeListener {
   private JSwitchableCalendar mCurrentlyActivePanel;
   private Calendar mCurrentDate;
 
+  @SuppressWarnings("this-escape")
   public JTripleCalendar(int pCurrentMonthPosition, Calendar pCurrentDate) {
     mCurrentMonthPosition = pCurrentMonthPosition;
     mCurrentDate = pCurrentDate;
@@ -145,6 +146,7 @@ public class JTripleCalendar extends JPanel implements PropertyChangeListener {
       dayChooser.setDay(calendar.get(Calendar.DAY_OF_MONTH));
     }
 
+    @SuppressWarnings("this-escape")
     public JSwitchableCalendar() {
       super();
       setEnabled(false);

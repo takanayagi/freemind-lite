@@ -38,6 +38,7 @@ public class FontProperty extends PropertyBean implements PropertyControl {
   private String[] mAvailableFontFamilyNames;
 
   /** TODO TODO */
+  @SuppressWarnings("this-escape")
   public FontProperty(String description, String label, TextTranslator pTranslator) {
     super();
     this.description = description;

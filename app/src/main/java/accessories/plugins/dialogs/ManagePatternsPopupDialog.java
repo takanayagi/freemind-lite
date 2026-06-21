@@ -138,6 +138,7 @@ public class ManagePatternsPopupDialog extends JDialog implements TextTranslator
   private static Logger logger = null;
 
   /** This is the default constructor */
+  @SuppressWarnings("this-escape")
   public ManagePatternsPopupDialog(JFrame caller, MindMapController controller) {
     super(caller);
     this.mController = controller;

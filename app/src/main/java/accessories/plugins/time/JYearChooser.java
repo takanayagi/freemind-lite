@@ -32,6 +32,7 @@ public class JYearChooser extends JSpinField {
   protected int oldYear;
 
   /** Default JCalendar constructor. */
+  @SuppressWarnings("this-escape")
   public JYearChooser() {
     setName("JYearChooser");
     Calendar calendar = Calendar.getInstance();
