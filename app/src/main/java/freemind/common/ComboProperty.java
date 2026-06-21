@@ -42,6 +42,7 @@ public class ComboProperty extends PropertyBean implements PropertyControl {
   /**
    * @param pTranslator TODO
    */
+  @SuppressWarnings("this-escape")
   public ComboProperty(
       String description, String label, String[] possibles, TextTranslator pTranslator) {
     super();
@@ -60,6 +61,7 @@ public class ComboProperty extends PropertyBean implements PropertyControl {
     mComboBox.addActionListener(pE -> firePropertyChangeEvent());
   }
 
+  @SuppressWarnings("this-escape")
   public ComboProperty(
       String description, String label, String[] possibles, List<String> possibleTranslations) {
     this.description = description;

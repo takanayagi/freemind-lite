@@ -33,6 +33,7 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
 public class EdgeStyleAction extends NodeGeneralAction implements MenuItemSelectedListener {
   private String mStyle;
 
+  @SuppressWarnings("this-escape")
   public EdgeStyleAction(MindMapController controller, String style) {
     super(controller, null, null);
     setName(/* controller.getText("edge_style") + */ controller.getText(style));

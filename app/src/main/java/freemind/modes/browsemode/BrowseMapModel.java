@@ -40,6 +40,7 @@ public class BrowseMapModel extends MapAdapter {
   private URL url;
   private MindMapLinkRegistry linkRegistry;
 
+  @SuppressWarnings("this-escape")
   public BrowseMapModel(BrowseNodeModel root, ModeController modeController) {
     super(modeController);
     if (root != null) setRoot(root);

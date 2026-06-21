@@ -181,6 +181,7 @@ public class JDayChooser extends JPanel implements ActionListener, KeyListener, 
    *
    * @param weekOfYearVisible true, if the weeks of a year shall be shown
    */
+  @SuppressWarnings("this-escape")
   public JDayChooser(boolean weekOfYearVisible) {
     if (mCalendarMarkingEvaluator == null) {
       CalendarMarkings markings = null;

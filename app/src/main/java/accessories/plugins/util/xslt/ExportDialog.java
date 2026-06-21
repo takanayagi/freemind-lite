@@ -98,6 +98,7 @@ public class ExportDialog extends JFrame {
   protected File xmlFile = null;
   private final ModeController mController;
 
+  @SuppressWarnings("this-escape")
   public ExportDialog(File nxmlFile, ModeController pController) {
 
     super(pController.getFrame().getResourceString("ExportDialog.2")); // $NON-NLS-1$

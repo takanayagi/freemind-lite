@@ -33,6 +33,7 @@ import freemind.modes.mindmapmode.actions.xml.ActionPair;
 public class EdgeWidthAction extends NodeGeneralAction implements MenuItemSelectedListener {
   private int mWidth;
 
+  @SuppressWarnings("this-escape")
   public EdgeWidthAction(MindMapController controller, int width) {
     super(controller, null, null);
     this.mWidth = width;

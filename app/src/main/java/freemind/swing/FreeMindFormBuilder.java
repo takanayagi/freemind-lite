@@ -31,6 +31,7 @@ public class FreeMindFormBuilder extends AbstractFormBuilder<FreeMindFormBuilder
    * @param layout the {@code FormLayout} to be used
    * @throws NullPointerException if {@code layout} is {@code null}
    */
+  @SuppressWarnings("this-escape")
   public FreeMindFormBuilder(FormLayout layout) {
     super(layout, new JPanel(null));
     opaque(FormsSetup.getOpaqueDefault());

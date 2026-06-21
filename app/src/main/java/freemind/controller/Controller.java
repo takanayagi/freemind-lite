@@ -138,7 +138,7 @@ public class Controller implements MapModuleChangeObserver {
   private NodeDropListener nodeDropListener;
   private MapMouseMotionListener mapMouseMotionListener;
   private MapMouseWheelListener mapMouseWheelListener;
-  private ModesCreator mModescreator = new ModesCreator(this);
+  private ModesCreator mModescreator;
   private PageFormat pageFormat = null;
   private PrinterJob printerJob = null;
   private Map<String, Font> fontMap = new HashMap<>();
@@ -198,11 +198,13 @@ public class Controller implements MapModuleChangeObserver {
   //
   // Constructors
   //
+  @SuppressWarnings("this-escape")
   public Controller(FreeMindMain frame) {
     this.frame = frame;
     if (logger == null) {
       logger = frame.getLogger(this.getClass().getName());
     }
+    mModescreator = new ModesCreator(this);
   }
 
   public void init() {

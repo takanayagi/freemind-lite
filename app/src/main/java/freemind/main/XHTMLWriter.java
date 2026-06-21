@@ -51,6 +51,7 @@ public class XHTMLWriter extends FixedHTMLWriter {
    * @param pos Starting position
    * @param len Length
    */
+  @SuppressWarnings("this-escape")
   public XHTMLWriter(Writer writer, HTMLDocument doc, int pos, int len) {
     super(new XHTMLFilterWriter(writer), doc, pos, len);
     setLineLength(Integer.MAX_VALUE);

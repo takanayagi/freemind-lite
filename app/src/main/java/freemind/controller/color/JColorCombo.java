@@ -40,6 +40,7 @@ public class JColorCombo extends JComboBox<ColorPair> {
 
     private static final int ICON_SIZE = (int) (Tools.getScalingFactor() * 16);
 
+    @SuppressWarnings("this-escape")
     public ColorIcon(Color pColor) {
       super(new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_RGB));
       BufferedImage image = (BufferedImage) getImage();
@@ -50,6 +51,7 @@ public class JColorCombo extends JComboBox<ColorPair> {
     }
   }
 
+  @SuppressWarnings("this-escape")
   public JColorCombo() {
     ColorPair[] colorList = sColorList;
     for (ColorPair colorPair : colorList) {
@@ -66,6 +68,7 @@ public class JColorCombo extends JComboBox<ColorPair> {
   }
 
   public static class ComboBoxRenderer extends JLabel implements ListCellRenderer<ColorPair> {
+    @SuppressWarnings("this-escape")
     public ComboBoxRenderer() {
       setOpaque(true);
       setHorizontalAlignment(LEFT);

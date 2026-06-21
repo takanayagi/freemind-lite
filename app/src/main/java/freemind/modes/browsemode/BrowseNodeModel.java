@@ -30,10 +30,7 @@ import freemind.modes.NodeAdapter;
  */
 public class BrowseNodeModel extends NodeAdapter {
 
-  //
-  // Constructors
-  //
-
+  @SuppressWarnings("this-escape")
   public BrowseNodeModel(Object userObject, MindMap map) {
     super(userObject, map);
     children = new LinkedList<>();

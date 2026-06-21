@@ -49,6 +49,7 @@ public class FreeMindProgressMonitor extends JDialog {
   protected boolean mCanceled = false;
 
   /** */
+  @SuppressWarnings("this-escape")
   public FreeMindProgressMonitor(String pTitle) {
     setTitle(getString(pTitle));
     mLabel = new JLabel("!");

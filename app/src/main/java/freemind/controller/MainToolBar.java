@@ -25,6 +25,7 @@ public class MainToolBar extends FreeMindToolBar {
   Controller controller;
   private static Logger logger = null;
 
+  @SuppressWarnings("this-escape")
   public MainToolBar(final Controller controller) {
     super();
     this.controller = controller;

@@ -45,6 +45,7 @@ public class FileMapModel extends MapAdapter {
     this(new File(File.separator), frame, modeController);
   }
 
+  @SuppressWarnings("this-escape")
   public FileMapModel(File root, FreeMindMain frame, ModeController modeController) {
     super(modeController);
     setRoot(new FileNodeModel(root, this));

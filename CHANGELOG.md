@@ -9,3 +9,4 @@
 - Upgrade Java version to 21
 - Re-format source files by Google Java Format
 - Upgrade JOrtho junit to jupiter
+- Suppress "this-escape" warnings

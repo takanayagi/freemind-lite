@@ -23,6 +23,7 @@ import javax.swing.JToolBar;
 
 public class FileToolBar extends JToolBar {
 
+  @SuppressWarnings("this-escape")
   public FileToolBar(FileController controller) {
     this.setRollover(true);
 

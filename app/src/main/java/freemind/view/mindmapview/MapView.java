@@ -269,6 +269,7 @@ public class MapView extends JPanel implements ViewAbstraction, Printable, Autos
   private static boolean antialiasEdges = false;
   private static boolean antialiasAll = false;
 
+  @SuppressWarnings("this-escape")
   public MapView(MindMap model, ViewFeedback pFeedback) {
     super();
     this.model = model;

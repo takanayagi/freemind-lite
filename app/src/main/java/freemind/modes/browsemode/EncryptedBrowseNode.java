@@ -61,6 +61,7 @@ public class EncryptedBrowseNode extends BrowseNodeModel {
   }
 
   /** */
+  @SuppressWarnings("this-escape")
   public EncryptedBrowseNode(Object userObject, MapFeedback pMapFeedback) {
     super(userObject, pMapFeedback.getMap());
     this.mMapFeedback = pMapFeedback;

@@ -52,6 +52,7 @@ public class NodeGeneralAction extends AbstractXmlAction {
    * null if you cannot provide a title that is present in the resources. Use the setName method to
    * set your not translateble title after that. give a resource name for the icon.
    */
+  @SuppressWarnings("this-escape")
   protected NodeGeneralAction(
       MindMapController modeController, final String textID, String iconPath) {
     super(
@@ -88,6 +89,7 @@ public class NodeGeneralAction extends AbstractXmlAction {
     this.singleNodeOperation = singleNodeOperation;
   }
 
+  @SuppressWarnings("this-escape")
   public NodeGeneralAction(
       MindMapController modeController,
       String textID,

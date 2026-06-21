@@ -36,6 +36,7 @@ public class RemoveArrowLinkAction extends MindmapAction {
   private final MindMapController controller;
 
   /** can be null can be null. */
+  @SuppressWarnings("this-escape")
   public RemoveArrowLinkAction(MindMapController controller, MindMapArrowLinkModel arrowLink) {
     super("remove_arrow_link", "images/edittrash.png", controller);
     this.controller = controller;

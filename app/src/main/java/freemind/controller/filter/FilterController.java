@@ -57,6 +57,7 @@ public class FilterController implements MapModuleChangeObserver {
   static final String FREEMIND_FILTER_EXTENSION_WITHOUT_DOT = "mmfilter";
   private static Filter inactiveFilter;
 
+  @SuppressWarnings("this-escape")
   public FilterController(Controller c) {
     this.c = c;
     c.getMapModuleManager().addListener(this);

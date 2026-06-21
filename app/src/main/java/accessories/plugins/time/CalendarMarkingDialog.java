@@ -78,6 +78,7 @@ public class CalendarMarkingDialog extends JDialog
     System.out.println(Tools.marshall(markingsZwo));
   }
 
+  @SuppressWarnings("this-escape")
   public CalendarMarkingDialog(MindMapController pController) {
     if (logger == null) {
       logger = freemind.main.Resources.getInstance().getLogger(this.getClass().getName());

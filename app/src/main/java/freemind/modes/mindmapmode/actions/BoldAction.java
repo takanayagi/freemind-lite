@@ -33,6 +33,7 @@ import freemind.modes.mindmapmode.MindMapController;
 
 public class BoldAction extends NodeGeneralAction implements MenuItemSelectedListener {
   /** */
+  @SuppressWarnings("this-escape")
   public BoldAction(MindMapController modeController) {
     super(modeController, "bold", "images/Bold16.gif");
     setDoActionClass(BoldNodeAction.class);

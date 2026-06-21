@@ -32,6 +32,7 @@ public class BrowseToolBar extends JToolBar {
   private ControllerAdapter c;
   private PersistentEditableComboBox urlfield = null;
 
+  @SuppressWarnings("this-escape")
   public BrowseToolBar(ControllerAdapter controller) {
 
     this.c = controller;

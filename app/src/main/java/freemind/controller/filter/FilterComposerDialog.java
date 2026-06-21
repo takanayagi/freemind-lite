@@ -461,6 +461,7 @@ public class FilterComposerDialog extends JDialog {
   private Controller mController;
   private DefaultComboBoxModel<Condition> simpleAttributeConditionComboBoxModel;
 
+  @SuppressWarnings("this-escape")
   public FilterComposerDialog(Controller controller, final FilterToolbar pFilterToolbar) {
     super(controller.getJFrame(), controller.getResourceString("filter_dialog"));
     mController = controller;

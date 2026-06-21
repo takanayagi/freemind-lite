@@ -34,6 +34,7 @@ public class BrowsePopupMenu extends JPopupMenu implements PopupMenuListener {
     item.setAccelerator(KeyStroke.getKeyStroke(c.getFrame().getAdjustableProperty(keystroke)));
   }
 
+  @SuppressWarnings("this-escape")
   public BrowsePopupMenu(BrowseController c) {
     this.c = c;
     add(c.find, "keystroke_find");

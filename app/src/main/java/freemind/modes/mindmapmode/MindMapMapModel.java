@@ -69,6 +69,7 @@ public class MindMapMapModel extends MapAdapter {
     this(null, pMapFeedback);
   }
 
+  @SuppressWarnings("this-escape")
   public MindMapMapModel(MindMapNodeModel root, MapFeedback pMapFeedback) {
     super(pMapFeedback);
     lockManager =

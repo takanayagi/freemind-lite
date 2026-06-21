@@ -145,7 +145,7 @@ public abstract class NodeAdapter implements MindMapNode {
   //
   // Constructors
   //
-
+  @SuppressWarnings("this-escape")
   protected NodeAdapter(Object userObject, MindMap pMap) {
     this.map = pMap;
     setText((String) userObject);

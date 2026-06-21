@@ -115,6 +115,7 @@ public class FreeMindSplashModern extends JFrame implements IFreeMindSplash {
     return feedBack;
   }
 
+  @SuppressWarnings("this-escape")
   public FreeMindSplashModern(final FreeMindMain frame) {
     super("FreeMind");
     this.frame = frame;

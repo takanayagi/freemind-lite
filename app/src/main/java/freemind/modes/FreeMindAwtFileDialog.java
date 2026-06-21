@@ -144,6 +144,7 @@ public class FreeMindAwtFileDialog extends FileDialog implements FreeMindFileDia
   }
 
   /** */
+  @SuppressWarnings("this-escape")
   public FreeMindAwtFileDialog() {
     super((Frame) null);
     if (logger == null) {

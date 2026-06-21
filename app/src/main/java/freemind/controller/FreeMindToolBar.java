@@ -52,9 +52,10 @@ public class FreeMindToolBar extends JToolBar {
   }
 
   /** */
+  @SuppressWarnings("this-escape")
   public FreeMindToolBar(String arg0, int arg1) {
     super(arg0, arg1);
-    this.setMargin(nullInsets);
+    setMargin(nullInsets);
     setFloatable(false);
   }
 

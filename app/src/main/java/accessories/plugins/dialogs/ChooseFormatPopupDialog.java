@@ -114,6 +114,7 @@ public class ChooseFormatPopupDialog extends JDialog implements TextTranslator, 
    *
    * @param pNode if this not null, the text resp. children are taken for format demonstration.
    */
+  @SuppressWarnings("this-escape")
   public ChooseFormatPopupDialog(
       JFrame caller,
       MindMapController controller,
@@ -132,11 +133,12 @@ public class ChooseFormatPopupDialog extends JDialog implements TextTranslator, 
   }
 
   /** This method initializes this */
+  @SuppressWarnings("this-escape")
   private void initialize(String dialogTitle) {
 
-    this.setTitle(mController.getText(dialogTitle));
+    setTitle(mController.getText(dialogTitle));
     JPanel contentPane = getJContentPane();
-    this.setContentPane(contentPane);
+    setContentPane(contentPane);
     setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
     addWindowListener(
         new WindowAdapter() {
@@ -161,7 +163,7 @@ public class ChooseFormatPopupDialog extends JDialog implements TextTranslator, 
     WindowConfigurationStorage storage = new WindowConfigurationStorage();
     mController.storeDialogPositions(this, storage, WINDOW_PREFERENCE_STORAGE_PROPERTY);
     setVisible(false);
-    this.dispose();
+    dispose();
   }
 
   private void okPressed() {

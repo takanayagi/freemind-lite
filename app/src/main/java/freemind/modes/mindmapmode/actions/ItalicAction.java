@@ -32,6 +32,7 @@ public class ItalicAction extends NodeGeneralAction implements MenuItemSelectedL
   private final MindMapController modeController;
 
   /** */
+  @SuppressWarnings("this-escape")
   public ItalicAction(MindMapController modeController) {
     super(modeController, "italic", "images/Italic16.gif");
     this.modeController = modeController;

@@ -43,14 +43,19 @@ import freemind.view.mindmapview.MainView;
 
 public class FileController extends ViewControllerAdapter {
 
-  Action newMap = new NewMapAction(this);
-  Action center = new CenterAction();
-  Action openPath = new OpenPathAction();
+  Action newMap;
+  Action center;
+  Action openPath;
 
-  private JPopupMenu popupmenu = new FilePopupMenu(this);
+  private JPopupMenu popupmenu;
 
+  @SuppressWarnings("this-escape")
   public FileController(Mode mode) {
     super(mode);
+    newMap = new NewMapAction(this);
+    center = new CenterAction();
+    openPath = new OpenPathAction();
+    popupmenu = new FilePopupMenu(this);
   }
 
   public JToolBar getModeToolBar() {

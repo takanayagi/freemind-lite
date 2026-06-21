@@ -36,6 +36,7 @@ public class NumberProperty extends PropertyBean implements PropertyControl {
   private final int step;
 
   /** */
+  @SuppressWarnings("this-escape")
   public NumberProperty(String description, String label, int min, int max, int step) {
     this.min = min;
     this.max = max;

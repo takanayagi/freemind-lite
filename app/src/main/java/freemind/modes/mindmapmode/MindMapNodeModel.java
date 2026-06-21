@@ -47,6 +47,7 @@ public class MindMapNodeModel extends NodeAdapter {
     this(null, pMap);
   }
 
+  @SuppressWarnings("this-escape")
   public MindMapNodeModel(Object userObject, MindMap pMap) {
     super(userObject, pMap);
     children = new LinkedList<>();

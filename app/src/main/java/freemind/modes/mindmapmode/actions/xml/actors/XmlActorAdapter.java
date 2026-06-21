@@ -40,6 +40,7 @@ public abstract class XmlActorAdapter implements ActorXml {
   protected static Logger logger = null;
 
   /** */
+  @SuppressWarnings("this-escape")
   public XmlActorAdapter(ExtendedMapFeedback pMapFeedback) {
     mMapFeedback = pMapFeedback;
     if (logger == null) {

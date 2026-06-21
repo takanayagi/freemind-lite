@@ -53,6 +53,7 @@ public class ColorProperty extends PropertyBean implements PropertyControl, Acti
    * @param defaultColor TODO
    * @param pTranslator TODO
    */
+  @SuppressWarnings("this-escape")
   public ColorProperty(
       String description, String label, String defaultColor, TextTranslator pTranslator) {
     super();

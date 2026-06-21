@@ -37,6 +37,7 @@ import freemind.main.Tools;
 public class NodeMotionListenerView extends JComponent {
   protected static Logger logger = null;
 
+  @SuppressWarnings("this-escape")
   public NodeMotionListenerView(NodeView view) {
     super();
     if (logger == null) {

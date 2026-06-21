@@ -55,6 +55,7 @@ public class IconSelectionPopupDialog extends JDialog implements KeyListener, Mo
   private FreeMindMain freeMindMain;
   private int mModifiers;
 
+  @SuppressWarnings("this-escape")
   public IconSelectionPopupDialog(
       JFrame caller, Vector<IconInformation> icons, FreeMindMain freeMindMain) {
 
