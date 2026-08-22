@@ -104,27 +104,25 @@ public abstract class BookGenerator {
 
   final void save(String language) throws Exception {
     File dictFile = new File("dictionary_" + language + ".ortho");
-    OutputStream dict = new FileOutputStream(dictFile);
-    dict = new BufferedOutputStream(dict);
-    Deflater deflater = new Deflater();
-    deflater.setLevel(Deflater.BEST_COMPRESSION);
-    dict = new DeflaterOutputStream(dict, deflater);
-    dict = new BufferedOutputStream(dict);
-    PrintStream dictPs = new PrintStream(dict, false, StandardCharsets.UTF_8);
+    OutputStream dict = new BufferedOutputStream(new FileOutputStream(dictFile));
+    try (Deflater deflater = new Deflater();
+         PrintStream dictPs = new PrintStream(dict, false, StandardCharsets.UTF_8);
+         PrintStream ps = new PrintStream(
+           new BufferedOutputStream(
+             new FileOutputStream("IncludedWords.txt")))) {
 
-    OutputStream txt = new FileOutputStream("IncludedWords.txt");
-    txt = new BufferedOutputStream(txt);
-    PrintStream ps = new PrintStream(txt, false, StandardCharsets.UTF_8);
+      deflater.setLevel(Deflater.BEST_COMPRESSION);
+      dict = new DeflaterOutputStream(dict, deflater);
+      dict = new BufferedOutputStream(dict);
 
-    // Save as word list
-    String[] words = book.getWords();
-    Arrays.sort(words);
-    for (String word : words) {
-      ps.print(word + '\n');
-      dictPs.print(word + '\n');
+      // Save as word list
+      String[] words = book.getWords();
+      Arrays.sort(words);
+      for (String word : words) {
+        ps.print(word + '\n');
+        dictPs.print(word + '\n');
+      }
     }
-    ps.close();
-    dictPs.close();
     saveStatistics(dictFile);
   }
 

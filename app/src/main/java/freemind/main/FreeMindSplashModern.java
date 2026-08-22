@@ -1,19 +1,19 @@
-/***************************************************************************
+/*
  *
  * FreeMindSplash, taken from GanttSplash.java.
  *
  * Copyright (C) 2002 by Thomas Alexandre (alexthomas(at)ganttproject.org) Copyright (C) 2005-2008
  * by Christian Foltin and Daniel Polansky
  *
- ***************************************************************************/
+ */
 
-/***************************************************************************
+/*
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- ***************************************************************************/
+ */
 
 package freemind.main;
 

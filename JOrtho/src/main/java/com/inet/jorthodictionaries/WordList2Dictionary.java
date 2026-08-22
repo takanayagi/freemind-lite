@@ -41,7 +41,7 @@ import java.util.zip.DeflaterOutputStream;
 public class WordList2Dictionary {
 
   /**
-   * The manin method
+   * The main method
    *
    * @param args command line arguments
    * @throws IOException if any IO error occur
@@ -60,34 +60,34 @@ public class WordList2Dictionary {
 
     // Create the output stream
     File dictFile = new File(args[1]);
-    OutputStream dict = new FileOutputStream(dictFile);
-    dict = new BufferedOutputStream(dict);
-    Deflater deflater = new Deflater();
-    deflater.setLevel(Deflater.BEST_COMPRESSION);
-    dict = new DeflaterOutputStream(dict, deflater);
-    dict = new BufferedOutputStream(dict);
-    PrintStream dictPs = new PrintStream(dict, false, "UTF8");
+    OutputStream dict = new BufferedOutputStream(new FileOutputStream(dictFile));
+    try (Deflater deflater = new Deflater()) {
+      deflater.setLevel(Deflater.BEST_COMPRESSION);
+      dict = new DeflaterOutputStream(dict, deflater);
+      dict = new BufferedOutputStream(dict);
+      PrintStream dictPs = new PrintStream(dict, false, "UTF8");
 
-    // create the input stream
-    File txtFile = new File(args[0]);
-    FileInputStream fis = new FileInputStream(txtFile);
-    Reader reader = new InputStreamReader(fis, "UTF8");
-    BufferedReader txt = new BufferedReader(reader);
+      // create the input stream
+      File txtFile = new File(args[0]);
+      FileInputStream fis = new FileInputStream(txtFile);
+      Reader reader = new InputStreamReader(fis, "UTF8");
+      BufferedReader txt = new BufferedReader(reader);
 
-    // read all the words
-    ArrayList<String> wordList = new ArrayList<String>();
-    String word = txt.readLine();
-    while (word != null) {
-      wordList.add(word);
-      word = txt.readLine();
+      // read all the words
+      ArrayList<String> wordList = new ArrayList<String>();
+      String word = txt.readLine();
+      while (word != null) {
+        wordList.add(word);
+        word = txt.readLine();
+      }
+      txt.close();
+      // Save dictionary
+      String[] words = wordList.toArray(new String[wordList.size()]);
+      Arrays.sort(words);
+      for (int i = 0; i < words.length; i++) {
+        dictPs.print(words[i] + '\n');
+      }
+      dictPs.close();
     }
-    txt.close();
-    // Save dictionary
-    String[] words = wordList.toArray(new String[wordList.size()]);
-    Arrays.sort(words);
-    for (int i = 0; i < words.length; i++) {
-      dictPs.print(words[i] + '\n');
-    }
-    dictPs.close();
   }
 }
