@@ -33,9 +33,9 @@ configurations.configureEach {
 dependencies {
     implementation("com.jgoodies:jgoodies-forms:1.9.0")
     implementation("org.jibx:jibx-run:${jibxVersion}")
-    implementation("org.jsoup:jsoup:1.21.2")
+    implementation("org.jsoup:jsoup:1.23.1")
     implementation project(":JOrtho")
-    implementation("org.freeplane.lightdev:simplyhtml:0.19.11")
+    implementation("org.freeplane.lightdev:simplyhtml:0.19.12")
     implementation("javax.help:javahelp:2.0.05")
     implementation("org.apache.xmlgraphics:batik-dom:${batikVersion}")
     implementation("org.apache.xmlgraphics:batik-svggen:${batikVersion}")
@@ -44,10 +44,7 @@ dependencies {
         exclude group: "org.apache.xmlgraphics", module: "batik-bridge"
         exclude group: "org.apache.xmlgraphics", module: "batik-transcoder"
     }
-    runtimeOnly("org.freeplane.dpolivaev.mnemonicsetter:mnemonicsetter:0.6") {
-        because 'simplyhtml dependency'
-    }
-    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.jibx:jibx-bind:${jibxVersion}")

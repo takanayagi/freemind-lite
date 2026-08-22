@@ -71,16 +71,16 @@ final class Dictionary extends DictionaryBase {
    * @throws IOException if an I/O error occurs.
    */
   public void save(OutputStream stream) throws IOException {
-    Deflater deflater = new Deflater();
-    deflater.setLevel(Deflater.BEST_COMPRESSION);
-    DeflaterOutputStream zip = new DeflaterOutputStream(stream, deflater);
-    for (int i = 0; i < size; i++) {
-      zip.write(tree[i]);
-      zip.write(tree[i] >> 8);
-    }
+    try (Deflater deflater = new Deflater();
+         DeflaterOutputStream zip = new DeflaterOutputStream(stream, deflater)) {
+      deflater.setLevel(Deflater.BEST_COMPRESSION);
+      for (int i = 0; i < size; i++) {
+        zip.write(tree[i]);
+        zip.write(tree[i] >> 8);
+      }
 
-    zip.flush();
-    zip.close();
+      zip.flush();
+    }
   }
 
   /**
@@ -90,8 +90,8 @@ final class Dictionary extends DictionaryBase {
    * @throws IOException if an I/O error occurs.
    */
   public void load(String filename) throws IOException {
-    FileInputStream fos = new FileInputStream(filename);
-    load(fos);
+    FileInputStream fis = new FileInputStream(filename);
+    load(fis);
   }
 
   /**

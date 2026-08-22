@@ -1,4 +1,4 @@
-/**
+/*
  * Created on 22.02.2004 FreeMind - A Program for creating and viewing Mindmaps Copyright (C)
  * 2000-2001 Joerg Mueller <joergmueller@bigfoot.com> See COPYING for Details
  *

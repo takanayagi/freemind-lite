@@ -748,64 +748,62 @@ public class Tools {
 
   public static String compress(String message) {
     byte[] input = uTF8StringToByteArray(message);
-    // Create the compressor with highest level of compression
-    Deflater compressor = new Deflater();
-    compressor.setLevel(Deflater.BEST_COMPRESSION);
-
-    // Give the compressor the data to compress
-    compressor.setInput(input);
-    compressor.finish();
-
+    // Create the compressor with highest level of compression, and
     // Create an expandable byte array to hold the compressed data.
     // You cannot use an array that's the same size as the orginal because
     // there is no guarantee that the compressed data will be smaller than
     // the uncompressed data.
-    ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
+    try (Deflater compressor = new Deflater();
+         ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length)) {
 
-    // Compress the data
-    byte[] buf = new byte[1024];
-    while (!compressor.finished()) {
-      int count = compressor.deflate(buf);
-      bos.write(buf, 0, count);
-    }
-    try {
-      bos.close();
+      compressor.setLevel(Deflater.BEST_COMPRESSION);
+
+      // Give the compressor the data to compress
+      compressor.setInput(input);
+      compressor.finish();
+
+      // Compress the data
+      byte[] buf = new byte[1024];
+      while (!compressor.finished()) {
+        int count = compressor.deflate(buf);
+        bos.write(buf, 0, count);
+      }
+
+      // Get the compressed data
+      byte[] compressedData = bos.toByteArray();
+      return toBase64(compressedData);
     } catch (IOException ignore) {
+      // ignore
     }
-
-    // Get the compressed data
-    byte[] compressedData = bos.toByteArray();
-    return toBase64(compressedData);
+    return "";
   }
 
   public static String decompress(String compressedMessage) {
     byte[] compressedData = fromBase64(compressedMessage);
     // Create the decompressor and give it the data to compress
-    Inflater decompressor = new Inflater();
-    decompressor.setInput(compressedData);
-
     // Create an expandable byte array to hold the decompressed data
-    ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
+    try (Inflater decompressor = new Inflater();
+         ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length)) {
 
-    // Decompress the data
-    byte[] buf = new byte[1024];
-    boolean errorOccured = false;
-    while (!decompressor.finished() && !errorOccured) {
-      try {
-        int count = decompressor.inflate(buf);
-        bos.write(buf, 0, count);
-      } catch (DataFormatException e) {
-        errorOccured = true;
+      decompressor.setInput(compressedData);
+
+      // Decompress the data
+      byte[] buf = new byte[1024];
+      boolean errorOccured = false;
+      while (!decompressor.finished() && !errorOccured) {
+        try {
+          int count = decompressor.inflate(buf);
+          bos.write(buf, 0, count);
+        } catch (DataFormatException e) {
+          errorOccured = true;
+        }
       }
-    }
-    try {
-      bos.close();
+      // Get the decompressed data
+      byte[] decompressedData = bos.toByteArray();
+      return byteArrayToUTF8String(decompressedData);
     } catch (IOException ignore) {
     }
-
-    // Get the decompressed data
-    byte[] decompressedData = bos.toByteArray();
-    return byteArrayToUTF8String(decompressedData);
+    return "";
   }
 
   /** */
