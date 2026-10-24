@@ -1,5 +1,15 @@
 plugins {
     id 'groovy-gradle-plugin'
+    id 'java-gradle-plugin'
+}
+
+gradlePlugin {
+    plugins {
+        propertiesGenerator {
+            id = 'takanayagi.properties-generator'
+            implementationClass = 'takanayagi.PropertiesGeneratorPlugin'
+        }
+    }
 }
 
 repositories {

@@ -2,6 +2,7 @@ plugins {
     id "application"
     id "eclipse"
     id "freemind-conventions"
+    id "takanayagi.properties-generator"
 }
 
 group = parent.name
@@ -56,6 +57,11 @@ dependencies {
     }
 }
 
+propertiesGenerator {
+    csvFile = file("src/main/resources/messages.csv")
+    propertiesPrefix = "Resources_"
+}
+
 sourceSets {
     xsdCompiler {
         java {
@@ -71,6 +77,15 @@ sourceSets {
         }
         compileClasspath = files(java.srcDirs)
     }
+    main {
+        resources {
+            srcDir(tasks.named("generateProperties").flatMap { it.outputDir })
+        }
+    }
+}
+
+tasks.named("processResources") {
+    exclude "**/${propertiesGenerator.csvFile.get().asFile.name}"
 }
 
 tasks.register("compileXsd", JavaExec) {
